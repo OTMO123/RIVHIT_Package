@@ -1,0 +1,72 @@
+{
+  "name": "packing-system",
+  "version": "1.0.0",
+  "description": "Automated packing system for RIVHIT orders",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "lerna run build",
+    "test": "lerna run test",
+    "test:watch": "lerna run test:watch",
+    "test:unit": "lerna run test:unit",
+    "test:integration": "lerna run test:integration",
+    "test:coverage": "lerna run test:coverage",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "lerna run dev --scope=@packing/backend",
+    "dev:frontend": "lerna run dev --scope=@packing/frontend",
+    "lint": "lerna run lint",
+    "lint:fix": "lerna run lint:fix",
+    "format": "prettier --write \"packages/**/*.{ts,tsx,js,jsx,json,md}\"",
+    "type-check": "lerna run type-check",
+    "package": "npm run build && lerna run package",
+    "postinstall": "husky install",
+    "clean": "lerna clean",
+    "prepare": "husky install",
+    "pre-commit": "lint-staged",
+    "validate": "npm run type-check && npm run lint && npm run test:unit",
+    "server": "node server.js",
+    "start": "node server.js",
+    "serve": "node server.js",
+    "diagnose": "node run-diagnostics.js",
+    "test:system": "node tests/system-diagnostics.test.js",
+    "test:api": "node tests/api-endpoint-tests.test.js"
+  },
+  "dependencies": {
+    "canvas": "^3.1.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "jsbarcode": "^3.12.1"
+  },
+  "devDependencies": {
+    "@lerna/cli": "^6.0.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "concurrently": "^7.6.0",
+    "eslint": "^8.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.0.0",
+    "nodemon": "^3.0.2",
+    "prettier": "^2.8.0",
+    "typescript": "^4.9.0"
+  },
+  "lint-staged": {
+    "packages/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "packages/**/*.{js,jsx,json,md}": [
+      "prettier --write"
+    ],
+    "packages/**/src/**/*.{ts,tsx}": [
+      "npm run test:unit --silent"
+    ]
+  },
+  "author": "Packing System Team",
+  "license": "MIT"
+}

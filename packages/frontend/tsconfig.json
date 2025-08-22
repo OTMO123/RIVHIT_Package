@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["DOM", "DOM.Iterable", "ES2020"],
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false,
+    "paths": {
+      "@packing/shared/*": ["../shared/src/*"],
+      "@/*": ["./src/renderer/*"]
+    },
+    "types": ["node", "react", "react-dom"]
+  },
+  "include": [
+    "src/renderer/**/*",
+    "src/main/**/*", 
+    "src/services/order.services.ts",
+    "src/services/mock-printer.service.ts",
+    "src/types/**/*",
+    "src/components/OrderList.tsx",
+    "src/components/OrderSearch.tsx", 
+    "src/components/OrderTable.tsx",
+    "src/components/OrderActions.tsx"
+  ],
+  "exclude": [
+    "node_modules", 
+    "dist", 
+    "build", 
+    "release", 
+    "tests",
+    "**/__tests__/**",
+    "**/*.test.*",
+    "**/*.spec.*"
+  ],
+  "typeAcquisition": {
+    "exclude": ["plist", "verror"]
+  }
+}

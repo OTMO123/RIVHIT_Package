@@ -1,0 +1,62 @@
+[
+  {
+    "catalogNumber": "MILK001",
+    "maxQuantity": 12,
+    "description": "Milk 1L - Max 12 per box",
+    "rivhitId": 1001
+  },
+  {
+    "catalogNumber": "BREAD001",
+    "maxQuantity": 20,
+    "description": "Bread loaf - Max 20 per box",
+    "rivhitId": 1002
+  },
+  {
+    "catalogNumber": "EGG001",
+    "maxQuantity": 30,
+    "description": "Eggs tray - Max 30 per box (5 trays)",
+    "rivhitId": 1003
+  },
+  {
+    "catalogNumber": "BUTTER001",
+    "maxQuantity": 24,
+    "description": "Butter 200g - Max 24 per box",
+    "rivhitId": 1004
+  },
+  {
+    "catalogNumber": "CHEESE001",
+    "maxQuantity": 15,
+    "description": "Cheese 500g - Max 15 per box",
+    "rivhitId": 1005
+  },
+  {
+    "catalogNumber": "YOGURT001",
+    "maxQuantity": 18,
+    "description": "Yogurt pack - Max 18 per box",
+    "rivhitId": 1006
+  },
+  {
+    "catalogNumber": "CHICKEN001",
+    "maxQuantity": 8,
+    "description": "Whole chicken - Max 8 per box",
+    "rivhitId": 1007
+  },
+  {
+    "catalogNumber": "BEEF001",
+    "maxQuantity": 10,
+    "description": "Beef 1kg - Max 10 per box",
+    "rivhitId": 1008
+  },
+  {
+    "catalogNumber": "TOMATO001",
+    "maxQuantity": 25,
+    "description": "Tomatoes 1kg - Max 25 per box",
+    "rivhitId": 1009
+  },
+  {
+    "catalogNumber": "POTATO001",
+    "maxQuantity": 20,
+    "description": "Potatoes 2kg - Max 20 per box",
+    "rivhitId": 1010
+  }
+]

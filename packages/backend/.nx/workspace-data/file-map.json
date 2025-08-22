@@ -1,0 +1,662 @@
+{
+  "version": "6.0",
+  "nxVersion": "20.8.2",
+  "pathMappings": {
+    "@packing/shared/*": [
+      "../shared/src/*"
+    ],
+    "@/*": [
+      "./src/*"
+    ]
+  },
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {},
+    "nonProjectFiles": [
+      {
+        "file": ".env",
+        "hash": "16757220154444524598"
+      },
+      {
+        "file": "config/scripts/print-image.ps1",
+        "hash": "533610293975903014"
+      },
+      {
+        "file": "database/packing.db",
+        "hash": "11073058897367913248"
+      },
+      {
+        "file": "dist/app-instance.d.ts",
+        "hash": "5418790973973737359"
+      },
+      {
+        "file": "dist/app-instance.js",
+        "hash": "4419728484405036559"
+      },
+      {
+        "file": "dist/app.d.ts",
+        "hash": "2429619672585975456"
+      },
+      {
+        "file": "dist/app.js",
+        "hash": "14182307914197973614"
+      },
+      {
+        "file": "dist/config/database.config.d.ts",
+        "hash": "11743178426451890549"
+      },
+      {
+        "file": "dist/config/database.config.js",
+        "hash": "18119350807813861911"
+      },
+      {
+        "file": "dist/config/logger.d.ts",
+        "hash": "15478498488808576538"
+      },
+      {
+        "file": "dist/config/logger.js",
+        "hash": "15226734487272919815"
+      },
+      {
+        "file": "dist/config/safe-test.config.d.ts",
+        "hash": "9464857378030935636"
+      },
+      {
+        "file": "dist/config/safe-test.config.js",
+        "hash": "831574875765223644"
+      },
+      {
+        "file": "dist/config/swagger.d.ts",
+        "hash": "648687610120160516"
+      },
+      {
+        "file": "dist/config/swagger.js",
+        "hash": "6832571841748979782"
+      },
+      {
+        "file": "dist/controllers/__tests__/orders.controller.test.d.ts",
+        "hash": "4595979742548113990"
+      },
+      {
+        "file": "dist/controllers/__tests__/orders.controller.test.js",
+        "hash": "9537487708132637297"
+      },
+      {
+        "file": "dist/controllers/auth.controller.d.ts",
+        "hash": "1896374276971954576"
+      },
+      {
+        "file": "dist/controllers/auth.controller.js",
+        "hash": "6717788859900822809"
+      },
+      {
+        "file": "dist/controllers/customers.controller.d.ts",
+        "hash": "15209365475481090456"
+      },
+      {
+        "file": "dist/controllers/customers.controller.js",
+        "hash": "18273521540642250948"
+      },
+      {
+        "file": "dist/controllers/items.controller.d.ts",
+        "hash": "11365356364803255907"
+      },
+      {
+        "file": "dist/controllers/items.controller.js",
+        "hash": "14419960716852454482"
+      },
+      {
+        "file": "dist/controllers/orders.controller.d.ts",
+        "hash": "17101626331207069951"
+      },
+      {
+        "file": "dist/controllers/orders.controller.js",
+        "hash": "10293347935247203558"
+      },
+      {
+        "file": "dist/controllers/print.controller.d.ts",
+        "hash": "3361850941287619138"
+      },
+      {
+        "file": "dist/controllers/print.controller.js",
+        "hash": "1712484285961678843"
+      },
+      {
+        "file": "dist/entities/MaxPerBoxSetting.d.ts",
+        "hash": "17872421677667790454"
+      },
+      {
+        "file": "dist/entities/MaxPerBoxSetting.js",
+        "hash": "10515789259598782418"
+      },
+      {
+        "file": "dist/factories/service.factory.d.ts",
+        "hash": "1641973525642965647"
+      },
+      {
+        "file": "dist/factories/service.factory.js",
+        "hash": "11302662178794123923"
+      },
+      {
+        "file": "dist/interfaces/ICacheService.d.ts",
+        "hash": "14516276488014322022"
+      },
+      {
+        "file": "dist/interfaces/ICacheService.js",
+        "hash": "10533815908077531553"
+      },
+      {
+        "file": "dist/interfaces/ILogger.d.ts",
+        "hash": "14455408067403697043"
+      },
+      {
+        "file": "dist/interfaces/ILogger.js",
+        "hash": "13119670008571976273"
+      },
+      {
+        "file": "dist/interfaces/IOrderRepository.d.ts",
+        "hash": "8932007999644238928"
+      },
+      {
+        "file": "dist/interfaces/IOrderRepository.js",
+        "hash": "10533815908077531553"
+      },
+      {
+        "file": "dist/interfaces/IPrinterService.d.ts",
+        "hash": "7838084082161424468"
+      },
+      {
+        "file": "dist/interfaces/IPrinterService.js",
+        "hash": "10533815908077531553"
+      },
+      {
+        "file": "dist/interfaces/IRivhitService.d.ts",
+        "hash": "6256141914832277306"
+      },
+      {
+        "file": "dist/interfaces/IRivhitService.js",
+        "hash": "10533815908077531553"
+      },
+      {
+        "file": "dist/interfaces/ISSLService.d.ts",
+        "hash": "5048905453858488056"
+      },
+      {
+        "file": "dist/interfaces/ISSLService.js",
+        "hash": "9436285725781213451"
+      },
+      {
+        "file": "dist/interfaces/index.d.ts",
+        "hash": "10346143541460989350"
+      },
+      {
+        "file": "dist/interfaces/index.js",
+        "hash": "10533304903177267411"
+      },
+      {
+        "file": "dist/middleware/auth.middleware.d.ts",
+        "hash": "14784298915078412744"
+      },
+      {
+        "file": "dist/middleware/auth.middleware.js",
+        "hash": "5060023861525372278"
+      },
+      {
+        "file": "dist/middleware/error.middleware.d.ts",
+        "hash": "16525105502341881328"
+      },
+      {
+        "file": "dist/middleware/error.middleware.js",
+        "hash": "1955847004067566760"
+      },
+      {
+        "file": "dist/middleware/security.middleware.d.ts",
+        "hash": "7853715553513189972"
+      },
+      {
+        "file": "dist/middleware/security.middleware.js",
+        "hash": "17540759673904465099"
+      },
+      {
+        "file": "dist/middleware/validation.middleware.d.ts",
+        "hash": "806191549166084240"
+      },
+      {
+        "file": "dist/middleware/validation.middleware.js",
+        "hash": "3883308536579901903"
+      },
+      {
+        "file": "dist/repositories/MaxPerBoxRepository.d.ts",
+        "hash": "7761542282016411415"
+      },
+      {
+        "file": "dist/repositories/MaxPerBoxRepository.js",
+        "hash": "2076443531417036691"
+      },
+      {
+        "file": "dist/routes/auth.routes.d.ts",
+        "hash": "4821638206370994868"
+      },
+      {
+        "file": "dist/routes/auth.routes.js",
+        "hash": "3319572829372816322"
+      },
+      {
+        "file": "dist/routes/customers.routes.d.ts",
+        "hash": "4821638206370994868"
+      },
+      {
+        "file": "dist/routes/customers.routes.js",
+        "hash": "14187290951833197946"
+      },
+      {
+        "file": "dist/routes/items.routes.d.ts",
+        "hash": "4821638206370994868"
+      },
+      {
+        "file": "dist/routes/items.routes.js",
+        "hash": "4761375941524454769"
+      },
+      {
+        "file": "dist/routes/orders.routes.d.ts",
+        "hash": "4821638206370994868"
+      },
+      {
+        "file": "dist/routes/orders.routes.js",
+        "hash": "14208480416876148854"
+      },
+      {
+        "file": "dist/routes/print.routes.d.ts",
+        "hash": "4821638206370994868"
+      },
+      {
+        "file": "dist/routes/print.routes.js",
+        "hash": "15412345823449299714"
+      },
+      {
+        "file": "dist/routes/settings.routes.d.ts",
+        "hash": "4821638206370994868"
+      },
+      {
+        "file": "dist/routes/settings.routes.js",
+        "hash": "15577270563112655152"
+      },
+      {
+        "file": "dist/schemas/api.schemas.d.ts",
+        "hash": "13820764426996824873"
+      },
+      {
+        "file": "dist/schemas/api.schemas.js",
+        "hash": "12519561090740581968"
+      },
+      {
+        "file": "dist/scripts/load-max-per-box-data.d.ts",
+        "hash": "14761844702866212349"
+      },
+      {
+        "file": "dist/scripts/load-max-per-box-data.js",
+        "hash": "10278258216087812997"
+      },
+      {
+        "file": "dist/server.d.ts",
+        "hash": "3303961800127394024"
+      },
+      {
+        "file": "dist/server.js",
+        "hash": "1388386695700472906"
+      },
+      {
+        "file": "dist/services/__tests__/cache.service.test.d.ts",
+        "hash": "4595979742548113990"
+      },
+      {
+        "file": "dist/services/__tests__/cache.service.test.js",
+        "hash": "4822382108889805863"
+      },
+      {
+        "file": "dist/services/__tests__/printer.service.test.d.ts",
+        "hash": "4595979742548113990"
+      },
+      {
+        "file": "dist/services/__tests__/printer.service.test.js",
+        "hash": "12366636829302729575"
+      },
+      {
+        "file": "dist/services/__tests__/rivhit.service.test.d.ts",
+        "hash": "4595979742548113990"
+      },
+      {
+        "file": "dist/services/__tests__/rivhit.service.test.js",
+        "hash": "6554028631075634988"
+      },
+      {
+        "file": "dist/services/cache.service.d.ts",
+        "hash": "9659963466611329178"
+      },
+      {
+        "file": "dist/services/cache.service.js",
+        "hash": "8754113632018356817"
+      },
+      {
+        "file": "dist/services/cache/memory.cache.service.d.ts",
+        "hash": "16689962128287356627"
+      },
+      {
+        "file": "dist/services/cache/memory.cache.service.js",
+        "hash": "5303259260851024316"
+      },
+      {
+        "file": "dist/services/cache/redis.cache.service.d.ts",
+        "hash": "273355511427830906"
+      },
+      {
+        "file": "dist/services/cache/redis.cache.service.js",
+        "hash": "11345875577753730344"
+      },
+      {
+        "file": "dist/services/logging/console.logger.service.d.ts",
+        "hash": "8003385333129570090"
+      },
+      {
+        "file": "dist/services/logging/console.logger.service.js",
+        "hash": "2913834735251620797"
+      },
+      {
+        "file": "dist/services/mock-rivhit.service.d.ts",
+        "hash": "13249830954192939067"
+      },
+      {
+        "file": "dist/services/mock-rivhit.service.js",
+        "hash": "1642647409890230988"
+      },
+      {
+        "file": "dist/services/printer.service.d.ts",
+        "hash": "11587329903586098688"
+      },
+      {
+        "file": "dist/services/printer.service.js",
+        "hash": "4430269695396358663"
+      },
+      {
+        "file": "dist/services/rivhit.service.d.ts",
+        "hash": "16302807656567106747"
+      },
+      {
+        "file": "dist/services/rivhit.service.js",
+        "hash": "17919627989259221145"
+      },
+      {
+        "file": "dist/services/safe-rivhit.service.d.ts",
+        "hash": "5690089815956987006"
+      },
+      {
+        "file": "dist/services/safe-rivhit.service.js",
+        "hash": "7367103093209803052"
+      },
+      {
+        "file": "dist/services/ssl.service.d.ts",
+        "hash": "5608902550994549367"
+      },
+      {
+        "file": "dist/services/ssl.service.js",
+        "hash": "8550111306704274150"
+      },
+      {
+        "file": "dist/services/winlabel-printer.service.d.ts",
+        "hash": "17941483792329400356"
+      },
+      {
+        "file": "dist/services/winlabel-printer.service.js",
+        "hash": "7740885438428431547"
+      },
+      {
+        "file": "dist/test-rivhit-integration.d.ts",
+        "hash": "13946174777311600962"
+      },
+      {
+        "file": "dist/test-rivhit-integration.js",
+        "hash": "8308061408561050795"
+      },
+      {
+        "file": "logs/combined.log",
+        "hash": "10897512905142570852"
+      },
+      {
+        "file": "logs/error.log",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "package.json",
+        "hash": "16504504328735402706"
+      },
+      {
+        "file": "printer-templates/blini.ezpl",
+        "hash": "15695084569495137617"
+      },
+      {
+        "file": "printer-templates/manty.ezpl",
+        "hash": "18132692111724202119"
+      },
+      {
+        "file": "printer-templates/pelmeni.ezpl",
+        "hash": "10796754185685579327"
+      },
+      {
+        "file": "printer-templates/universal.ezpl",
+        "hash": "18169404353605658600"
+      },
+      {
+        "file": "printer-templates/vareniki.ezpl",
+        "hash": "14237210857872887240"
+      },
+      {
+        "file": "src/app-instance.ts",
+        "hash": "13500055103631354844"
+      },
+      {
+        "file": "src/app.ts",
+        "hash": "4708631298972036404"
+      },
+      {
+        "file": "src/config/database.config.ts",
+        "hash": "17097614495234770716"
+      },
+      {
+        "file": "src/config/logger.ts",
+        "hash": "6296888475310965065"
+      },
+      {
+        "file": "src/config/safe-test.config.ts",
+        "hash": "5198036101411010161"
+      },
+      {
+        "file": "src/config/swagger.ts",
+        "hash": "4123138635627317070"
+      },
+      {
+        "file": "src/controllers/__tests__/orders.controller.test.ts",
+        "hash": "780465437317083967"
+      },
+      {
+        "file": "src/controllers/auth.controller.ts",
+        "hash": "6440115476855926734"
+      },
+      {
+        "file": "src/controllers/customers.controller.ts",
+        "hash": "17888279920981299530"
+      },
+      {
+        "file": "src/controllers/items.controller.ts",
+        "hash": "5636126792929355274"
+      },
+      {
+        "file": "src/controllers/orders.controller.ts",
+        "hash": "14371368046845581337"
+      },
+      {
+        "file": "src/controllers/print.controller.ts",
+        "hash": "9591842104696190588"
+      },
+      {
+        "file": "src/entities/MaxPerBoxSetting.ts",
+        "hash": "6005198758833030832"
+      },
+      {
+        "file": "src/factories/service.factory.ts",
+        "hash": "15922518415722822942"
+      },
+      {
+        "file": "src/interfaces/ICacheService.ts",
+        "hash": "11547908951304368405"
+      },
+      {
+        "file": "src/interfaces/ILogger.ts",
+        "hash": "10979753254262472103"
+      },
+      {
+        "file": "src/interfaces/IOrderRepository.ts",
+        "hash": "6369206690903870347"
+      },
+      {
+        "file": "src/interfaces/IPrinterService.ts",
+        "hash": "7972537775935145836"
+      },
+      {
+        "file": "src/interfaces/IRivhitService.ts",
+        "hash": "969160571441118473"
+      },
+      {
+        "file": "src/interfaces/ISSLService.ts",
+        "hash": "7073293782013824228"
+      },
+      {
+        "file": "src/interfaces/index.ts",
+        "hash": "13855755224863805934"
+      },
+      {
+        "file": "src/middleware/auth.middleware.ts",
+        "hash": "69948317553207413"
+      },
+      {
+        "file": "src/middleware/error.middleware.ts",
+        "hash": "12990319464024616235"
+      },
+      {
+        "file": "src/middleware/security.middleware.ts",
+        "hash": "258507388706037498"
+      },
+      {
+        "file": "src/middleware/validation.middleware.ts",
+        "hash": "1389481140548337204"
+      },
+      {
+        "file": "src/repositories/MaxPerBoxRepository.ts",
+        "hash": "9944819014791916518"
+      },
+      {
+        "file": "src/routes/auth.routes.ts",
+        "hash": "3931088359985521360"
+      },
+      {
+        "file": "src/routes/customers.routes.ts",
+        "hash": "5986038066940614627"
+      },
+      {
+        "file": "src/routes/items.routes.ts",
+        "hash": "4724432109602118327"
+      },
+      {
+        "file": "src/routes/orders.routes.ts",
+        "hash": "532490300235452379"
+      },
+      {
+        "file": "src/routes/print.routes.ts",
+        "hash": "6137006796366580016"
+      },
+      {
+        "file": "src/routes/settings.routes.ts",
+        "hash": "1312093950572670070"
+      },
+      {
+        "file": "src/schemas/api.schemas.ts",
+        "hash": "994210889766090996"
+      },
+      {
+        "file": "src/scripts/load-max-per-box-data.ts",
+        "hash": "12857470904799260859"
+      },
+      {
+        "file": "src/server.ts",
+        "hash": "17633697546795771865"
+      },
+      {
+        "file": "src/services/__tests__/cache.service.test.ts",
+        "hash": "1753289475237787472"
+      },
+      {
+        "file": "src/services/__tests__/printer.service.test.ts",
+        "hash": "1907754145765547133"
+      },
+      {
+        "file": "src/services/__tests__/rivhit.service.test.ts",
+        "hash": "14648080379344789558"
+      },
+      {
+        "file": "src/services/box-label.service.ts",
+        "hash": "7303884462008730262"
+      },
+      {
+        "file": "src/services/cache.service.ts",
+        "hash": "13846473624299992818"
+      },
+      {
+        "file": "src/services/cache/memory.cache.service.ts",
+        "hash": "798235795611886528"
+      },
+      {
+        "file": "src/services/cache/redis.cache.service.ts",
+        "hash": "12391627357534416869"
+      },
+      {
+        "file": "src/services/logging/console.logger.service.ts",
+        "hash": "15012773056084264057"
+      },
+      {
+        "file": "src/services/mock-rivhit.service.ts",
+        "hash": "9980713821858642339"
+      },
+      {
+        "file": "src/services/printer.service.ts",
+        "hash": "7833633429170964991"
+      },
+      {
+        "file": "src/services/rivhit.service.ts",
+        "hash": "6507534639666400609"
+      },
+      {
+        "file": "src/services/safe-rivhit.service.ts",
+        "hash": "14006088788385995184"
+      },
+      {
+        "file": "src/services/ssl.service.ts",
+        "hash": "17958898853259109005"
+      },
+      {
+        "file": "src/services/winlabel-printer.service.ts",
+        "hash": "4879874265876701273"
+      },
+      {
+        "file": "src/test-data/max-per-box-sample.json",
+        "hash": "10872884012835279479"
+      },
+      {
+        "file": "src/test-rivhit-integration.ts",
+        "hash": "11590079743445619067"
+      },
+      {
+        "file": "tsconfig.json",
+        "hash": "4074714167495213079"
+      }
+    ]
+  }
+}

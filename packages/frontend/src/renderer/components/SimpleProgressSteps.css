@@ -1,0 +1,153 @@
+/* Simple Progress Steps - Minimalist Design */
+
+.simple-progress-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 0;
+  margin-bottom: 20px;
+  background: #fafafa;
+  border-radius: 8px;
+  gap: 0;
+}
+
+.simple-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Step Indicator */
+.step-indicator {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background: white;
+  border: 2px solid #d9d9d9;
+  color: #8c8c8c;
+}
+
+/* Step Label */
+.step-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #8c8c8c;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+/* Pending State */
+.simple-step.pending .step-indicator {
+  background: white;
+  border-color: #d9d9d9;
+  color: #8c8c8c;
+}
+
+.simple-step.pending .step-label {
+  color: #8c8c8c;
+}
+
+/* Active State */
+.simple-step.active .step-indicator {
+  background: #1890ff;
+  border-color: #1890ff;
+  color: white;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+}
+
+.simple-step.active .step-label {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+/* Completed State */
+.simple-step.completed .step-indicator {
+  background: #52c41a;
+  border-color: #52c41a;
+  color: white;
+}
+
+.simple-step.completed .step-indicator svg {
+  font-size: 16px;
+}
+
+.simple-step.completed .step-label {
+  color: #52c41a;
+}
+
+/* Connector Line */
+.step-connector {
+  width: 60px;
+  height: 2px;
+  background: #d9d9d9;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.step-connector.active {
+  background: #52c41a;
+}
+
+.step-connector.active::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid #52c41a;
+}
+
+/* Hover Effects */
+.simple-step:hover .step-indicator {
+  transform: scale(1.1);
+}
+
+.simple-step.active {
+  animation: subtle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes subtle-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .simple-progress-container {
+    padding: 12px 8px;
+  }
+  
+  .simple-step {
+    padding: 6px 8px;
+  }
+  
+  .step-label {
+    font-size: 12px;
+  }
+  
+  .step-connector {
+    width: 30px;
+  }
+  
+  .step-indicator {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+}

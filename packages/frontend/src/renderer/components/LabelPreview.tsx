@@ -3,6 +3,7 @@ import { Modal, Row, Col, Card, Button, Space, Typography, Badge, Spin, message,
 import { PrinterOutlined, InboxOutlined, CheckCircleOutlined, ZoomInOutlined, ExpandOutlined } from '@ant-design/icons';
 import { PackingBox, DeliveryRegion } from '@packing/shared';
 import { apiService } from '../services/api.service';
+import { SimpleProgressSteps } from './SimpleProgressSteps';
 
 const { Title, Text } = Typography;
 
@@ -262,16 +263,38 @@ export const LabelPreview: React.FC<LabelPreviewProps> = ({
   return (
     <Modal
       title={
-        <Space direction="vertical" style={{ width: '100%' }}>
-          <Title level={4} style={{ margin: 0 }}>
-            Предпросмотр этикеток коробок
-          </Title>
-          <Space>
-            <Text type="secondary">Заказ #{orderId}</Text>
+        <div style={{ width: '100%' }}>
+          <div style={{ textAlign: 'center', marginBottom: 8, fontSize: 16, fontWeight: 500 }}>
+            Заказ #{orderId}
+          </div>
+          <SimpleProgressSteps
+            steps={[
+              {
+                key: 'packing',
+                title: 'Упаковка',
+                titleHe: 'אריזה',
+                status: 'completed' as const
+              },
+              {
+                key: 'labels',
+                title: 'Этикетки',
+                titleHe: 'תוויות',
+                status: 'active' as const
+              },
+              {
+                key: 'invoice',
+                title: 'Счет',
+                titleHe: 'חשבונית',
+                status: 'pending' as const
+              }
+            ]}
+            locale={'ru'}
+          />
+          <Space style={{ width: '100%', justifyContent: 'center', display: 'flex', marginTop: 8 }}>
             <Badge color="blue" text={getRegionName(region)} />
             <Badge count={`${sortedBoxes.length} коробок`} style={{ backgroundColor: '#52c41a' }} />
           </Space>
-        </Space>
+        </div>
       }
       visible={visible}
       onCancel={onCancel}

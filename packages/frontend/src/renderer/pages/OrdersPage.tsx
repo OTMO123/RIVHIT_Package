@@ -42,6 +42,8 @@ import { MaxPerBoxSettingsModal } from '../components/MaxPerBoxSettings';
 import { RegionSelector } from '../components/RegionSelector';
 import { LabelPreview } from '../components/LabelPreview';
 import { InvoiceModal } from '../components/InvoiceModal';
+import { PackingWorkflowModal } from '../components/PackingWorkflowModal';
+import { SimpleProgressSteps, SimpleStep } from '../components/SimpleProgressSteps';
 import { DeliveryRegion, PackingBox } from '@packing/shared';
 
 const { Title } = Typography;
@@ -89,6 +91,7 @@ export const OrdersPage: React.FC = () => {
   const [showLabelPreview, setShowLabelPreview] = useState(false);
   const [packingBoxes, setPackingBoxes] = useState<PackingBox[]>([]);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [showWorkflowModal, setShowWorkflowModal] = useState(false);
 
   const getStatusColor = (status: string) => {
     const colors = {
@@ -1447,9 +1450,38 @@ export const OrdersPage: React.FC = () => {
 
         {/* Packing Modal */}
         <Modal
-          title={selectedOrder ? 
-            (locale === 'he' ? `אריזת הזמנה ${selectedOrder.orderNumber}` : `Упаковка заказа ${selectedOrder.orderNumber}`) : 
-            (locale === 'he' ? 'אריזת הזמנה' : 'Упаковка заказа')
+          title={
+            <div style={{ width: '100%' }}>
+              <div style={{ textAlign: 'center', marginBottom: 8, fontSize: 16, fontWeight: 500 }}>
+                {selectedOrder ? 
+                  (locale === 'he' ? `הזמנה ${selectedOrder.orderNumber}` : `Заказ ${selectedOrder.orderNumber}`) : 
+                  (locale === 'he' ? 'הזמנה' : 'Заказ')
+                }
+              </div>
+              <SimpleProgressSteps
+                steps={[
+                  {
+                    key: 'packing',
+                    title: 'Упаковка',
+                    titleHe: 'אריזה',
+                    status: 'active' as const
+                  },
+                  {
+                    key: 'labels',
+                    title: 'Этикетки',
+                    titleHe: 'תוויות',
+                    status: 'pending' as const
+                  },
+                  {
+                    key: 'invoice',
+                    title: 'Счет',
+                    titleHe: 'חשבונית',
+                    status: 'pending' as const
+                  }
+                ]}
+                locale={locale as 'ru' | 'he'}
+              />
+            </div>
           }
           open={packingModalVisible}
           onCancel={() => {
@@ -1967,6 +1999,43 @@ export const OrdersPage: React.FC = () => {
           onInvoiceCreated={handleInvoiceComplete}
         />
       )}
+
+      {/* Новый Workflow Modal с линией сборки - временно отключен
+      {showWorkflowModal && selectedOrder && (
+        <PackingWorkflowModal
+          visible={showWorkflowModal}
+          orderId={selectedOrder.id}
+          orderNumber={selectedOrder.orderNumber}
+          customerName={selectedOrder.customerName || ''}
+          customerData={orderDetails?.customer}
+          orderItems={orderItems}
+          packingData={packingData}
+          locale={locale as 'ru' | 'he'}
+          onClose={() => {
+            setShowWorkflowModal(false);
+            setSelectedOrder(null);
+            setOrderItems([]);
+            setPackingData({});
+          }}
+          onComplete={() => {
+            setShowWorkflowModal(false);
+            setSelectedOrder(null);
+            setOrderItems([]);
+            setPackingData({});
+            loadOrders(); // Refresh orders list
+            message.success(
+              locale === 'he' ? 
+                '✅ ההזמנה הושלמה בהצלחה!' : 
+                '✅ Заказ успешно завершен!'
+            );
+          }}
+          onPack={async (packData) => {
+            // Handle packing completion
+            setPackingData(packData);
+            console.log('Packing completed with data:', packData);
+          }}
+        />
+      )} */}
     </div>
   );
 };

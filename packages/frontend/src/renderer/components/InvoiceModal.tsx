@@ -17,6 +17,7 @@ import {
   PrinterOutlined
 } from '@ant-design/icons';
 import { PackingBox } from '@packing/shared';
+import { SimpleProgressSteps } from './SimpleProgressSteps';
 
 const { Title, Text } = Typography;
 
@@ -109,12 +110,34 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
   return (
     <Modal
       title={
-        <Space>
-          <FileDoneOutlined style={{ color: '#52c41a' }} />
-          <Title level={4} style={{ margin: 0 }}>
-            Создание счета-фактуры
-          </Title>
-        </Space>
+        <div style={{ width: '100%' }}>
+          <div style={{ textAlign: 'center', marginBottom: 8, fontSize: 16, fontWeight: 500 }}>
+            Заказ #{orderNumber}
+          </div>
+          <SimpleProgressSteps
+            steps={[
+              {
+                key: 'packing',
+                title: 'Упаковка',
+                titleHe: 'אריזה',
+                status: 'completed' as const
+              },
+              {
+                key: 'labels',
+                title: 'Этикетки',
+                titleHe: 'תוויות',
+                status: 'completed' as const
+              },
+              {
+                key: 'invoice',
+                title: 'Счет',
+                titleHe: 'חשבונית',
+                status: 'active' as const
+              }
+            ]}
+            locale={'ru'}
+          />
+        </div>
       }
       visible={visible}
       onCancel={onClose}

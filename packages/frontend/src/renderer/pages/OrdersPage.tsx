@@ -1452,7 +1452,7 @@ export const OrdersPage: React.FC = () => {
         <Modal
           title={
             <div style={{ width: '100%' }}>
-              <div style={{ textAlign: 'center', marginBottom: 8, fontSize: 16, fontWeight: 500 }}>
+              <div style={{ textAlign: 'center', marginBottom: 12, fontSize: 20, fontWeight: 600 }}>
                 {selectedOrder ? 
                   (locale === 'he' ? `הזמנה ${selectedOrder.orderNumber}` : `Заказ ${selectedOrder.orderNumber}`) : 
                   (locale === 'he' ? 'הזמנה' : 'Заказ')
@@ -1470,7 +1470,7 @@ export const OrdersPage: React.FC = () => {
                     key: 'labels',
                     title: 'Этикетки',
                     titleHe: 'תוויות',
-                    status: 'pending' as const
+                    status: packingBoxes.length > 0 ? 'completed' : 'pending' as const
                   },
                   {
                     key: 'invoice',
@@ -1480,6 +1480,18 @@ export const OrdersPage: React.FC = () => {
                   }
                 ]}
                 locale={locale as 'ru' | 'he'}
+                onStepClick={(stepKey, stepIndex) => {
+                  // Handle navigation between steps
+                  if (stepKey === 'labels' && packingBoxes.length > 0) {
+                    // Open labels modal
+                    setPackingModalVisible(false);
+                    setShowRegionSelector(true);
+                  } else if (stepKey === 'invoice' && packingBoxes.length > 0) {
+                    // Open invoice modal
+                    setPackingModalVisible(false);
+                    setShowInvoiceModal(true);
+                  }
+                }}
               />
             </div>
           }
@@ -1983,6 +1995,17 @@ export const OrdersPage: React.FC = () => {
           customerCity={selectedOrder?.customerCity}
           onPrint={handlePrintComplete}
           onCancel={() => setShowLabelPreview(false)}
+          onNavigateToStep={(stepKey) => {
+            if (stepKey === 'packing') {
+              // Go back to packing modal
+              setShowLabelPreview(false);
+              setPackingModalVisible(true);
+            } else if (stepKey === 'invoice') {
+              // Go to invoice modal
+              setShowLabelPreview(false);
+              setShowInvoiceModal(true);
+            }
+          }}
         />
       )}
       

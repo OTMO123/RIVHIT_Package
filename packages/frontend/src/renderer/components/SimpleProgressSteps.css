@@ -109,6 +109,20 @@
   border-left: 8px solid #52c41a;
 }
 
+/* Clickable State */
+.simple-step.clickable {
+  cursor: pointer;
+}
+
+.simple-step.clickable:hover .step-indicator {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.simple-step.clickable:active .step-indicator {
+  transform: scale(1.05);
+}
+
 /* Hover Effects */
 .simple-step:hover .step-indicator {
   transform: scale(1.1);

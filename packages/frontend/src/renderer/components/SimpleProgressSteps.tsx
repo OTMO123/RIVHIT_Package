@@ -14,17 +14,29 @@ export interface SimpleStep {
 interface SimpleProgressStepsProps {
   steps: SimpleStep[];
   locale?: 'ru' | 'he';
+  onStepClick?: (stepKey: string, stepIndex: number) => void;
 }
 
 export const SimpleProgressSteps: React.FC<SimpleProgressStepsProps> = ({
   steps,
-  locale = 'ru'
+  locale = 'ru',
+  onStepClick
 }) => {
+  const handleStepClick = (step: SimpleStep, index: number) => {
+    // Only allow clicking on completed or active steps
+    if (step.status !== 'pending' && onStepClick) {
+      onStepClick(step.key, index);
+    }
+  };
+
   return (
     <div className="simple-progress-container">
       {steps.map((step, index) => (
         <React.Fragment key={step.key}>
-          <div className={`simple-step ${step.status}`}>
+          <div 
+            className={`simple-step ${step.status} ${step.status !== 'pending' && onStepClick ? 'clickable' : ''}`}
+            onClick={() => handleStepClick(step, index)}
+          >
             <div className="step-indicator">
               {step.status === 'completed' ? (
                 <CheckCircleFilled />

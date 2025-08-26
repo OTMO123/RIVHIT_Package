@@ -111,7 +111,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
     <Modal
       title={
         <div style={{ width: '100%' }}>
-          <div style={{ textAlign: 'center', marginBottom: 8, fontSize: 16, fontWeight: 500 }}>
+          <div style={{ textAlign: 'center', marginBottom: 12, fontSize: 20, fontWeight: 600 }}>
             Заказ #{orderNumber}
           </div>
           <SimpleProgressSteps
@@ -132,10 +132,14 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
                 key: 'invoice',
                 title: 'Счет',
                 titleHe: 'חשבונית',
-                status: 'active' as const
+                status: invoiceCreated ? 'completed' : 'active' as const
               }
             ]}
             locale={'ru'}
+            onStepClick={(stepKey) => {
+              // Navigation is handled by parent component
+              console.log('Navigate to step:', stepKey);
+            }}
           />
         </div>
       }

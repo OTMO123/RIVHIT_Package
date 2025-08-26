@@ -16,6 +16,7 @@ interface LabelPreviewProps {
   customerCity?: string;
   onPrint: () => void;
   onCancel: () => void;
+  onNavigateToStep?: (stepKey: string) => void;
 }
 
 interface GeneratedLabel {
@@ -104,7 +105,8 @@ export const LabelPreview: React.FC<LabelPreviewProps> = ({
   customerName,
   customerCity,
   onPrint,
-  onCancel
+  onCancel,
+  onNavigateToStep
 }) => {
   const [labels, setLabels] = useState<GeneratedLabel[]>([]);
   const [loading, setLoading] = useState(false);
@@ -264,7 +266,7 @@ export const LabelPreview: React.FC<LabelPreviewProps> = ({
     <Modal
       title={
         <div style={{ width: '100%' }}>
-          <div style={{ textAlign: 'center', marginBottom: 8, fontSize: 16, fontWeight: 500 }}>
+          <div style={{ textAlign: 'center', marginBottom: 12, fontSize: 20, fontWeight: 600 }}>
             Заказ #{orderId}
           </div>
           <SimpleProgressSteps
@@ -284,11 +286,16 @@ export const LabelPreview: React.FC<LabelPreviewProps> = ({
               {
                 key: 'invoice',
                 title: 'Счет',
-                titleHe: 'חשבונית',
-                status: 'pending' as const
+                titleHe: 'חשбונית',
+                status: printing ? 'completed' : 'pending' as const
               }
             ]}
             locale={'ru'}
+            onStepClick={(stepKey) => {
+              if (onNavigateToStep) {
+                onNavigateToStep(stepKey);
+              }
+            }}
           />
           <Space style={{ width: '100%', justifyContent: 'center', display: 'flex', marginTop: 8 }}>
             <Badge color="blue" text={getRegionName(region)} />

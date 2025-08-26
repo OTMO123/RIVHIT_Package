@@ -20,7 +20,8 @@ import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   ReloadOutlined,
-  InboxOutlined
+  InboxOutlined,
+  FileDoneOutlined
 } from '@ant-design/icons';
 import { PackingItem } from '@packing/shared';
 import { BoxLabelPrint } from './BoxLabelPrint';
@@ -32,8 +33,10 @@ interface PrintActionsProps {
   items: PackingItem[];
   customerName?: string;
   customerCity?: string;
+  customerData?: any; // Full customer data for invoice
   disabled?: boolean;
-  onPrintComplete?: (jobId: string, type: 'shipping' | 'product' | 'box') => void;
+  onPrintComplete?: (jobId: string, type: 'shipping' | 'product' | 'box' | 'invoice') => void;
+  orderNumber?: string; // Order number for invoice reference
 }
 
 interface PrinterStatus {
@@ -51,8 +54,10 @@ export const PrintActions: React.FC<PrintActionsProps> = ({
   items,
   customerName = 'לקוח',
   customerCity,
+  customerData,
   disabled = false,
-  onPrintComplete
+  onPrintComplete,
+  orderNumber
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [printerStatus, setPrinterStatus] = useState<PrinterStatus | null>(null);
@@ -233,6 +238,125 @@ export const PrintActions: React.FC<PrintActionsProps> = ({
     }
   };
 
+  // Создание счета-фактуры (חשבונית)
+  const createInvoice = async () => {
+    console.log('🔵 [FRONTEND] Starting invoice creation');
+    console.log('📋 Available data:', {
+      orderNumber,
+      orderId,
+      customerName,
+      customerData,
+      printableItems_count: printableItems.length,
+      printableItems
+    });
+
+    if (printableItems.length === 0) {
+      message.warning('Нет товаров для создания счета-фактуры');
+      return;
+    }
+
+    if (!orderNumber) {
+      console.error('❌ No order number provided');
+      message.error('Не указан номер заказа');
+      return;
+    }
+
+    Modal.confirm({
+      title: 'Создание счета-фактуры (חשבונית)',
+      content: (
+        <Space direction="vertical">
+          <Text>Будет создан счет-фактура для заказа {orderNumber}</Text>
+          <Text type="secondary">Товаров: {printableItems.length}</Text>
+          <Text type="secondary">
+            Общее количество: {printableItems.reduce((sum, item) => sum + item.packedQuantity, 0)}
+          </Text>
+        </Space>
+      ),
+      okText: 'Создать חשבונית',
+      cancelText: 'Отмена',
+      onOk: async () => {
+        setIsLoading(true);
+        try {
+          // Подготавливаем данные для создания счета
+          const invoiceItems = printableItems.map(item => {
+            const invoiceItem = {
+              item_id: item.item_id,
+              item_name: item.item_name || item.item_extended_description || 'Unknown Item',
+              quantity: item.packedQuantity, // Используем фактически упакованное количество
+              price: item.sale_nis || (item as any).price || 0,
+              cost_nis: item.cost_nis || 0
+            };
+            console.log('📦 Prepared item:', invoiceItem);
+            return invoiceItem;
+          });
+
+          const cleanOrderNumber = orderNumber.replace(/[^\d]/g, ''); // Только цифры
+          
+          const requestData = {
+            orderNumber: cleanOrderNumber,
+            items: invoiceItems,
+            customerData: customerData || { 
+              customer_id: orderId,
+              customer_name: customerName 
+            }
+          };
+
+          console.log('📡 [FRONTEND] Sending request to backend:', JSON.stringify(requestData, null, 2));
+
+          const response = await fetch('/api/invoices/create-from-order', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData)
+          });
+
+          const data = await response.json();
+          
+          if (data.success) {
+            message.success('Счет-фактура (חשבונית) успешно создан!');
+            onPrintComplete?.('invoice_created', 'invoice');
+            
+            // Автоматически печатаем этикетки после создания счета
+            Modal.confirm({
+              title: 'Печать этикеток',
+              content: 'Счет создан. Напечатать этикетки для товаров?',
+              okText: 'Печать',
+              cancelText: 'Позже',
+              onOk: () => printProductLabels()
+            });
+          } else if (data.preparedData) {
+            // Если запись отключена, показываем подготовленные данные
+            Modal.info({
+              title: 'Данные для счета-фактуры подготовлены',
+              content: (
+                <div>
+                  <Alert 
+                    message="Создание счетов отключено в безопасном режиме" 
+                    description={data.enableWrites}
+                    type="warning"
+                    showIcon
+                  />
+                  <pre style={{ fontSize: '12px', marginTop: '10px' }}>
+                    {JSON.stringify(data.preparedData, null, 2)}
+                  </pre>
+                </div>
+              ),
+              width: 600
+            });
+          } else {
+            message.error(`Ошибка создания счета: ${data.error}`);
+          }
+        } catch (error) {
+          console.error('Error creating invoice:', error);
+          message.error('Ошибка при создании счета-фактуры');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    });
+  };
+
   const showPrinterStatus = async () => {
     await checkPrinterStatus();
     setShowStatusModal(true);
@@ -330,9 +454,23 @@ export const PrintActions: React.FC<PrintActionsProps> = ({
           )}
           
           <Space wrap>
-            <Tooltip title="Печать этикетки доставки для всего заказа">
+            <Tooltip title="Создать счет-фактуру (חשבונית) и затем печатать">
               <Button
                 type="primary"
+                icon={<FileDoneOutlined />}
+                onClick={createInvoice}
+                loading={isLoading}
+                disabled={disabled || printableItems.length === 0}
+                style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+              >
+                Создать חשבונית
+              </Button>
+            </Tooltip>
+
+            <Divider type="vertical" />
+
+            <Tooltip title="Печать этикетки доставки для всего заказа">
+              <Button
                 icon={<FileTextOutlined />}
                 onClick={printShippingLabel}
                 loading={isLoading}
@@ -354,6 +492,19 @@ export const PrintActions: React.FC<PrintActionsProps> = ({
             </Tooltip>
 
             <Divider type="vertical" />
+
+            <Tooltip title="Создать счет-фактуру (חשבונית) и сохранить в RIVHIT">
+              <Button
+                type="primary"
+                danger
+                icon={<FileDoneOutlined />}
+                onClick={createInvoice}
+                loading={isLoading}
+                disabled={disabled || printableItems.length === 0}
+              >
+                Создать חשבונית
+              </Button>
+            </Tooltip>
 
             <BoxLabelPrint
               orderId={orderId}

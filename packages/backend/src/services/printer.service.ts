@@ -51,7 +51,7 @@ export interface GoDEXPrinterStatus {
  * Поддерживает USB, Serial и Ethernet подключения
  */
 export class PrinterService implements IPrinterService {
-  private isConnected: boolean = false;
+  public isConnected: boolean = false;
   private printerModel: string = 'GoDEX ZX420';
   private supportedFormats: string[] = ['barcode', 'qr', 'text', 'ezpl'];
   private connectionType: 'usb' | 'serial' | 'ethernet' = 'usb';
@@ -67,7 +67,7 @@ export class PrinterService implements IPrinterService {
 
   private async loadConfiguration(): Promise<void> {
     try {
-      const configPath = path.join(process.cwd(), 'printer-config.json');
+      const configPath = path.join(__dirname, '../../printer-config.json');
       const configFile = await fs.readFile(configPath, 'utf-8');
       this.config = JSON.parse(configFile);
       
@@ -912,7 +912,7 @@ E
     }
   }
 
-  private async sendRawCommand(command: string): Promise<string> {
+  public async sendRawCommand(command: string): Promise<string> {
     console.log(`📤 Sending EZPL command: ${command.substring(0, 50)}...`);
     
     // В тестовом режиме возвращаем мок-ответ
@@ -961,6 +961,8 @@ E
 
   private async executeConnectionMethod(method: any, command: string): Promise<string> {
     switch (method.method) {
+      case 'network_socket':
+        return await this.sendViaNetworkSocket(method.config, command);
       case 'raw_copy':
         return await this.sendViaCopy(command);
       case 'lpt_redirect':
@@ -1071,8 +1073,13 @@ E
     // Для Ethernet подключения используем socket connection
     const net = require('net');
     
+    // Получаем настройки сети из конфигурации
+    const networkPort = this.config?.printer?.network_port || 9101;
+    const timeout = this.config?.printer?.timeout || 10000;
+    
     return new Promise((resolve, reject) => {
-      const socket = net.createConnection(9100, this.port, () => {
+      const socket = net.createConnection(networkPort, this.port, () => {
+        console.log(`🌐 Connected to printer at ${this.port}:${networkPort}`);
         socket.write(command);
         socket.end();
       });
@@ -1083,18 +1090,83 @@ E
       });
 
       socket.on('end', () => {
-        resolve(response);
+        console.log('✅ Network command sent successfully');
+        resolve(response || 'OK');
       });
 
       socket.on('error', (error: any) => {
+        console.error(`❌ Network error: ${error.message}`);
         reject(error);
       });
 
-      // Timeout через 10 секунд
+      // Timeout через настроенное время
       setTimeout(() => {
         socket.destroy();
-        reject(new Error('Network command timeout'));
-      }, 10000);
+        reject(new Error(`Network command timeout after ${timeout}ms`));
+      }, timeout);
+    });
+  }
+
+  private async sendViaNetworkSocket(config: any, command: string): Promise<string> {
+    const net = require('net');
+    const host = config.host || this.port;
+    const port = config.port || 9100;
+    const timeout = config.timeout || 10000;
+    
+    return new Promise((resolve, reject) => {
+      console.log(`🌐 Connecting to printer at ${host}:${port}...`);
+      
+      const socket = net.createConnection(port, host, () => {
+        console.log(`✅ Connected to printer at ${host}:${port}`);
+        socket.write(Buffer.from(command, 'utf8'));
+        
+        // Для EZPL команд не ждем ответа, просто закрываем соединение
+        setTimeout(() => {
+          socket.end();
+        }, 500);
+      });
+
+      let response = '';
+      socket.on('data', (data: any) => {
+        response += data.toString();
+      });
+
+      socket.on('end', () => {
+        console.log('✅ Network command sent successfully');
+        resolve(response || 'OK');
+      });
+
+      socket.on('error', (error: any) => {
+        console.error(`❌ Network connection error: ${error.message}`);
+        // Попробуем переподключиться один раз
+        if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+          console.log('🔄 Retrying connection...');
+          setTimeout(() => {
+            const retrySocket = net.createConnection(port, host, () => {
+              retrySocket.write(Buffer.from(command, 'utf8'));
+              setTimeout(() => {
+                retrySocket.end();
+              }, 500);
+            });
+            
+            retrySocket.on('end', () => {
+              resolve('OK');
+            });
+            
+            retrySocket.on('error', (retryError: any) => {
+              reject(new Error(`Connection failed: ${retryError.message}`));
+            });
+          }, 1000);
+        } else {
+          reject(error);
+        }
+      });
+
+      // Timeout
+      setTimeout(() => {
+        socket.destroy();
+        reject(new Error(`Network command timeout after ${timeout}ms`));
+      }, timeout);
     });
   }
 

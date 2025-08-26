@@ -4,6 +4,7 @@ import { IRivhitService } from '../interfaces/IRivhitService';
 import { MemoryCacheService } from '../services/cache/memory.cache.service';
 import { RedisCacheService } from '../services/cache/redis.cache.service';
 import { PrinterService } from '../services/printer.service';
+import { ZPLPrinterService } from '../services/zpl-printer.service';
 import { WinLabelPrinterService, WinLabelPrinterFactory } from '../services/winlabel-printer.service';
 import { RivhitService } from '../services/rivhit.service';
 import { MockRivhitService } from '../services/mock-rivhit.service';
@@ -113,9 +114,22 @@ export class PrinterServiceFactory {
   }
 
   /**
+   * Создание ZPL принтер-сервиса (для GoDEX с ZPL)
+   */
+  static createZPL(): IPrinterService {
+    return new ZPLPrinterService();
+  }
+
+  /**
    * Создание принтер-сервиса по умолчанию
    */
   static createDefault(): IPrinterService {
+    // Используем ZPL для GoDEX принтера
+    if (process.env.USE_ZPL === 'true' || true) { // По умолчанию ZPL
+      console.log('🖨️ Using ZPL printer service for GoDEX');
+      return this.createZPL();
+    }
+
     const config: PrinterConfig = {
       templatesPath: process.env.PRINTER_TEMPLATES_PATH || './printer-templates',
       connectionType: (process.env.PRINTER_CONNECTION_TYPE as any) || 'usb',

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import * as path from 'path';
 import { 
   PrinterService, 
   PrinterServiceFactory,
@@ -9,20 +10,35 @@ import {
 import { IPrinterService } from '../interfaces/IPrinterService';
 import { PackingItem, PackingBox } from '@packing/shared';
 import { BoxLabelService, BoxLabelData } from '../services/box-label.service';
+import { BoxLabelZPLService } from '../services/box-label-zpl.service';
+import { BoxLabelEZPLService, BoxLabelEZPLData } from '../services/box-label-ezpl.service';
+import { ImagePrintService } from '../services/image-print.service';
+import { SimpleZPLService } from '../services/simple-zpl.service';
+import { WindowsPrintService } from '../services/windows-print.service';
 import { ILogger } from '../interfaces/ILogger';
 import { ConsoleLoggerService } from '../services/logging/console.logger.service';
 
 export class PrintController {
   private printerService: PrinterService;
   private boxLabelService: BoxLabelService;
+  private boxLabelZPLService: BoxLabelZPLService;
+  private boxLabelEZPLService: BoxLabelEZPLService;
+  private imagePrintService: ImagePrintService;
+  private simpleZPLService: SimpleZPLService;
+  private windowsPrintService: WindowsPrintService;
   private logger: ILogger;
 
   constructor(printerService?: PrinterService) {
     // Initialize logger
     this.logger = new ConsoleLoggerService('PrintController');
     
-    // Initialize box label service
+    // Initialize box label services
     this.boxLabelService = new BoxLabelService(this.logger);
+    this.boxLabelZPLService = new BoxLabelZPLService();
+    this.boxLabelEZPLService = new BoxLabelEZPLService(this.logger);
+    this.imagePrintService = new ImagePrintService();
+    this.simpleZPLService = new SimpleZPLService();
+    this.windowsPrintService = new WindowsPrintService();
     
     if (printerService) {
       this.printerService = printerService;
@@ -817,32 +833,42 @@ export class PrintController {
         return;
       }
       
-      const results: any[] = [];
+      console.log('📦 Received labels for printing:', labels.length, 'boxes');
       
-      // Печатаем каждую этикетку
-      for (const label of labels) {
-        try {
-          // Здесь должна быть реальная печать
-          // Пока просто симулируем успех
-          results.push({
-            boxNumber: label.boxNumber,
-            success: true
-          });
-        } catch (error) {
-          results.push({
-            boxNumber: label.boxNumber,
-            success: false,
-            error: error instanceof Error ? error.message : 'Print failed'
-          });
-        }
+      // Проверяем наличие изображений
+      const hasImages = labels.every(label => label.imageData);
+      
+      let printResult: any = { success: false, printedCount: 0 };
+      
+      if (hasImages) {
+        // Используем новый сервис печати изображений (работающий метод ZPL)
+        console.log('🏷️ Using image printing service (ZPL method 1)...');
+        
+        printResult = await this.imagePrintService.printBoxLabelsWithImages(labels);
+      } else {
+        // Иначе генерируем ZPL текстовые этикетки
+        console.log('📝 Using text ZPL method...');
+        const boxesToPrint = labels.map(label => ({
+          boxNumber: label.boxNumber,
+          totalBoxes: labels.length,
+          orderId: orderId,
+          items: label.items || [],
+          imageData: label.imageData
+        }));
+        printResult = await this.boxLabelZPLService.printBoxLabels(boxesToPrint);
       }
       
-      const successCount = results.filter(r => r.success).length;
+      // Формируем результаты для ответа
+      const results = labels.map((label, index) => ({
+        boxNumber: label.boxNumber,
+        success: index < printResult.printedCount,
+        itemsCount: label.items?.length || 0
+      }));
       
       res.status(200).json({
-        success: successCount > 0,
+        success: printResult.success,
         results,
-        message: `Напечатано ${successCount} из ${labels.length} этикеток`
+        message: `Напечатано ${printResult.printedCount} из ${labels.length} этикеток`
       });
       
     } catch (error) {
@@ -934,5 +960,345 @@ export class PrintController {
         error: error instanceof Error ? error.message : 'Failed to assign boxes'
       });
     }
+  }
+
+  /**
+   * Generate EZPL code for box label (no image generation)
+   * POST /api/print/box-label-ezpl
+   */
+  async generateBoxLabelEZPL(req: Request, res: Response): Promise<void> {
+    try {
+      const { 
+        orderId, 
+        boxNumber, 
+        totalBoxes,
+        customerName, 
+        customerCity,
+        items,
+        region,
+        format = 'standard'
+      } = req.body;
+
+      // Validation
+      if (!orderId || !boxNumber || !customerName) {
+        res.status(400).json({
+          success: false,
+          error: 'Order ID, box number, and customer name are required'
+        });
+        return;
+      }
+
+      this.logger.info('Generating EZPL for box label', {
+        orderId,
+        boxNumber,
+        totalBoxes,
+        format
+      });
+
+      // Prepare data for EZPL generation
+      const ezplData: BoxLabelEZPLData = {
+        orderId,
+        boxNumber,
+        totalBoxes: totalBoxes || 1,
+        customerName,
+        customerCity,
+        region,
+        items: items || [],
+        deliveryDate: new Date().toLocaleDateString('he-IL')
+      };
+
+      // Generate EZPL code
+      const ezplCode = format === 'compact' 
+        ? this.boxLabelEZPLService.generateCompactBoxLabelEZPL(ezplData)
+        : this.boxLabelEZPLService.generateBoxLabelEZPL(ezplData);
+
+      // Return EZPL code
+      res.status(200).json({
+        success: true,
+        ezpl: ezplCode,
+        format,
+        message: `EZPL code generated for box ${boxNumber}/${totalBoxes}`
+      });
+
+    } catch (error) {
+      this.logger.error('Failed to generate EZPL for box label', error as Error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to generate EZPL'
+      });
+    }
+  }
+
+  /**
+   * Print box labels using EZPL (direct printer commands)
+   * POST /api/print/box-labels-ezpl
+   */
+  async printBoxLabelsEZPL(req: Request, res: Response): Promise<void> {
+    try {
+      const { 
+        orderId, 
+        boxes, 
+        customerName, 
+        customerCity,
+        region,
+        format = 'standard'
+      }: {
+        orderId: string | number;
+        boxes: PackingBox[];
+        customerName: string;
+        customerCity?: string;
+        region?: string;
+        format?: 'standard' | 'compact';
+      } = req.body;
+
+      // Validation
+      if (!orderId || !boxes || !Array.isArray(boxes) || boxes.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'Order ID and boxes array are required'
+        });
+        return;
+      }
+
+      if (!customerName) {
+        res.status(400).json({
+          success: false,
+          error: 'Customer name is required'
+        });
+        return;
+      }
+
+      console.log(`🏷️ Printing ${boxes.length} box labels using EZPL for order ${orderId}`);
+
+      const printResults: any[] = [];
+      const ezplCommands: string[] = [];
+
+      // Generate EZPL for each box
+      for (let i = 0; i < boxes.length; i++) {
+        const box = boxes[i];
+        try {
+          // Prepare data for EZPL generation
+          const ezplData: BoxLabelEZPLData = {
+            orderId,
+            boxNumber: i + 1,  // Use index for correct numbering
+            totalBoxes: boxes.length,
+            customerName,
+            customerCity,
+            region,
+            items: box.items.map(item => ({
+              name: item.name,
+              nameHebrew: item.nameHebrew,
+              nameRussian: item.nameRussian,
+              quantity: item.quantity,
+              barcode: item.barcode,
+              catalogNumber: item.catalogNumber
+            })),
+            deliveryDate: new Date().toLocaleDateString('he-IL')
+          };
+
+          // Generate EZPL code
+          const ezplCode = format === 'compact' 
+            ? this.boxLabelEZPLService.generateCompactBoxLabelEZPL(ezplData)
+            : this.boxLabelEZPLService.generateBoxLabelEZPL(ezplData);
+
+          ezplCommands.push(ezplCode);
+
+          // Send EZPL to printer
+          if (this.printerService && this.printerService.isConnected) {
+            await this.printerService.sendRawCommand(ezplCode);
+            
+            printResults.push({
+              boxNumber: i + 1,
+              success: true,
+              ezplLength: ezplCode.length
+            });
+
+            // Mark box as printed
+            box.isPrinted = true;
+            box.printedAt = new Date().toISOString();
+
+            // Delay between labels to prevent printer buffer overflow
+            await this.delay(1500);
+          } else {
+            // If printer not connected, just generate EZPL
+            printResults.push({
+              boxNumber: i + 1,
+              success: false,
+              ezplLength: ezplCode.length,
+              error: 'Printer not connected - EZPL generated but not sent'
+            });
+          }
+
+        } catch (error) {
+          console.error(`❌ Failed to print EZPL label for box ${i + 1}:`, error);
+          printResults.push({
+            boxNumber: i + 1,
+            success: false,
+            error: error instanceof Error ? error.message : String(error)
+          });
+        }
+      }
+
+      // Calculate results
+      const successCount = printResults.filter(r => r.success).length;
+      const failedCount = printResults.filter(r => !r.success).length;
+
+      res.status(200).json({
+        success: successCount > 0,
+        message: `Printed ${successCount} of ${boxes.length} box labels using EZPL`,
+        results: printResults,
+        ezplCommands: ezplCommands,  // Return EZPL for debugging
+        stats: {
+          total: boxes.length,
+          successful: successCount,
+          failed: failedCount
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error printing box labels with EZPL:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to print box labels'
+      });
+    }
+  }
+
+  /**
+   * Generate HTML visualization of box label EZPL
+   * POST /api/print/box-label-html
+   */
+  async generateBoxLabelHTML(req: Request, res: Response): Promise<void> {
+    try {
+      const { 
+        orderId, 
+        boxNumber = 1, 
+        totalBoxes = 1, 
+        customerCompany,
+        customerName, 
+        customerCity, 
+        items = [],
+        region,
+        deliveryDate,
+        format = 'single' // 'single' or 'multiple'
+      } = req.body;
+
+      // Validate required fields
+      if (!orderId || !customerName) {
+        res.status(400).json({
+          success: false,
+          error: 'Missing required fields: orderId and customerName'
+        });
+        return;
+      }
+
+      // Prepare data for EZPL service
+      const ezplData: BoxLabelEZPLData = {
+        orderId,
+        boxNumber,
+        totalBoxes,
+        customerCompany,
+        customerName,
+        customerCity,
+        region,
+        deliveryDate,
+        items: items.map((item: any) => ({
+          name: item.name || item.itemName || 'Unknown Item',
+          nameHebrew: item.nameHebrew || item.name,
+          nameRussian: item.nameRussian,
+          quantity: item.quantity || 1,
+          barcode: item.barcode,
+          catalogNumber: item.catalogNumber || item.barcode
+        }))
+      };
+
+      // Generate HTML visualization
+      const html = this.boxLabelEZPLService.generateBoxLabelHTML(ezplData);
+
+      // Return HTML as JSON for easier handling in frontend
+      res.status(200).json({
+        success: true,
+        html: html
+      });
+
+    } catch (error) {
+      console.error('❌ Failed to generate box label HTML:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to generate box label HTML',
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  }
+
+  /**
+   * Generate HTML visualization for multiple box labels
+   * POST /api/print/box-labels-html
+   */
+  async generateMultipleBoxLabelsHTML(req: Request, res: Response): Promise<void> {
+    try {
+      const { 
+        orderId, 
+        boxes = [], 
+        customerCompany,
+        customerName, 
+        customerCity, 
+        region,
+        deliveryDate
+      } = req.body;
+
+      // Validate required fields
+      if (!orderId || !customerName || !boxes.length) {
+        res.status(400).json({
+          success: false,
+          error: 'Missing required fields: orderId, customerName, and boxes'
+        });
+        return;
+      }
+
+      // Prepare data for each box
+      const labelsData: BoxLabelEZPLData[] = boxes.map((box: any, index: number) => ({
+        orderId,
+        boxNumber: box.boxNumber || index + 1,
+        totalBoxes: boxes.length,
+        customerCompany,
+        customerName,
+        customerCity,
+        region,
+        deliveryDate,
+        items: (box.items || []).map((item: any) => ({
+          name: item.name || item.itemName || 'Unknown Item',
+          nameHebrew: item.nameHebrew || item.name,
+          nameRussian: item.nameRussian,
+          quantity: item.quantity || 1,
+          barcode: item.barcode,
+          catalogNumber: item.catalogNumber || item.barcode
+        }))
+      }));
+
+      // Generate HTML visualization for all labels
+      const html = this.boxLabelEZPLService.generateMultipleBoxLabelsHTML(labelsData);
+
+      // Return HTML as JSON for easier handling in frontend
+      res.status(200).json({
+        success: true,
+        html: html
+      });
+
+    } catch (error) {
+      console.error('❌ Failed to generate multiple box labels HTML:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to generate multiple box labels HTML',
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  }
+
+  /**
+   * Helper method to add delay
+   */
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }

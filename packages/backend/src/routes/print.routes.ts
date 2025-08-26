@@ -178,4 +178,40 @@ router.post('/batch-print', async (req, res) => {
   await printController.batchPrintLabels(req, res);
 });
 
+/**
+ * @route POST /api/print/box-label-ezpl
+ * @desc Generate EZPL code for box label (no image generation)
+ * @body { orderId: string | number, boxNumber: number, totalBoxes?: number, customerName: string, customerCity?: string, items?: any[], region?: string, format?: 'standard' | 'compact' }
+ */
+router.post('/box-label-ezpl', async (req, res) => {
+  await printController.generateBoxLabelEZPL(req, res);
+});
+
+/**
+ * @route POST /api/print/box-labels-ezpl
+ * @desc Print box labels using EZPL (direct printer commands)
+ * @body { orderId: string | number, boxes: PackingBox[], customerName: string, customerCity?: string, region?: string, format?: 'standard' | 'compact' }
+ */
+router.post('/box-labels-ezpl', async (req, res) => {
+  await printController.printBoxLabelsEZPL(req, res);
+});
+
+/**
+ * @route POST /api/print/box-label-html
+ * @desc Generate HTML visualization of box label EZPL
+ * @body { orderId: string | number, boxNumber?: number, totalBoxes?: number, customerName: string, customerCity?: string, items?: any[], region?: string }
+ */
+router.post('/box-label-html', async (req, res) => {
+  await printController.generateBoxLabelHTML(req, res);
+});
+
+/**
+ * @route POST /api/print/box-labels-html
+ * @desc Generate HTML visualization for multiple box labels
+ * @body { orderId: string | number, boxes: any[], customerName: string, customerCity?: string, region?: string }
+ */
+router.post('/box-labels-html', async (req, res) => {
+  await printController.generateMultipleBoxLabelsHTML(req, res);
+});
+
 export default router;

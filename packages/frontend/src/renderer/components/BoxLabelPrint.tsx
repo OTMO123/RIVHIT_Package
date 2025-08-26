@@ -114,9 +114,20 @@ export const BoxLabelPrint: React.FC<BoxLabelPrintProps> = ({
     setPrintResults([]);
 
     try {
-      const response = await apiService.post('/api/print/box-labels', {
+      // Используем EZPL endpoint для прямой печати
+      const response = await apiService.post('/api/print/box-labels-ezpl', {
         orderId,
-        boxes,
+        boxes: boxes.map(box => ({
+          ...box,
+          items: box.items.map(item => ({
+            name: item.name,
+            nameHebrew: item.nameHebrew || item.name,
+            nameRussian: item.nameRussian,
+            quantity: item.quantity,
+            barcode: item.barcode,
+            catalogNumber: item.catalogNumber || item.barcode
+          }))
+        })),
         customerName,
         customerCity,
         format: labelFormat,
@@ -147,57 +158,86 @@ export const BoxLabelPrint: React.FC<BoxLabelPrintProps> = ({
     }
   };
 
-  // Генерация превью этикетки
+  // Генерация превью этикетки (HTML визуализация)
   const handlePreview = async (boxNumber: number) => {
     const box = boxes.find(b => b.boxNumber === boxNumber);
     if (!box) return;
 
     try {
-      const response = await apiService.post('/api/print/box-label-preview', {
+      // Используем новый HTML endpoint для визуализации
+      const response = await apiService.post('/api/print/box-label-html', {
         orderId,
         boxNumber: box.boxNumber,
         totalBoxes: boxes.length,
+        customerCompany: '', // TODO: Add company if available
         customerName,
         customerCity,
-        items: box.items,
-        format: labelFormat
+        region: selectedRegion,
+        deliveryDate: new Date().toLocaleDateString('he-IL'),
+        items: box.items.map(item => ({
+          name: item.name,
+          nameHebrew: item.nameHebrew || item.name,
+          nameRussian: item.nameRussian,
+          quantity: item.quantity,
+          barcode: item.barcode,
+          catalogNumber: item.catalogNumber || item.barcode
+        }))
       });
 
-      if (response.data.success) {
-        // Открываем превью в новом окне
+      // Открываем HTML визуализацию в новом окне
+      if (response.data.success && response.data.html) {
         const previewWindow = window.open('', '_blank');
         if (previewWindow) {
-          previewWindow.document.write(`
-            <html>
-              <head>
-                <title>Превью этикетки - Коробка ${boxNumber}</title>
-                <style>
-                  body { 
-                    display: flex; 
-                    justify-content: center; 
-                    align-items: center; 
-                    min-height: 100vh; 
-                    margin: 0;
-                    background: #f0f2f5;
-                  }
-                  img { 
-                    max-width: 90%; 
-                    max-height: 90vh; 
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                    border: 1px solid #d9d9d9;
-                  }
-                </style>
-              </head>
-              <body>
-                <img src="${response.data.preview}" alt="Label Preview" />
-              </body>
-            </html>
-          `);
+          previewWindow.document.write(response.data.html);
+          previewWindow.document.close();
         }
       }
     } catch (error) {
-      console.error('Error generating preview:', error);
+      console.error('Error generating HTML preview:', error);
       message.error('Не удалось создать превью');
+    }
+  };
+
+  // Показать все этикетки в одном окне
+  const handlePreviewAll = async () => {
+    if (boxes.length === 0) {
+      message.warning('Нет коробок для превью');
+      return;
+    }
+
+    try {
+      // Используем endpoint для множественных этикеток
+      const response = await apiService.post('/api/print/box-labels-html', {
+        orderId,
+        customerCompany: '', // TODO: Add company if available
+        customerName,
+        customerCity,
+        region: selectedRegion,
+        deliveryDate: new Date().toLocaleDateString('he-IL'),
+        boxes: boxes.map(box => ({
+          boxNumber: box.boxNumber,
+          items: box.items.map(item => ({
+            name: item.name,
+            nameHebrew: item.nameHebrew || item.name,
+            nameRussian: item.nameRussian,
+            quantity: item.quantity,
+            barcode: item.barcode,
+            catalogNumber: item.catalogNumber || item.barcode
+          }))
+        }))
+      });
+
+      // Открываем HTML визуализацию всех этикеток
+      if (response.data.success && response.data.html) {
+        const previewWindow = window.open('', '_blank');
+        if (previewWindow) {
+          previewWindow.document.write(response.data.html);
+          previewWindow.document.close();
+        }
+      }
+    } catch (error) {
+      console.error('Error generating HTML preview for all boxes:', error);
+      message.error('Не удалось создать превью всех коробок');
     }
   };
 
@@ -250,6 +290,14 @@ export const BoxLabelPrint: React.FC<BoxLabelPrintProps> = ({
         footer={[
           <Button key="cancel" onClick={() => setIsModalVisible(false)}>
             Отмена
+          </Button>,
+          <Button
+            key="preview-all"
+            icon={<InboxOutlined />}
+            onClick={handlePreviewAll}
+            disabled={boxes.length === 0 || !selectedRegion}
+          >
+            Превью всех коробок
           </Button>,
           <Button
             key="print"

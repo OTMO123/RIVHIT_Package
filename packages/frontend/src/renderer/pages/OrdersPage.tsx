@@ -32,7 +32,8 @@ import {
   ContainerOutlined,
   PlusOutlined,
   MinusOutlined,
-  SettingOutlined
+  SettingOutlined,
+  FileTextOutlined
 } from '@ant-design/icons';
 import { useI18n } from '../i18n/i18n';
 import { apiService, Order } from '../services/api.service';
@@ -40,6 +41,7 @@ import { SVGConnections, Connection } from '../components/SVGConnections';
 import { MaxPerBoxSettingsModal } from '../components/MaxPerBoxSettings';
 import { RegionSelector } from '../components/RegionSelector';
 import { LabelPreview } from '../components/LabelPreview';
+import { InvoiceModal } from '../components/InvoiceModal';
 import { DeliveryRegion, PackingBox } from '@packing/shared';
 
 const { Title } = Typography;
@@ -86,6 +88,7 @@ export const OrdersPage: React.FC = () => {
   const [selectedRegion, setSelectedRegion] = useState<DeliveryRegion | null>(null);
   const [showLabelPreview, setShowLabelPreview] = useState(false);
   const [packingBoxes, setPackingBoxes] = useState<PackingBox[]>([]);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
   const getStatusColor = (status: string) => {
     const colors = {
@@ -671,14 +674,23 @@ export const OrdersPage: React.FC = () => {
   const handlePrintComplete = async () => {
     if (!selectedOrder) return;
     
-    // Сохраняем только локально, не отправляем в RIVHIT
+    // Показываем сообщение об успешной печати
     message.success(
       locale === 'he' 
-        ? `הזמנה ${selectedOrder.orderNumber} ארוזה בהצלחה` 
-        : `Заказ ${selectedOrder.orderNumber} успешно упакован и этикетки напечатаны`
+        ? `המדבקות הודפסו בהצלחה` 
+        : `Этикетки успешно напечатаны`
     );
     
+    // Закрываем окно предпросмотра этикеток (оно само закроется через LabelPreview)
+    // и открываем модал для создания счета
+    setTimeout(() => {
+      setShowInvoiceModal(true);
+    }, 500);
+  };
+
+  const handleInvoiceComplete = () => {
     // Закрываем все модальные окна
+    setShowInvoiceModal(false);
     setShowLabelPreview(false);
     setPackingModalVisible(false);
     
@@ -688,7 +700,14 @@ export const OrdersPage: React.FC = () => {
     setPackingData({});
     setConnections([]);
     
-    // Обновляем список заказов (только локальный статус)
+    // Показываем финальное сообщение
+    message.success(
+      locale === 'he' 
+        ? `הזמנה ${selectedOrder?.orderNumber} הושלמה בהצלחה!` 
+        : `Заказ ${selectedOrder?.orderNumber} успешно завершен!`
+    );
+    
+    // Обновляем список заказов
     loadOrders();
   };
 
@@ -1458,7 +1477,7 @@ export const OrdersPage: React.FC = () => {
             </Button>
           ]}
           width={1400}
-          bodyStyle={{ overflowX: 'auto', padding: '24px' }}
+          styles={{ body: { overflowX: 'auto', padding: '24px' } }}
         >
           <Spin spinning={detailsLoading}>
             {orderItems.length > 0 && (
@@ -1932,6 +1951,20 @@ export const OrdersPage: React.FC = () => {
           customerCity={selectedOrder?.customerCity}
           onPrint={handlePrintComplete}
           onCancel={() => setShowLabelPreview(false)}
+        />
+      )}
+      
+      {/* Модал создания счета */}
+      {showInvoiceModal && selectedOrder && (
+        <InvoiceModal
+          visible={showInvoiceModal}
+          orderId={selectedOrder.id}
+          orderNumber={selectedOrder.orderNumber}
+          boxes={packingBoxes}
+          customerName={selectedOrder.customerName || ''}
+          customerData={orderDetails?.customer}
+          onClose={() => setShowInvoiceModal(false)}
+          onInvoiceCreated={handleInvoiceComplete}
         />
       )}
     </div>

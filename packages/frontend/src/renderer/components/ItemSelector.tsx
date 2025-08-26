@@ -740,6 +740,7 @@ export const ItemSelector: React.FC<ItemSelectorProps> = ({
         <div style={{ marginBottom: '16px' }}>
           <PrintActions
             orderId={orderId}
+            orderNumber={orderId} // Pass orderId as orderNumber for invoice creation
             items={packingItems}
             customerName={customerName}
             disabled={readOnly}

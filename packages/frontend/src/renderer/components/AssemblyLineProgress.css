@@ -1,0 +1,346 @@
+/* Assembly Line Progress Component Styles */
+
+.assembly-line-container {
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.assembly-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+/* Step Styles */
+.assembly-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.assembly-step.active {
+  transform: scale(1.05);
+}
+
+.assembly-step.completed {
+  opacity: 0.9;
+}
+
+.assembly-step.pending {
+  opacity: 0.5;
+}
+
+/* Step Icon Wrapper */
+.step-icon-wrapper {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.step-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.assembly-step.active .step-icon {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+  box-shadow: 0 8px 24px rgba(24, 144, 255, 0.3);
+}
+
+.assembly-step.completed .step-icon {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  box-shadow: 0 8px 24px rgba(82, 196, 26, 0.3);
+}
+
+.assembly-step.pending .step-icon {
+  background: #f0f2f5;
+  border: 2px dashed #d9d9d9;
+}
+
+/* Active Icon Container */
+.active-icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+}
+
+.loading-spinner {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Pending Icon */
+.pending-icon {
+  font-size: 24px;
+  color: #bfbfbf;
+}
+
+/* Pulse Ring Animation */
+.pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid #1890ff;
+  animation: pulse 1.5s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Step Content */
+.step-content {
+  text-align: center;
+}
+
+.step-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #f0f2f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  font-weight: bold;
+  font-size: 12px;
+  color: #595959;
+  transition: all 0.3s ease;
+}
+
+.assembly-step.active .step-number {
+  background: #1890ff;
+  color: white;
+}
+
+.assembly-step.completed .step-number {
+  background: #52c41a;
+  color: white;
+}
+
+.step-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #262626;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.assembly-step.active .step-title {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.assembly-step.completed .step-title {
+  color: #52c41a;
+}
+
+.assembly-step.pending .step-title {
+  color: #8c8c8c;
+}
+
+/* Connector */
+.connector {
+  flex: 0 0 80px;
+  height: 2px;
+  position: relative;
+  margin: 0 -20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.connector-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #d9d9d9;
+  transition: all 0.3s ease;
+}
+
+.connector.completed .connector-line {
+  background: #52c41a;
+}
+
+.connector.active .connector-line {
+  background: linear-gradient(90deg, #52c41a 0%, #1890ff 100%);
+}
+
+.connector-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: #1890ff;
+  width: 0;
+  transition: width 0.6s ease;
+}
+
+.connector.active .connector-progress {
+  animation: progress 2s ease-in-out infinite;
+}
+
+@keyframes progress {
+  0% { width: 0; }
+  50% { width: 100%; }
+  100% { width: 0; }
+}
+
+.connector-arrow {
+  position: relative;
+  fill: #d9d9d9;
+  z-index: 1;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.connector.completed .connector-arrow {
+  fill: #52c41a;
+}
+
+.connector.active .connector-arrow {
+  fill: #1890ff;
+  animation: arrow-move 1s ease-in-out infinite;
+}
+
+@keyframes arrow-move {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+/* Assembly Status */
+.assembly-status {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+}
+
+.status-text {
+  font-size: 14px;
+  color: #262626;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.status-text strong {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+/* Progress Bar */
+.progress-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #52c41a 0%, #1890ff 100%);
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .assembly-line {
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .connector {
+    width: 2px;
+    height: 40px;
+    flex: 0 0 40px;
+    margin: -20px 0;
+  }
+  
+  .connector-line {
+    width: 2px;
+    height: 100%;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .connector-arrow {
+    transform: rotate(90deg);
+  }
+  
+  .connector.active .connector-arrow {
+    animation: arrow-move-vertical 1s ease-in-out infinite;
+  }
+  
+  @keyframes arrow-move-vertical {
+    0%, 100% { transform: rotate(90deg) translateX(0); }
+    50% { transform: rotate(90deg) translateX(5px); }
+  }
+}

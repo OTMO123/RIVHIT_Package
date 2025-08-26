@@ -1,0 +1,74 @@
+^Q30,3
+^W100
+^H10
+^P1
+^S4
+^AD
+^C1
+^R0
+~Q+0
+^O0
+^D0
+^E20
+~R255
+^L
+
+Dy2-me-dd
+Th:m:s
+
+; Main border
+R10,10,1180,1180,6
+
+; Order number (large, centered)
+A400,100,0,8,3,3,N,"${ORDER_ID}"
+A480,180,0,4,1,1,N,"Order"
+A380,220,0,3,1,1,R,"${CUSTOMER_NAME_HE}"
+
+; Box indicator (top right)
+R900,40,1150,140,4
+A975,60,0,3,1,1,N,"Box"
+A950,95,0,5,1,1,N,"${BOX_NUMBER}/${TOTAL_BOXES}"
+
+; Region indicator (top left)
+R50,40,300,140,4
+A175,60,0,3,1,1,R,"${REGION_HE}"
+A175,95,0,2,1,1,N,"${REGION_RU}"
+
+; Customer name
+A300,250,0,3,1,1,R,"${CUSTOMER_NAME}"
+
+; Separator line
+L50,320,1150,320,3
+
+; Item 1
+R80,360,1120,520,2
+A1080,390,0,3,1,1,R,"${ITEM1_NAME_HE}"
+A1080,425,0,2,1,1,N,"${ITEM1_NAME_RU}"
+A120,405,0,5,2,2,N,"${ITEM1_QTY}"
+B400,390,0,1,2,6,80,B,"${ITEM1_BARCODE}"
+
+; Item 2
+R80,540,1120,700,2
+A1080,570,0,3,1,1,R,"${ITEM2_NAME_HE}"
+A1080,605,0,2,1,1,N,"${ITEM2_NAME_RU}"
+A120,585,0,5,2,2,N,"${ITEM2_QTY}"
+B400,570,0,1,2,6,80,B,"${ITEM2_BARCODE}"
+
+; Item 3
+R80,720,1120,880,2
+A1080,750,0,3,1,1,R,"${ITEM3_NAME_HE}"
+A1080,785,0,2,1,1,N,"${ITEM3_NAME_RU}"
+A120,765,0,5,2,2,N,"${ITEM3_QTY}"
+B400,750,0,1,2,6,80,B,"${ITEM3_BARCODE}"
+
+; Item 4
+R80,900,1120,1060,2
+A1080,930,0,3,1,1,R,"${ITEM4_NAME_HE}"
+A1080,965,0,2,1,1,N,"${ITEM4_NAME_RU}"
+A120,945,0,5,2,2,N,"${ITEM4_QTY}"
+B400,930,0,1,2,6,80,B,"${ITEM4_BARCODE}"
+
+; Date at bottom
+A500,1130,0,2,1,1,N,"${DATE}"
+
+E

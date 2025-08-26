@@ -82,6 +82,9 @@ export interface PackingBoxItem {
   catalogNumber?: string;
   barcode?: string;
   weight?: number;
+  price?: number;
+  sale_nis?: number;
+  cost_nis?: number;
 }
 
 export interface BoxAssignment {

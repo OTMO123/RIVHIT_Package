@@ -98,15 +98,24 @@ export enum DocumentStatus {
   RETURNED = 8
 }
 
-// Document types
+// Document types (from actual RIVHIT API)
 export enum DocumentType {
-  QUOTE = 1,
-  ORDER = 2,
-  DELIVERY_NOTE = 3,
-  INVOICE = 4,
-  RECEIPT = 5,
-  CREDIT_NOTE = 6,
-  RETURN = 7
+  INVOICE = 1,              // חשבונית מס - Tax Invoice
+  INVOICE_RECEIPT = 2,      // חשבונית מס קבלה - Invoice-Receipt
+  CREDIT_NOTE = 3,          // חשבונית מס זיכוי - Credit Note
+  DELIVERY_NOTE = 4,        // תעודת משלוח - Shipping List
+  RETURN = 5,               // תעודת החזרה - Return Document
+  QUOTE = 6,                // הצעת מחיר - Price Quote
+  ORDER = 7,                // הזמנה - Order
+  PROFORMA = 8,             // חשבון חיוב - Proforma Invoice
+  PURCHASE_INVOICE = 9,     // חשבונית קניות למלאי
+  STOCK_OUT = 10,           // תעודת יציאה ממלאי
+  STOCK_IN = 11,            // תעודת כניסה למלאי
+  MANUAL_INVOICE = 12,      // חשבונית-קליטה מפנקס
+  SUPPLIER_ORDER = 13,      // הזמנה מספק
+  SELF_INVOICE = 14,        // חשבונית מס עצמית
+  MANUAL_DELIVERY = 100,    // תעודת משלוח מפנקס
+  INTER_WAREHOUSE = 999     // ת.משלוח בין מחסנים
 }
 
 // Currency types

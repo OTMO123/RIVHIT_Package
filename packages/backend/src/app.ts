@@ -34,6 +34,7 @@ import authRoutes from './routes/auth.routes';
 import customersRoutes from './routes/customers.routes';
 import itemsRoutes from './routes/items.routes';
 import settingsRoutes from './routes/settings.routes';
+import invoiceRoutes from './routes/invoice.routes';
 import { initializeDatabase } from './config/database.config';
 
 // Dependency Injection Container
@@ -210,6 +211,7 @@ export class AppFactory {
     this.app.use('/api/orders', optionalAuth, ordersRoutes);
     this.app.use('/api/print', optionalAuth, printRoutes);
     this.app.use('/api/settings', optionalAuth, settingsRoutes);
+    this.app.use('/api/invoices', optionalAuth, invoiceRoutes);
 
     // Старые маршруты для обратной совместимости (v1)
     const router = express.Router();

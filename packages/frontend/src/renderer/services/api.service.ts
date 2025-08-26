@@ -89,6 +89,7 @@ export interface Order {
   orderNumber: string;
   customerName: string;
   customerCity?: string;
+  customer_id?: number;  // Added customer_id from RIVHIT
   status: 'pending' | 'processing' | 'packed' | 'shipped';
   items: number;
   weight: number;
@@ -257,6 +258,7 @@ class ApiService {
       id: doc.document_number?.toString() || `temp-${doc.customer_id}-${Date.now()}`,
       orderNumber: doc.document_number ? `${doc.document_number}` : `TEMP-${doc.customer_id}`,
       customerName,
+      customer_id: doc.customer_id,  // Include customer_id from RIVHIT
       status: statusMapping[doc.status || 0] || 'pending',
       items: calculatedItemCount,
       weight: calculatedItemCount * 0.3, // Estimate weight based on items
@@ -356,6 +358,7 @@ class ApiService {
           id: doc.document_number?.toString() || `temp-${Date.now()}-${index}`,
           orderNumber: `${doc.document_number}`,
           customerName: doc.customer_name?.trim() || `Customer ${doc.customer_id}`,
+          customer_id: doc.customer_id,  // Include customer_id from backend
           status: 'pending' as const, // Default status
           items: itemTypesCount,
           weight: itemTypesCount * 0.3, // Estimate based on item types

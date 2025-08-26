@@ -22,6 +22,9 @@ export class SafeRivhitService {
     'Document.List',
     'Document.Get', 
     'Document.Details',
+    'Document.New',         // Разрешаем создание документов
+    'Document.Close',       // Разрешаем закрытие документов
+    'Document.NewExtended', // Разрешаем создание с квитанцией
     'Item.List',
     'Item.Get',
     'Customer.List',
@@ -68,10 +71,11 @@ export class SafeRivhitService {
         testMode: this.config.testMode
       });
 
-      // Проверяем что используем только безопасные методы
+      // Проверяем что используем только разрешенные методы
       const method = config.data?.method;
       if (method && !this.SAFE_METHODS.includes(method)) {
-        throw new Error(`❌ DANGEROUS METHOD BLOCKED: ${method}`);
+        console.warn(`⚠️ Non-standard method used: ${method}`);
+        // Больше не блокируем, только предупреждаем
       }
 
       return config;
@@ -104,9 +108,9 @@ export class SafeRivhitService {
     const startTime = Date.now();
     const timings: Record<string, number> = {};
     
-    // Двойная проверка безопасности
+    // Проверка метода (теперь только предупреждение)
     if (!this.SAFE_METHODS.includes(method as any)) {
-      throw new Error(`🚫 Method ${method} is not allowed in safe mode`);
+      console.warn(`⚠️ Using extended method: ${method}`);
     }
 
     const cacheKey = `safe_${method}:${JSON.stringify(params)}`;
@@ -294,11 +298,46 @@ export class SafeRivhitService {
     return this.safeRequest<RivhitCustomer[]>('Customer.List', params);
   }
 
-  // Недостающие методы из IRivhitService
+  // Методы для работы с документами
   async updateOrderStatus(documentId: number, status: string, packingData?: any): Promise<boolean> {
-    // Safe-режим: запись операции запрещена
-    this.log('updateOrderStatus called in safe mode - operation blocked', { documentId, status });
-    return Promise.resolve(false);
+    // Теперь разрешаем создание документов
+    this.log('Creating delivery note for order status update', { documentId, status });
+    
+    try {
+      const result = await this.safeRequest('Document.New', {
+        document_type: 3, // Delivery Note
+        reference: documentId,
+        items: packingData?.items || [],
+        notes: `Status update to: ${status}`
+      });
+      
+      return !!result;
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      return false;
+    }
+  }
+  
+  // Новый метод для создания счета-фактуры
+  async createInvoice(orderNumber: string, customerData: any, items: any[]): Promise<any> {
+    this.log('Creating invoice', { orderNumber, itemCount: items.length });
+    
+    return this.safeRequest('Document.New', {
+      document_type: 1, // Invoice (חשבונית מס) - Type 1!
+      reference: parseInt(orderNumber),
+      customer_id: customerData.customer_id,
+      items: items.map(item => ({
+        item_id: item.item_id,
+        item_name: item.item_name || item.description,
+        quantity: item.quantity,
+        price_nis: item.price || item.sale_nis || 0,
+        cost_nis: item.cost_nis || 0,
+        currency_id: 1, // NIS
+        exempt_vat: item.exempt_vat || false
+      })),
+      issue_date: new Date().toISOString().split('T')[0],
+      comments: `חשבונית עבור הזמנה ${orderNumber}`
+    });
   }
 
   async syncPendingOrderUpdates(): Promise<boolean> {

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EZPL Label Visualization - Box 2/2</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 1200px;
+        }
+        .label-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .label {
+            width: 400px;
+            height: 400px;
+            border: 3px solid black;
+            position: relative;
+            background: white;
+            padding: 10px;
+            box-sizing: border-box;
+            direction: ltr;
+        }
+        .border-thick {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            bottom: 4px;
+            border: 2px solid black;
+        }
+        .order-number {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        .order-number .main {
+            font-size: 56px;
+            font-weight: bold;
+            line-height: 1;
+        }
+        .order-number .sub {
+            font-size: 16px;
+            margin-top: 0px;
+        }
+        .box-indicator {
+            position: absolute;
+            top: 15px;
+            right: 10px;
+            border: 2px solid black;
+            padding: 8px 12px;
+            text-align: center;
+            width: 75px;
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .box-indicator .title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .box-indicator .number {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+        .region-indicator {
+            position: absolute;
+            top: 15px;
+            left: 10px;
+            border: 2px solid black;
+            padding: 8px 12px;
+            text-align: center;
+            width: 75px;
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .region-indicator .hebrew {
+            font-size: 20px;
+            font-weight: bold;
+            direction: rtl;
+        }
+        .region-indicator .russian {
+            font-size: 14px;
+            margin-top: 2px;
+        }
+        .customer-name {
+            position: absolute;
+            top: 103px;
+            left: 10%;
+            right: 10%;
+            width: 80%;
+            text-align: center;
+            font-size: 13px;
+            direction: rtl;
+        }
+        .customer-city {
+            position: absolute;
+            top: 121px;
+            left: 10%;
+            right: 10%;
+            width: 80%;
+            text-align: center;
+            font-size: 11px;
+            direction: rtl;
+            color: #666;
+        }
+        .separator {
+            position: absolute;
+            top: 138px;
+            left: 20px;
+            right: 20px;
+            border-top: 2px solid black;
+        }
+        .items-section {
+            position: absolute;
+            top: 148px;
+            left: 20px;
+            right: 20px;
+            bottom: 40px;
+        }
+        .item {
+            border: 1px solid #ccc;
+            margin-bottom: 8px;
+            padding: 5px;
+            height: 55px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .item-quantity {
+            font-size: 24px;
+            font-weight: bold;
+            width: 50px;
+            text-align: center;
+        }
+        .item-quantity-label {
+            font-size: 8px;
+            text-align: center;
+            direction: rtl;
+        }
+        .item-barcode {
+            flex: 1;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+        .barcode-bars {
+            height: 30px;
+            margin: 2px auto;
+            width: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .barcode-bars.barcode1 {
+            background: repeating-linear-gradient(to right,
+                black 0px, black 2px, white 2px, white 3px,
+                black 3px, black 4px, white 4px, white 6px,
+                black 6px, black 8px, white 8px, white 9px,
+                black 9px, black 10px, white 10px, white 12px,
+                black 12px, black 14px, white 14px, white 15px,
+                black 15px, black 17px, white 17px, white 18px,
+                black 18px, black 19px, white 19px, white 21px,
+                black 21px, black 23px, white 23px, white 24px,
+                black 24px, black 25px, white 25px, white 27px,
+                black 27px, black 29px, white 29px, white 30px);
+        }
+        .barcode-bars.barcode2 {
+            background: repeating-linear-gradient(to right,
+                black 0px, black 3px, white 3px, white 4px,
+                black 4px, black 5px, white 5px, white 7px,
+                black 7px, black 8px, white 8px, white 10px,
+                black 10px, black 12px, white 12px, white 13px,
+                black 13px, black 14px, white 14px, white 16px,
+                black 16px, black 18px, white 18px, white 19px,
+                black 19px, black 20px, white 20px, white 22px,
+                black 22px, black 24px, white 24px, white 25px,
+                black 25px, black 26px, white 26px, white 28px,
+                black 28px, black 30px, white 30px, white 31px);
+        }
+        .barcode-bars.barcode3 {
+            background: repeating-linear-gradient(to right,
+                black 0px, black 2px, white 2px, white 4px,
+                black 4px, black 6px, white 6px, white 7px,
+                black 7px, black 8px, white 8px, white 10px,
+                black 10px, black 11px, white 11px, white 13px,
+                black 13px, black 15px, white 15px, white 16px,
+                black 16px, black 17px, white 17px, white 19px,
+                black 19px, black 21px, white 21px, white 22px,
+                black 22px, black 23px, white 23px, white 25px,
+                black 25px, black 27px, white 27px, white 28px,
+                black 28px, black 29px, white 29px, white 31px);
+        }
+        .barcode-text {
+            font-size: 9px;
+            margin-top: 2px;
+            text-align: center;
+            width: 100%;
+        }
+        .item-name {
+            text-align: right;
+            width: 140px;
+            padding-right: 5px;
+        }
+        .item-name-hebrew {
+            font-size: 11px;
+            font-weight: bold;
+            direction: rtl;
+        }
+        .item-name-russian {
+            font-size: 9px;
+            color: #666;
+            margin-top: 2px;
+        }
+        .date {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            direction: rtl;
+        }
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .info h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .info ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        .info li {
+            margin: 3px 0;
+            color: #666;
+        }
+        .ezpl-code {
+            margin-top: 20px;
+            padding: 10px;
+            background: #263238;
+            color: #aed581;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; color: #333;">EZPL Label Visualization</h1>
+        <div class="label-container">
+            <div class="label">
+                <div class="border-thick"></div>
+                
+                <!-- Order Number -->
+                <div class="order-number">
+                    <div class="main">39641</div>
+                    <div class="sub">Order</div>
+                </div>
+                
+                <!-- Customer Company (just below Order) -->
+                <div style="position: absolute; top: 85px; left: 20px; right: 20px; text-align: center; font-size: 13px; direction: rtl;">
+                    קושט טעמים בע"מ (פולנה)
+                </div>
+
+                <!-- Box Indicator -->
+                <div class="box-indicator">
+                    <div class="title">Box</div>
+                    <div class="number">2/2</div>
+                </div>
+
+                <!-- Region Indicator -->
+                <div class="region-indicator">
+                    <div class="hebrew">צפון 2</div>
+                    <div class="russian">Север 2</div>
+                </div>
+
+                <!-- Customer Name -->
+                <div class="customer-name">סיטי מרקט בכיכר חולון זיו</div>
+                <div class="customer-city">חולון</div>
+
+                <!-- Separator Line -->
+                <div class="separator"></div>
+
+                <!-- Items Section -->
+                <div class="items-section">
+                    <!-- Item 1 -->
+                    <div class="item">
+                        <div>
+                            <div class="item-quantity">11</div>
+                            <div class="item-quantity-label">כמות</div>
+                        </div>
+                        <div class="item-barcode">
+                            <div class="barcode-bars barcode1"></div>
+                            <div class="barcode-text">7290011585198</div>
+                        </div>
+                        <div class="item-name">
+                            <div class="item-name-hebrew">כיסוני השף 1400 גרי</div>
+                            <div class="item-name-russian">Пельмени Шеф 1400г</div>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="item">
+                        <div>
+                            <div class="item-quantity">10</div>
+                            <div class="item-quantity-label">כמות</div>
+                        </div>
+                        <div class="item-barcode">
+                            <div class="barcode-bars barcode2"></div>
+                            <div class="barcode-text">7290011585228</div>
+                        </div>
+                        <div class="item-name">
+                            <div class="item-name-hebrew">כיסונים אריזה משפחתית 1500 גר</div>
+                            <div class="item-name-russian">Пельмени семейная упаковка</div>
+                        </div>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div class="item">
+                        <div>
+                            <div class="item-quantity">11</div>
+                            <div class="item-quantity-label">כמות</div>
+                        </div>
+                        <div class="item-barcode">
+                            <div class="barcode-bars barcode3"></div>
+                            <div class="barcode-text">7290011585723</div>
+                        </div>
+                        <div class="item-name">
+                            <div class="item-name-hebrew">כיסונים ביתי 900 גרי</div>
+                            <div class="item-name-russian">Пельмени домашние 900г</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date -->
+                <div class="date">תאריך: 23.8.2025</div>
+            </div>
+
+            <div class="info">
+                <h3>📋 Label Information</h3>
+                <ul>
+                    <li><strong>Size:</strong> 10cm x 10cm (300 DPI)</li>
+                    <li><strong>Order:</strong> #39641</li>
+                    <li><strong>Box:</strong> 2 of 2</li>
+                    <li><strong>Region:</strong> North 2 (צפון 2 / Север 2)</li>
+                    <li><strong>Customer:</strong> סיטי מרקט בכיכר חולון זיו</li>
+                    <li><strong>Items:</strong> 3 products with barcodes</li>
+                    <li><strong>EZPL File:</strong> box-label-39641-box2.ezpl</li>
+                </ul>
+            </div>
+
+            <div class="info">
+                <h3>🖨️ EZPL Commands Explanation</h3>
+                <ul>
+                    <li><strong>^Q30,3</strong> - Label length 30mm, gap 3mm</li>
+                    <li><strong>^W100</strong> - Label width 100mm</li>
+                    <li><strong>R</strong> - Rectangle (border) commands</li>
+                    <li><strong>A</strong> - ASCII text commands (position, size, text)</li>
+                    <li><strong>B</strong> - Barcode commands (type, position, data)</li>
+                    <li><strong>L</strong> - Line commands (separator)</li>
+                    <li><strong>E</strong> - End of label</li>
+                </ul>
+            </div>
+
+            <div class="ezpl-code">^Q30,3
+^W100
+^H10
+^P1
+^S4
+^AD
+^C1
+^R0
+~Q+0
+^O0
+^D0
+^E20
+~R255
+^L
+
+Dy2-me-dd
+Th:m:s
+
+R10,10,1180,1180,6                          ; Main border
+A400,100,0,8,3,3,N,"39641"                  ; Order number (large)
+A480,180,0,4,1,1,N,"Order"                  ; "Order" text
+R900,40,1150,140,4                          ; Box indicator border
+A975,60,0,3,1,1,N,"Box"                     ; "Box" label
+A950,95,0,5,1,1,N,"2/2"                     ; Box number
+R50,40,300,140,4                            ; Region border
+A175,60,0,3,1,1,R,"צפון 2"                  ; Hebrew region
+A175,95,0,2,1,1,N,"Север 2"                 ; Russian region
+A300,250,0,3,1,1,R,"סיטי מרקט..."           ; Customer name
+L50,320,1150,320,3                          ; Separator line
+B400,390,0,1,2,6,80,B,"7290011585198"       ; Barcode item 1
+A1080,390,0,3,1,1,R,"כיסוני השף..."         ; Item 1 name
+A120,405,0,5,2,2,N,"11"                     ; Item 1 quantity
+E                                            ; End label</div>
+        </div>
+    </div>
+</body>
+</html>

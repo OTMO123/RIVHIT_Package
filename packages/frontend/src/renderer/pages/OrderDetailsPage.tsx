@@ -163,7 +163,7 @@ export const OrderDetailsPage: React.FC = () => {
       case DocumentType.ORDER: return 'הזמנה';
       case DocumentType.DELIVERY_NOTE: return 'תעודת משלוח';
       case DocumentType.INVOICE: return 'חשבונית';
-      case DocumentType.RECEIPT: return 'קבלה';
+      case DocumentType.INVOICE_RECEIPT: return 'חשבונית מס קבלה';
       case DocumentType.CREDIT_NOTE: return 'זיכוי';
       case DocumentType.RETURN: return 'החזרה';
       default: return 'לא ידוע';
@@ -236,7 +236,7 @@ export const OrderDetailsPage: React.FC = () => {
     }
   };
 
-  const handlePrintComplete = (jobId: string, type: 'shipping' | 'product' | 'box') => {
+  const handlePrintComplete = (jobId: string, type: 'shipping' | 'product' | 'box' | 'invoice') => {
     console.log(`Print completed: ${type} job ${jobId} for order ${selectedOrder?.document_number}`);
   };
 
@@ -376,8 +376,10 @@ export const OrderDetailsPage: React.FC = () => {
           {packingItems.length > 0 && (
             <PrintActions
               orderId={selectedOrder.document_number?.toString() || '0'}
+              orderNumber={selectedOrder.document_number?.toString()}
               items={packingItems}
               customerName={orderCustomer ? `${orderCustomer.first_name} ${orderCustomer.last_name}` : undefined}
+              customerData={orderCustomer}
               onPrintComplete={handlePrintComplete}
             />
           )}

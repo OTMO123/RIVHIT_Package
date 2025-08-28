@@ -22,29 +22,35 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { t, dir } = useI18n();
+  const { t, dir, language } = useI18n();
 
   const menuItems = [
-    {
-      key: '/',
-      icon: <HomeOutlined />,
-      label: 'Dashboard',
-    },
     {
       key: '/orders',
       icon: <ShoppingCartOutlined />,
       label: t.nav.orders,
     },
     {
-      key: '/packing',
-      icon: <ContainerOutlined />,
-      label: t.nav.packing,
-    },
-    {
-      key: '/printing',
+      key: '/printer-test',
       icon: <PrinterOutlined />,
-      label: t.nav.printing,
+      label: language === 'ru' ? 'Тест принтера' : 'Printer Test',
     }
+    // Temporarily disabled pages:
+    // {
+    //   key: '/packing',
+    //   icon: <ContainerOutlined />,
+    //   label: t.nav.packing,
+    // },
+    // {
+    //   key: '/printing',
+    //   icon: <PrinterOutlined />,
+    //   label: t.nav.printing,
+    // },
+    // {
+    //   key: '/dashboard',
+    //   icon: <HomeOutlined />,
+    //   label: 'Dashboard',
+    // }
   ];
 
   const handleMenuClick = ({ key }: { key: string }) => {
@@ -73,7 +79,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         
         <Menu
           mode="inline"
-          selectedKeys={[location.pathname]}
+          selectedKeys={[location.pathname === '/' ? '/orders' : location.pathname]}
           style={{ 
             border: 'none',
             paddingTop: '16px'

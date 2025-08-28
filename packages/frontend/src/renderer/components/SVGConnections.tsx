@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 export interface Connection {
   id: string;
@@ -16,7 +16,7 @@ interface SVGConnectionsProps {
   onConnectionClick?: (connectionId: string) => void;
 }
 
-export const SVGConnections: React.FC<SVGConnectionsProps> = ({
+export const SVGConnections: React.FC<SVGConnectionsProps> = React.memo(({
   connections,
   dragPosition,
   dragStartPosition,
@@ -51,7 +51,7 @@ export const SVGConnections: React.FC<SVGConnectionsProps> = ({
         height: '100%',
         pointerEvents: 'none',
         overflow: 'visible',
-        zIndex: 1000,
+        zIndex: 1000
       }}
     >
       <defs>
@@ -111,9 +111,16 @@ export const SVGConnections: React.FC<SVGConnectionsProps> = ({
       
       <style>{`
         .dragging-cable {
-          transition: d 0.05s ease-out;
+          transition: none;
         }
       `}</style>
     </svg>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison for memo optimization
+  return (
+    JSON.stringify(prevProps.connections) === JSON.stringify(nextProps.connections) &&
+    JSON.stringify(prevProps.dragPosition) === JSON.stringify(nextProps.dragPosition) &&
+    JSON.stringify(prevProps.dragStartPosition) === JSON.stringify(nextProps.dragStartPosition)
+  );
+});

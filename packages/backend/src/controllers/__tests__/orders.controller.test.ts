@@ -67,7 +67,11 @@ describe('OrdersController', () => {
       await controller.getOrders(mockRequest as Request, mockResponse as Response);
 
       // Assert
-      expect(mockRivhitService.getDocuments).toHaveBeenCalledWith({});
+      expect(mockRivhitService.getDocuments).toHaveBeenCalledWith(
+        expect.objectContaining({
+          date_from: expect.any(String) // Controller always adds default date
+        })
+      );
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
         success: true,
@@ -90,9 +94,9 @@ describe('OrdersController', () => {
 
       // Assert
       expect(mockRivhitService.getDocuments).toHaveBeenCalledWith({
-        fromDate: '2023-01-01',
-        toDate: '2023-01-31',
-        documentType: 1
+        date_from: '2023-01-01',
+        date_to: '2023-01-31',
+        document_type: 1
       });
     });
 
@@ -162,7 +166,7 @@ describe('OrdersController', () => {
 
       // Assert
       expect(mockRivhitService.getDocuments).toHaveBeenCalledWith({
-        documentNumber: 123
+        date_from: expect.any(String) // Controller uses date-based filtering
       });
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -216,12 +220,14 @@ describe('OrdersController', () => {
           item_name: 'Test Item',
           item_extended_description: 'Test Item Description',
           item_part_num: 'TEST001',
+          line_id: 'L1', // Added by controller
           barcode: '1234567890',
           item_group_id: 1,
           storage_id: 1,
           quantity: 10,
           cost_nis: 50,
           sale_nis: 100,
+          price_nis: 100, // Controller filters on this field
           currency_id: 1,
           cost_mtc: 50,
           sale_mtc: 100,
@@ -232,16 +238,19 @@ describe('OrdersController', () => {
           is_serial: 0,
           sapak: 0,
           item_name_en: 'Test Item',
-          item_order: 1
+          item_order: 1,
+          unique_id: '123_1' // Added by controller
         }
       ];
-      mockRivhitService.getItems.mockResolvedValue(mockItems);
+      mockRivhitService.getDocumentDetails.mockResolvedValue({
+        data: { items: mockItems }
+      });
 
       // Act
       await controller.getOrderItems(mockRequest as Request, mockResponse as Response);
 
       // Assert
-      expect(mockRivhitService.getItems).toHaveBeenCalledWith({ item_group_id: 123 });
+      expect(mockRivhitService.getDocumentDetails).toHaveBeenCalledWith(7, 123);
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
         success: true,
@@ -254,7 +263,7 @@ describe('OrdersController', () => {
       // Arrange
       mockRequest.params = { id: '123' };
       const error = new Error('Service error');
-      mockRivhitService.getItems.mockRejectedValue(error);
+      mockRivhitService.getDocumentDetails.mockRejectedValue(error);
 
       // Act
       await controller.getOrderItems(mockRequest as Request, mockResponse as Response);

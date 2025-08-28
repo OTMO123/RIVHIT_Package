@@ -94,7 +94,7 @@ describe('RivhitService', () => {
           error_code: 0,
           client_message: '',
           debug_message: '',
-          data: { documents: mockDocuments },
+          data: { document_list: mockDocuments },
         },
       };
       mockedAxios.post.mockResolvedValue(apiResponse);
@@ -188,7 +188,7 @@ describe('RivhitService', () => {
           error_code: 0,
           client_message: '',
           debug_message: '',
-          data: { items: mockItems },
+          data: { item_list: mockItems }
         },
       };
       mockedAxios.post.mockResolvedValue(apiResponse);
@@ -202,7 +202,7 @@ describe('RivhitService', () => {
         api_token: mockApiToken,
         item_group_id: undefined,
       });
-      expect(mockCache.set).toHaveBeenCalledWith('items:all', mockItems, 1800);
+      expect(mockCache.set).toHaveBeenCalledWith('items:all', mockItems, 600);
     });
 
     it('should handle groupId parameter', async () => {
@@ -214,7 +214,7 @@ describe('RivhitService', () => {
           error_code: 0,
           client_message: '',
           debug_message: '',
-          data: { items: mockItems },
+          data: { item_list: mockItems }
         },
       };
       mockedAxios.post.mockResolvedValue(apiResponse);
@@ -227,7 +227,7 @@ describe('RivhitService', () => {
 
       // Assert
       expect(result).toEqual(mockItems);
-      expect(mockCache.get).toHaveBeenCalledWith(`items:${JSON.stringify({ item_group_id: groupId })}`);
+      expect(mockCache.get).toHaveBeenCalledWith(`items:${groupId}`);
       expect(mockedAxios.post).toHaveBeenCalledWith('/Item.List', {
         api_token: mockApiToken,
         item_group_id: groupId,

@@ -25,6 +25,7 @@ import {
 } from '@ant-design/icons';
 import { PackingItem } from '@packing/shared';
 import { BoxLabelPrint } from './BoxLabelPrint';
+import { PrinterSettings } from './PrinterSettings';
 
 const { Text, Title } = Typography;
 
@@ -62,7 +63,9 @@ export const PrintActions: React.FC<PrintActionsProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [printerStatus, setPrinterStatus] = useState<PrinterStatus | null>(null);
   const [showStatusModal, setShowStatusModal] = useState(false);
+  const [showPrinterSettings, setShowPrinterSettings] = useState(false);
   const [lastPrintJob, setLastPrintJob] = useState<string | null>(null);
+  const [lastPrintError, setLastPrintError] = useState<string | null>(null);
 
   // Фильтруем только упакованные товары для печати
   const printableItems = items.filter(item => 
@@ -71,88 +74,235 @@ export const PrintActions: React.FC<PrintActionsProps> = ({
     item.packedQuantity > 0
   );
 
+  const handlePrintError = (error: string, context: string) => {
+    console.error(`💥 [PRINT ERROR] ${context}:`, error);
+    setLastPrintError(error);
+    
+    // Show error modal with printer settings button
+    Modal.error({
+      title: 'Ошибка печати',
+      content: (
+        <div>
+          <Alert
+            message="Не удалось напечатать этикетки"
+            description={`${error}${context ? ` (${context})` : ''}`}
+            type="error"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+          <Text type="secondary">
+            Возможные причины:
+          </Text>
+          <ul style={{ marginTop: 8, marginBottom: 16 }}>
+            <li>Принтер выключен или недоступен</li>
+            <li>Проблемы с сетевым подключением</li>
+            <li>Неверные настройки принтера</li>
+            <li>Проблемы с сетью или VPN</li>
+          </ul>
+        </div>
+      ),
+      okText: 'Настройки принтера',
+      onOk: () => {
+        console.log('🔧 [PRINT ERROR] Opening printer settings...');
+        setShowPrinterSettings(true);
+      }
+    });
+  };
+
   const checkPrinterStatus = async () => {
+    console.log('🔍 [PRINTER STATUS] Checking printer status...');
     try {
       const response = await fetch('/api/print/status');
       const data = await response.json();
       
+      console.log('📡 [PRINTER STATUS] Response:', data);
+      
       if (data.success) {
         setPrinterStatus(data.status);
+        console.log(`✅ [PRINTER STATUS] Status retrieved, isReady: ${data.status.isReady}`);
         return data.status.isReady;
       } else {
-        message.error('Не удалось проверить статус принтера');
+        console.error('❌ [PRINTER STATUS] Failed to get status:', data.error);
+        handlePrintError(data.error || 'Не удалось проверить статус принтера', 'Проверка статуса');
         return false;
       }
     } catch (error) {
-      message.error('Ошибка подключения к принтеру');
+      const errorMsg = error instanceof Error ? error.message : 'Неизвестная ошибка';
+      console.error('💥 [PRINTER STATUS] Network error:', errorMsg);
+      handlePrintError(`Ошибка подключения к принтеру: ${errorMsg}`, 'Сетевая ошибка');
       return false;
     }
   };
 
   const printShippingLabel = async () => {
+    console.log('🏷️ [SHIPPING LABEL] Начинаем печать этикетки доставки...');
+    console.log('📋 [SHIPPING LABEL] Параметры:', {
+      orderId,
+      customerName,
+      printableItemsCount: printableItems.length,
+      items: printableItems.map(item => ({ 
+        id: item.item_id, 
+        description: item.item_name,
+        quantity: item.quantity 
+      }))
+    });
+
     if (printableItems.length === 0) {
+      console.warn('⚠️ [SHIPPING LABEL] Нет товаров для печати');
       message.warning('Нет товаров для печати этикетки доставки');
       return;
     }
 
     setIsLoading(true);
     try {
+      console.log('🔍 [SHIPPING LABEL] Проверяем статус принтера...');
       // Проверяем статус принтера
       const isReady = await checkPrinterStatus();
+      console.log('📡 [SHIPPING LABEL] Статус принтера:', isReady);
+      
       if (!isReady) {
+        console.warn('⚠️ [SHIPPING LABEL] Принтер не готов, показываем подтверждение');
         Modal.confirm({
           title: 'Принтер не готов',
           content: 'Принтер не готов к печати. Продолжить?',
-          onOk: () => proceedWithShippingPrint(),
-          onCancel: () => setIsLoading(false)
+          onOk: () => {
+            console.log('✅ [SHIPPING LABEL] Пользователь подтвердил печать');
+            proceedWithShippingPrint();
+          },
+          onCancel: () => {
+            console.log('❌ [SHIPPING LABEL] Пользователь отменил печать');
+            setIsLoading(false);
+          }
         });
         return;
       }
 
+      console.log('✅ [SHIPPING LABEL] Принтер готов, продолжаем печать');
       await proceedWithShippingPrint();
     } catch (error) {
-      console.error('Error printing shipping label:', error);
-      message.error('Ошибка при печати этикетки доставки');
+      console.error('🚨 [SHIPPING LABEL] Критическая ошибка:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'UnknownError'
+      });
+      message.error(`Ошибка при печати этикетки доставки: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
+      console.log('🏁 [SHIPPING LABEL] Завершение печати этикетки');
       setIsLoading(false);
     }
   };
 
   const proceedWithShippingPrint = async () => {
+    console.log('🚀 [SHIPPING PRINT] Отправляем запрос на печать этикетки...');
+    
+    const requestData = {
+      orderId,
+      customerName,
+      items: printableItems,
+      copies: 1
+    };
+    
+    console.log('📦 [SHIPPING PRINT] Данные запроса:', requestData);
+    
     try {
+      console.log('🌐 [SHIPPING PRINT] Отправляем POST /api/print/shipping-label');
+      
       const response = await fetch('/api/print/shipping-label', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          orderId,
-          customerName,
-          items: printableItems,
-          copies: 1
-        })
+        body: JSON.stringify(requestData)
       });
 
+      console.log('📡 [SHIPPING PRINT] Ответ сервера:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+
+      if (!response.ok) {
+        console.error('❌ [SHIPPING PRINT] HTTP ошибка:', response.status);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const data = await response.json();
+      console.log('📦 [SHIPPING PRINT] Данные ответа:', data);
       
       if (data.success) {
+        console.log('✅ [SHIPPING PRINT] Печать успешна, jobId:', data.jobId);
         message.success('Этикетка доставки отправлена на печать');
         setLastPrintJob(data.jobId);
         onPrintComplete?.(data.jobId, 'shipping');
         
         // Обновляем статус заказа в RIVHIT API
+        console.log('🔄 [SHIPPING PRINT] Обновляем статус заказа...');
         await updateOrderStatus('shipping_label_printed', data.jobId, 'shipping');
       } else {
-        message.error(`Ошибка печати: ${data.error}`);
+        console.error('❌ [SHIPPING PRINT] Ошибка в ответе:', data.error);
+        handlePrintError(data.error || 'Неизвестная ошибка печати', 'Печать этикетки доставки');
       }
     } catch (error) {
-      message.error('Ошибка при отправке на печать');
+      console.error('🚨 [SHIPPING PRINT] Критическая ошибка:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'UnknownError'
+      });
+      handlePrintError(error instanceof Error ? error.message : String(error), 'Отправка на печать');
     }
   };
 
   const printProductLabels = async () => {
+    console.log('🔥 [FRONTEND DEBUG] =====================================');
+    console.log('🔥 [FRONTEND DEBUG] PRODUCT LABELS PRINT BUTTON CLICKED!');
+    console.log('🔥 [FRONTEND DEBUG] This should be visible in browser console!');
+    console.log('🔥 [FRONTEND DEBUG] =====================================');
+    
+    console.log('🔍 [PRODUCT PRINT] Checking printable items...');
+    console.log('📋 [PRODUCT PRINT] All items:', items.length);
+    console.log('📦 [PRODUCT PRINT] Filtered printable items:', printableItems.length);
+    console.log('🔍 [PRODUCT PRINT] Items details:', items.map(item => ({
+      id: item.item_id,
+      isPacked: item.isPacked,
+      isAvailable: item.isAvailable, 
+      packedQuantity: item.packedQuantity,
+      name: item.item_name
+    })));
+    
     if (printableItems.length === 0) {
-      message.warning('Нет товаров для печати этикеток');
+      console.warn('⚠️ [PRODUCT PRINT] No printable items found');
+      console.log('🔥 [FRONTEND DEBUG] About to show warning message...');
+      message.warning('Нет товаров для печати этикеток. Убедитесь, что товары упакованы (isPacked=true, isAvailable=true, packedQuantity>0)');
+      
+      // Show detailed modal with printer settings button for debugging
+      Modal.warning({
+        title: 'Нет товаров для печати',
+        content: (
+          <div>
+            <Alert
+              message="Товары не готовы к печати"
+              description={`Из ${items.length} товаров, 0 готовы к печати. Проверьте, что товары упакованы.`}
+              type="warning"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+            <Text type="secondary">
+              Требования для печати:
+            </Text>
+            <ul style={{ marginTop: 8, marginBottom: 16 }}>
+              <li>isPacked = true (товар упакован)</li>
+              <li>isAvailable = true (товар доступен)</li>
+              <li>packedQuantity &gt; 0 (упакованное количество больше нуля)</li>
+            </ul>
+          </div>
+        ),
+        okText: 'Настройки принтера',
+        onOk: () => {
+          console.log('🔧 [PRODUCT PRINT] Opening printer settings for debugging...');
+          setShowPrinterSettings(true);
+        }
+      });
       return;
     }
 
@@ -180,60 +330,157 @@ export const PrintActions: React.FC<PrintActionsProps> = ({
   };
 
   const proceedWithProductPrint = async () => {
+    console.log('🔥 [FRONTEND DEBUG] =====================================');
+    console.log('🔥 [FRONTEND DEBUG] PROCEEDING WITH PRODUCT PRINT!');
+    console.log('🔥 [FRONTEND DEBUG] This means items are ready for printing!');
+    console.log('🔥 [FRONTEND DEBUG] =====================================');
+    
+    console.log('🔍 [PRODUCT PRINT] Starting product labels print...');
+    console.log('📋 [PRODUCT PRINT] Items to print:', printableItems.length);
+    console.log('📦 [PRODUCT PRINT] Printable items details:', printableItems);
+    
     try {
-      const response = await fetch('/api/print/product-labels', {
+      const requestData = {
+        orderId,
+        items: printableItems,
+        options: {
+          copies: 1,
+          labelSize: 'medium',
+          includeBarcodes: true,
+          includeText: true,
+          includeQuantity: true,
+          includePrices: true
+        }
+      };
+      
+      console.log('📦 [PRODUCT PRINT] Request data:', requestData);
+      console.log('🌐 [PRODUCT PRINT] Using enhanced API service for comprehensive logging...');
+      
+      // Use enhanced API service to forward backend logs to frontend console
+      const data = await fetch('/api/print/product-labels', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          orderId,
-          items: printableItems,
-          options: {
-            copies: 1,
-            labelSize: 'medium',
-            includeBarcodes: true,
-            includeText: true,
-            includeQuantity: true,
-            includePrices: true
-          }
-        })
+        body: JSON.stringify(requestData)
+      }).then(async (response) => {
+        console.log('📡 [PRODUCT PRINT] Response status:', response.status);
+        console.log('📡 [PRODUCT PRINT] Response headers:', Object.fromEntries(response.headers.entries()));
+        
+        const responseText = await response.text();
+        console.log('📄 [PRODUCT PRINT] Raw response text:', responseText);
+        
+        let data: any;
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('❌ [PRODUCT PRINT] JSON parse error:', parseError);
+          throw new Error('Invalid JSON response from server');
+        }
+        
+        // Forward any backend debug logs to frontend console
+        if (data.debug) {
+          console.log('🔍 [BACKEND DEBUG] Debug info from server:', data.debug);
+        }
+        
+        if (data.logs && Array.isArray(data.logs)) {
+          console.log('🔍 [BACKEND LOGS] Server logs:');
+          data.logs.forEach((log: any, index: number) => {
+            console.log(`🔍 [BACKEND LOG ${index + 1}]`, log);
+          });
+        }
+        
+        if (!response.ok) {
+          console.error('❌ [PRODUCT PRINT] HTTP error:', response.status, data);
+          throw new Error(`HTTP ${response.status}: ${data?.error || response.statusText}`);
+        }
+        
+        return data;
       });
-
-      const data = await response.json();
+      
+      console.log('📦 [PRODUCT PRINT] Final response data:', data);
       
       if (data.success) {
+        console.log('✅ [PRODUCT PRINT] Print job successful');
         message.success(`Этикетки товаров отправлены на печать (${data.printedItems} шт.)`);
         setLastPrintJob(data.jobId);
         onPrintComplete?.(data.jobId, 'product');
         
         // Обновляем статус заказа в RIVHIT API
+        console.log('🔄 [PRODUCT PRINT] Updating order status...');
         await updateOrderStatus('product_labels_printed', data.jobId, 'product');
       } else {
-        message.error(`Ошибка печати: ${data.error}`);
+        console.error('❌ [PRODUCT PRINT] Error in response:', data.error);
+        handlePrintError(data.error || 'Неизвестная ошибка печати', 'Печать этикеток товаров');
       }
     } catch (error) {
-      message.error('Ошибка при отправке на печать');
+      console.error('🚨 [PRODUCT PRINT] Critical error:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      
+      // Ensure error modal appears with printer settings button
+      handlePrintError(
+        error instanceof Error ? error.message : 'Ошибка сети',
+        'Печать этикеток товаров'
+      );
     }
   };
 
   const testPrint = async () => {
+    console.log('🖨️ [TEST PRINT] Начинаем тестовую печать...');
+    console.log('📋 [TEST PRINT] Текущие параметры:', {
+      orderId,
+      customerName,
+      itemsCount: items.length,
+      disabled
+    });
+    
     setIsLoading(true);
     try {
+      console.log('🌐 [TEST PRINT] Отправляем запрос на /api/print/test');
+      
       const response = await fetch('/api/print/test', {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       });
 
+      console.log('📡 [TEST PRINT] Ответ сервера:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+
+      if (!response.ok) {
+        console.error('❌ [TEST PRINT] HTTP ошибка:', response.status, response.statusText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const data = await response.json();
+      console.log('📦 [TEST PRINT] Данные ответа:', data);
       
       if (data.success) {
+        console.log('✅ [TEST PRINT] Тестовая печать успешна');
         message.success('Тестовая печать отправлена');
       } else {
-        message.error(`Ошибка тестовой печати: ${data.error}`);
+        console.error('❌ [TEST PRINT] Ошибка в ответе:', data.error);
+        handlePrintError(data.error || 'Неизвестная ошибка тестовой печати', 'Тестовая печать');
       }
     } catch (error) {
-      message.error('Ошибка при тестовой печати');
+      console.error('🚨 [TEST PRINT] Критическая ошибка:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'UnknownError'
+      });
+      handlePrintError(
+        error instanceof Error ? error.message : 'Ошибка сети',
+        'Тестовая печать'
+      );
     } finally {
+      console.log('🏁 [TEST PRINT] Завершение тестовой печати');
       setIsLoading(false);
     }
   };
@@ -611,6 +858,26 @@ export const PrintActions: React.FC<PrintActionsProps> = ({
             <Spin tip="Проверка статуса принтера..." />
           </div>
         )}
+      </Modal>
+
+      {/* Модальное окно настроек принтера */}
+      <Modal
+        title="Настройки принтера"
+        open={showPrinterSettings}
+        onCancel={() => setShowPrinterSettings(false)}
+        footer={null}
+        width={800}
+        style={{ top: 20 }}
+      >
+        <PrinterSettings
+          onSave={(config) => {
+            console.log('🔧 [PRINTER SETTINGS] Settings saved:', config);
+            message.success('Настройки принтера сохранены');
+            setShowPrinterSettings(false);
+            // Можно перезапустить проверку статуса после изменения настроек
+            setTimeout(() => checkPrinterStatus(), 1000);
+          }}
+        />
       </Modal>
     </>
   );

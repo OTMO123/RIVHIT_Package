@@ -35,10 +35,12 @@ import customersRoutes from './routes/customers.routes';
 import itemsRoutes from './routes/items.routes';
 import settingsRoutes from './routes/settings.routes';
 import invoiceRoutes from './routes/invoice.routes';
+import orderStatusRoutes from './routes/order-status.routes';
+import { printerDiscoveryRouter } from './routes/printer-discovery.routes';
 import { initializeDatabase } from './config/database.config';
 
 // Dependency Injection Container
-class Container {
+export class Container {
   private static instance: Container;
   private services: Map<string, any> = new Map();
 
@@ -80,7 +82,7 @@ export class AppFactory {
     
     try {
       await this.setupDatabase();
-      this.setupServices();
+      await this.setupServices();
       this.setupMiddleware();
       this.setupRoutes();
       this.setupErrorHandling();
@@ -103,17 +105,18 @@ export class AppFactory {
     }
   }
 
-  private setupServices(): void {
+  private async setupServices(): Promise<void> {
     this.logger.logInfo('Initializing application services using SOLID principles');
 
     try {
       // Используем ApplicationServiceFactory для создания всех сервисов
-      const services = ApplicationServiceFactory.createServices();
+      const services = await ApplicationServiceFactory.createServices();
       
       // Регистрируем сервисы в контейнере (Dependency Injection)
       this.container.register('cacheService', services.cacheService);
       this.container.register('rivhitService', services.rivhitService);
       this.container.register('printerService', services.printerService);
+      this.container.register('zplPrinterService', services.zplPrinterService);
 
       // Создаем логгер через фабрику
       const loggerFactory = new ConsoleLoggerFactory();
@@ -195,14 +198,16 @@ export class AppFactory {
     // Dependency Injection - получаем сервисы из контейнера
     const rivhitService = this.container.get<IRivhitService>('rivhitService');
     const printerService = this.container.get<IPrinterService>('printerService');
+    const zplPrinterService = this.container.get('zplPrinterService');
 
     // Single Responsibility Principle - каждый контроллер отвечает за свою область
     const ordersController = new OrdersController(rivhitService);
     const printController = new PrintController(printerService as any);
 
-    // Добавляем контроллеры в app.locals для routes
+    // Добавляем контроллеры и сервисы в app.locals для routes
     this.app.locals.ordersController = ordersController;
     this.app.locals.printController = printController;
+    this.app.locals.zplPrinterService = zplPrinterService;
 
     // 🔐 Аутентификация (доступно без токена)
     this.app.use('/api/auth', authRoutes);
@@ -212,6 +217,8 @@ export class AppFactory {
     this.app.use('/api/print', optionalAuth, printRoutes);
     this.app.use('/api/settings', optionalAuth, settingsRoutes);
     this.app.use('/api/invoices', optionalAuth, invoiceRoutes);
+    this.app.use('/api/order-status', optionalAuth, orderStatusRoutes);
+    this.app.use('/api/printers', optionalAuth, printerDiscoveryRouter);
 
     // Старые маршруты для обратной совместимости (v1)
     const router = express.Router();

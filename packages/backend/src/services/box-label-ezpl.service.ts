@@ -301,7 +301,12 @@ export class BoxLabelEZPLService {
       'NORTH1': { hebrew: 'צפון 1', russian: 'Север 1' },
       'NORTH2': { hebrew: 'צפון 2', russian: 'Север 2' },
       'SOUTH1': { hebrew: 'דרום 1', russian: 'Юг 1' },
-      'SOUTH2': { hebrew: 'דרום 2', russian: 'Юг 2' }
+      'SOUTH2': { hebrew: 'דרום 2', russian: 'Юг 2' },
+      // City regions for test cases
+      'tel_aviv': { hebrew: 'תל אביב', russian: 'Тель-Авив' },
+      'haifa': { hebrew: 'חיפה', russian: 'Хайфа' },
+      'beer_sheva': { hebrew: 'באר שבע', russian: 'Беэр-Шева' },
+      'other': { hebrew: 'אחר', russian: 'Другой' }
     };
     
     return regionMap[region] || { hebrew: region, russian: region };

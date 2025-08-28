@@ -116,3 +116,21 @@ yarn-error.log*
 
 # Husky
 .husky/_/
+
+# RIVHIT API Configuration (NEVER commit API keys!)
+**/config.json
+**/config.*.json
+packages/frontend/resources/backend/config.json
+api-keys.json
+rivhit-config.json
+
+# User data/AppData files
+config.json
+**/app-data/
+**/user-config.json
+
+# Backend resources (included in Electron build)
+packages/frontend/resources/backend/
+
+# Electron release files
+packages/frontend/release/

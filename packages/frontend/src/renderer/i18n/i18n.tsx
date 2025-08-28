@@ -16,7 +16,7 @@ interface I18nProviderProps {
 }
 
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('he'); // Default to Hebrew
+  const [language, setLanguage] = useState<Language>('ru'); // Default to Russian
 
   useEffect(() => {
     // Load saved language from localStorage

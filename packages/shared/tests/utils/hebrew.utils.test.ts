@@ -46,7 +46,7 @@ describe('Hebrew Utils', () => {
 
   describe('sanitizeHebrewText', () => {
     it('should remove control characters', () => {
-      const textWithControls = 'שלום\\u0001\\u0002עולם';
+      const textWithControls = 'שלום\u0001\u0002עולם';
       expect(sanitizeHebrewText(textWithControls)).toBe('שלוםעולם');
     });
 
@@ -63,7 +63,7 @@ describe('Hebrew Utils', () => {
 
   describe('normalizeHebrewText', () => {
     it('should normalize Hebrew text', () => {
-      const textWithBidi = 'שלום\\u200Eעולם';
+      const textWithBidi = 'שלום\u200Eעולם';
       expect(normalizeHebrewText(textWithBidi)).toBe('שלוםעולם');
     });
 

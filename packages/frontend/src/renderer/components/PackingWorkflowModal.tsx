@@ -113,7 +113,9 @@ export const PackingWorkflowModal: React.FC<PackingWorkflowModalProps> = ({
           nameRussian: item.description_russian || item.name_russian,
           quantity: packData.quantity || item.quantity,
           catalogNumber: item.catalog_number,
-          barcode: item.barcode || item.sku
+          barcode: item.barcode || item.sku,
+          price: item.price || item.sale_nis || 0,
+          sale_nis: item.sale_nis || item.price || 0
         });
 
         // Create new box every 10 items (you can adjust this logic)

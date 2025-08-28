@@ -2,14 +2,21 @@
   "name": "@packing/frontend",
   "version": "1.0.0",
   "description": "Electron frontend for packing system",
+  "author": "RIVHIT",
   "main": "dist/main.js",
   "scripts": {
-    "copy-assets": "node -e \"const fs=require('fs');const path=require('path');if(!fs.existsSync('dist/assets'))fs.mkdirSync('dist/assets',{recursive:true});fs.copyFileSync('src/assets/icon.jpg','dist/assets/icon.jpg')\"",
+    "copy-assets": "node -e \"const fs=require('fs');const path=require('path');if(!fs.existsSync('dist/assets'))fs.mkdirSync('dist/assets',{recursive:true});if(fs.existsSync('assets/icons/icon.png'))fs.copyFileSync('assets/icons/icon.png','dist/assets/icon.png')\"",
     "build": "npm run copy-assets && webpack --mode production",
     "build:dev": "npm run copy-assets && webpack --mode development",
+    "build:backend": "node scripts/build-backend.js",
+    "build:windows": "node scripts/build-windows.js",
+    "build:all": "npm run build:backend && npm run build && npm run package:win",
     "dev": "concurrently \"webpack --mode development --watch\" \"wait-on dist/main.js && electron dist/main.js\"",
     "electron": "electron .",
     "package": "electron-builder",
+    "package:win": "electron-builder --win",
+    "package:mac": "electron-builder --mac",
+    "package:linux": "electron-builder --linux",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
@@ -42,8 +49,11 @@
     "css-loader": "^6.7.3",
     "electron": "^37.2.0",
     "electron-builder": "^26.0.12",
+    "fs-extra": "^11.3.1",
     "html-webpack-plugin": "^5.5.0",
     "jest": "^29.4.3",
+    "jest-environment-jsdom": "^30.1.1",
+    "sharp": "^0.34.3",
     "style-loader": "^3.3.2",
     "ts-jest": "^29.0.5",
     "ts-loader": "^9.4.2",
@@ -59,7 +69,7 @@
     "setupFilesAfterEnv": [
       "<rootDir>/tests/setup.ts"
     ],
-    "moduleNameMapping": {
+    "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/renderer/$1",
       "^@shared/(.*)$": "<rootDir>/../shared/src/$1"
     },
@@ -67,19 +77,48 @@
       "src/**/*.{ts,tsx}",
       "!src/**/*.d.ts",
       "!src/main/**/*"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.(ts|tsx|js)",
+      "**/*.(test|spec).(ts|tsx|js)"
     ]
   },
   "build": {
-    "appId": "com.company.packing-system",
-    "productName": "Packing System",
+    "appId": "com.rivhit.bravo-packing",
+    "productName": "BRAVO Packing System",
     "directories": {
-      "output": "release"
+      "output": "release",
+      "buildResources": "assets"
     },
+    "icon": "assets/icons/icon",
     "files": [
       "dist/**/*",
       "node_modules/**/*",
       "package.json"
     ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "assets/icons/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
     "win": {
       "target": [
         {
@@ -89,7 +128,19 @@
           ]
         }
       ],
-      "icon": "src/assets/icon.jpg"
+      "icon": "assets/icons/icon.ico"
+    },
+    "linux": {
+      "icon": "assets/icons",
+      "category": "Utility",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
     },
     "nsis": {
       "oneClick": false,

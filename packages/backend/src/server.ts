@@ -11,7 +11,8 @@ import { ConsoleLoggerFactory } from './services/logging/console.logger.service'
 import { LogLevel } from './interfaces/ILogger';
 
 // Загрузка переменных окружения
-dotenv.config();
+dotenv.config({ path: '.env', override: true });
+console.log('🔧 Environment loaded - RIVHIT_API_TOKEN:', process.env.RIVHIT_API_TOKEN ? `***${process.env.RIVHIT_API_TOKEN.slice(-4)}` : 'NOT_SET');
 
 // Создание логгера для сервера
 const loggerFactory = new ConsoleLoggerFactory({

@@ -90,7 +90,7 @@ export interface Order {
   customerName: string;
   customerCity?: string;
   customer_id?: number;  // Added customer_id from RIVHIT
-  status: 'pending' | 'processing' | 'packed' | 'shipped';
+  status: 'pending' | 'processing' | 'packed' | 'shipped' | 'packing' | 'completed' | 'packed_pending_labels' | 'labels_printed';
   items: number;
   weight: number;
   createdAt: string;
@@ -581,8 +581,79 @@ class ApiService {
     }
   }
 
-  // Generic POST method for API calls
+  // Enhanced POST method with comprehensive debug logging forwarding
   async post(url: string, data: any): Promise<any> {
+    try {
+      console.log(`🔍 [FRONTEND API] =====================================`);
+      console.log(`🔍 [FRONTEND API] Starting POST request`);
+      console.log(`📤 [FRONTEND API] POST request to: ${url}`);
+      console.log(`📦 [FRONTEND API] Request payload:`, data);
+      
+      const startTime = Date.now();
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+
+      const responseTime = Date.now() - startTime;
+      console.log(`⏱️ [FRONTEND API] Response time: ${responseTime}ms`);
+      console.log(`📡 [FRONTEND API] Response status: ${response.status} ${response.statusText}`);
+
+      // Check if response includes debug logs from backend
+      const responseText = await response.text();
+      let result: any;
+
+      try {
+        result = JSON.parse(responseText);
+        
+        // Forward backend debug logs to frontend console
+        if (result.debug) {
+          console.log(`🔍 [BACKEND DEBUG] Debug data:`, result.debug);
+        }
+        
+        // Forward backend logs if they exist
+        if (result.logs && Array.isArray(result.logs)) {
+          console.log(`🔍 [BACKEND LOGS] Forwarding ${result.logs.length} log entries:`);
+          result.logs.forEach((log: any, index: number) => {
+            console.log(`🔍 [BACKEND LOG ${index + 1}]`, log);
+          });
+        }
+
+        console.log(`✅ [FRONTEND API] POST response:`, result);
+      } catch (parseError) {
+        console.error(`❌ [FRONTEND API] Failed to parse response JSON:`, parseError);
+        console.log(`📄 [FRONTEND API] Raw response:`, responseText);
+        result = { success: false, error: 'Invalid JSON response' };
+      }
+
+      if (!response.ok) {
+        console.error(`❌ [FRONTEND API] HTTP error! status: ${response.status}`);
+        console.error(`❌ [FRONTEND API] Response body:`, result);
+        throw new Error(`HTTP ${response.status}: ${result?.error || response.statusText}`);
+      }
+
+      console.log(`🔍 [FRONTEND API] =====================================`);
+      return result;
+    } catch (error) {
+      console.error(`❌ [FRONTEND API] POST request failed:`, error);
+      console.error(`🔍 [FRONTEND API] Error details:`, {
+        url,
+        data,
+        error: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        } : error
+      });
+      throw error;
+    }
+  }
+
+  // Generic POST method for API calls
+  async postOld(url: string, data: any): Promise<any> {
     try {
       console.log(`📤 POST request to: ${url}`);
       const response = await fetch(url, {

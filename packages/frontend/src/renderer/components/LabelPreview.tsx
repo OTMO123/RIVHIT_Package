@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Modal, Row, Col, Card, Button, Space, Typography, Badge, Spin, message, Tooltip } from 'antd';
+import { Modal, Row, Col, Card, Button, Space, Typography, Badge, Spin, message, Tooltip, Alert } from 'antd';
 import { PrinterOutlined, InboxOutlined, CheckCircleOutlined, ZoomInOutlined, ExpandOutlined } from '@ant-design/icons';
 import { PackingBox, DeliveryRegion } from '@packing/shared';
 import { apiService } from '../services/api.service';
 import { SimpleProgressSteps } from './SimpleProgressSteps';
+import { PrinterSettings } from './PrinterSettings';
 
 const { Title, Text } = Typography;
 
@@ -114,6 +115,7 @@ export const LabelPreview: React.FC<LabelPreviewProps> = ({
   const [printStatus, setPrintStatus] = useState<{ [key: number]: boolean }>({});
   const [selectedLabel, setSelectedLabel] = useState<GeneratedLabel | null>(null);
   const [zoomModalVisible, setZoomModalVisible] = useState(false);
+  const [showPrinterSettings, setShowPrinterSettings] = useState(false);
 
   // Генерация всех этикеток при открытии
   React.useEffect(() => {
@@ -193,8 +195,29 @@ export const LabelPreview: React.FC<LabelPreviewProps> = ({
   };
 
   const handleBatchPrint = async () => {
+    console.log('🔥 [FRONTEND DEBUG] =====================================');
+    console.log('🔥 [FRONTEND DEBUG] BATCH PRINT BUTTON CLICKED!');
+    console.log('🔥 [FRONTEND DEBUG] "Напечатать баркоды" button pressed!');
+    console.log('🔥 [FRONTEND DEBUG] This should be visible in browser console!');
+    console.log('🔥 [FRONTEND DEBUG] =====================================');
+    
     setPrinting(true);
     setPrintStatus({});
+    
+    const requestData = {
+      orderId,
+      boxes: sortedBoxes.map((box, index) => ({
+        ...box,
+        boxNumber: index + 1
+      })),
+      region,
+      customerName,
+      customerCity,
+      totalBoxes: sortedBoxes.length
+    };
+    
+    console.log('🔍 [BATCH PRINT] Request data:', requestData);
+    console.log('🌐 [BATCH PRINT] Sending request to /api/print/box-labels-ezpl');
     
     try {
       // Отправляем все этикетки на печать
@@ -203,20 +226,38 @@ export const LabelPreview: React.FC<LabelPreviewProps> = ({
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          orderId,
-          boxes: sortedBoxes.map((box, index) => ({
-            ...box,
-            boxNumber: index + 1
-          })),
-          region,
-          customerName,
-          customerCity,
-          totalBoxes: sortedBoxes.length
-        })
-      }).then(res => res.json());
+        body: JSON.stringify(requestData)
+      });
 
-      if (response.success) {
+      console.log('📡 [BATCH PRINT] Response status:', response.status, response.statusText);
+      console.log('📡 [BATCH PRINT] Response headers:', Object.fromEntries(response.headers.entries()));
+      
+      const responseText = await response.text();
+      console.log('📄 [BATCH PRINT] Raw response:', responseText);
+      
+      let responseData: any;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('❌ [BATCH PRINT] Failed to parse response JSON:', parseError);
+        throw new Error('Invalid JSON response from server');
+      }
+      
+      // Forward any backend debug logs to frontend console
+      if (responseData.logs && Array.isArray(responseData.logs)) {
+        console.log('🔍 [BACKEND LOGS] Forwarding', responseData.logs.length, 'log entries from backend:');
+        responseData.logs.forEach((log: any, index: number) => {
+          console.log(`🔍 [BACKEND LOG ${index + 1}]`, log);
+        });
+      }
+      
+      if (responseData.debug) {
+        console.log('🔍 [BACKEND DEBUG] Debug info from server:', responseData.debug);
+      }
+      
+      console.log('📦 [BATCH PRINT] Final response data:', responseData);
+
+      if (responseData.success) {
         // Обновляем статус печати для каждой коробки
         const statusMap: { [key: number]: boolean } = {};
         sortedBoxes.forEach((_, index) => {
@@ -232,11 +273,30 @@ export const LabelPreview: React.FC<LabelPreviewProps> = ({
           onCancel(); // Закрываем текущий модал после успешной печати
         }, 2000);
       } else {
-        message.error('Ошибка печати этикеток');
+        console.error('❌ [BATCH PRINT] Print failed:', responseData);
+        const errorMessage = responseData.message || 'Неизвестная ошибка печати';
+        const errorDetails = {
+          stats: responseData.stats,
+          results: responseData.results,
+          message: responseData.message
+        };
+        
+        // Show error modal with printer settings button instead of just message.error
+        handlePrintError(
+          errorMessage,
+          'Печать этикеток коробок',
+          errorDetails
+        );
       }
     } catch (error) {
-      console.error('Error printing labels:', error);
-      message.error('Не удалось напечатать этикетки');
+      console.error('💥 [BATCH PRINT] Critical error:', error);
+      
+      // Show error modal with printer settings button instead of just message.error
+      handlePrintError(
+        error instanceof Error ? error.message : 'Критическая ошибка сети',
+        'Сетевая ошибка',
+        { error: error instanceof Error ? error.stack : String(error) }
+      );
     } finally {
       setPrinting(false);
     }
@@ -260,6 +320,47 @@ export const LabelPreview: React.FC<LabelPreviewProps> = ({
   const handleZoomModalClose = () => {
     setZoomModalVisible(false);
     setSelectedLabel(null);
+  };
+
+  const handlePrintError = (error: string, context: string, details?: any) => {
+    console.error(`💥 [PRINT ERROR] ${context}:`, error, details);
+    
+    // Show error modal with printer settings button
+    Modal.error({
+      title: 'Ошибка печати баркодов',
+      content: (
+        <div>
+          <Alert
+            message="Не удалось напечатать этикетки"
+            description={`${error}${context ? ` (${context})` : ''}`}
+            type="error"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+          <Typography.Text type="secondary">
+            Возможные причины:
+          </Typography.Text>
+          <ul style={{ marginTop: 8, marginBottom: 16 }}>
+            <li>Принтер выключен или недоступен</li>
+            <li>Проблемы с подключением к принтеру</li>
+            <li>Неверные настройки принтера</li>
+            <li>Проблемы с драйверами принтера</li>
+          </ul>
+          {details && (
+            <div>
+              <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+                Детали: {JSON.stringify(details, null, 2)}
+              </Typography.Text>
+            </div>
+          )}
+        </div>
+      ),
+      okText: 'Настройки принтера',
+      onOk: () => {
+        console.log('🔧 [PRINT ERROR] Opening printer settings...');
+        setShowPrinterSettings(true);
+      }
+    });
   };
 
   return (
@@ -471,6 +572,24 @@ export const LabelPreview: React.FC<LabelPreviewProps> = ({
             />
           </div>
         )}
+      </Modal>
+
+      {/* Модальное окно настроек принтера */}
+      <Modal
+        title="Настройки принтера"
+        open={showPrinterSettings}
+        onCancel={() => setShowPrinterSettings(false)}
+        footer={null}
+        width={800}
+        style={{ top: 20 }}
+      >
+        <PrinterSettings
+          onSave={(config) => {
+            console.log('🔧 [PRINTER SETTINGS] Settings saved:', config);
+            message.success('Настройки принтера сохранены');
+            setShowPrinterSettings(false);
+          }}
+        />
       </Modal>
     </Modal>
   );

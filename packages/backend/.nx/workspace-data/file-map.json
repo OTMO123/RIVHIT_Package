@@ -14,424 +14,64 @@
     "projectFileMap": {},
     "nonProjectFiles": [
       {
-        "file": ".env",
-        "hash": "16757220154444524598"
+        "file": "LPT1",
+        "hash": "8052130512150300025"
+      },
+      {
+        "file": "PRINTER_NETWORK_SETUP.md",
+        "hash": "9979881817240321421"
+      },
+      {
+        "file": "PRINTER_SETTINGS_CHECKLIST.md",
+        "hash": "990833933717474161"
+      },
+      {
+        "file": "check-network.sh",
+        "hash": "14321137234620224706"
+      },
+      {
+        "file": "check-printer-info.js",
+        "hash": "16592915892504501381"
       },
       {
         "file": "config/scripts/print-image.ps1",
         "hash": "533610293975903014"
       },
       {
-        "file": "database/packing.db",
-        "hash": "11073058897367913248"
+        "file": "convert-image-to-zpl.js",
+        "hash": "12872743078045650025"
       },
       {
-        "file": "dist/app-instance.d.ts",
-        "hash": "5418790973973737359"
+        "file": "ezpl-to-image.js",
+        "hash": "17681147543460416148"
       },
       {
-        "file": "dist/app-instance.js",
-        "hash": "4419728484405036559"
+        "file": "find-all-printers.sh",
+        "hash": "2682721258589841801"
       },
       {
-        "file": "dist/app.d.ts",
-        "hash": "2429619672585975456"
-      },
-      {
-        "file": "dist/app.js",
-        "hash": "14182307914197973614"
-      },
-      {
-        "file": "dist/config/database.config.d.ts",
-        "hash": "11743178426451890549"
-      },
-      {
-        "file": "dist/config/database.config.js",
-        "hash": "18119350807813861911"
-      },
-      {
-        "file": "dist/config/logger.d.ts",
-        "hash": "15478498488808576538"
-      },
-      {
-        "file": "dist/config/logger.js",
-        "hash": "15226734487272919815"
-      },
-      {
-        "file": "dist/config/safe-test.config.d.ts",
-        "hash": "9464857378030935636"
-      },
-      {
-        "file": "dist/config/safe-test.config.js",
-        "hash": "831574875765223644"
-      },
-      {
-        "file": "dist/config/swagger.d.ts",
-        "hash": "648687610120160516"
-      },
-      {
-        "file": "dist/config/swagger.js",
-        "hash": "6832571841748979782"
-      },
-      {
-        "file": "dist/controllers/__tests__/orders.controller.test.d.ts",
-        "hash": "4595979742548113990"
-      },
-      {
-        "file": "dist/controllers/__tests__/orders.controller.test.js",
-        "hash": "9537487708132637297"
-      },
-      {
-        "file": "dist/controllers/auth.controller.d.ts",
-        "hash": "1896374276971954576"
-      },
-      {
-        "file": "dist/controllers/auth.controller.js",
-        "hash": "6717788859900822809"
-      },
-      {
-        "file": "dist/controllers/customers.controller.d.ts",
-        "hash": "15209365475481090456"
-      },
-      {
-        "file": "dist/controllers/customers.controller.js",
-        "hash": "18273521540642250948"
-      },
-      {
-        "file": "dist/controllers/items.controller.d.ts",
-        "hash": "11365356364803255907"
-      },
-      {
-        "file": "dist/controllers/items.controller.js",
-        "hash": "14419960716852454482"
-      },
-      {
-        "file": "dist/controllers/orders.controller.d.ts",
-        "hash": "17101626331207069951"
-      },
-      {
-        "file": "dist/controllers/orders.controller.js",
-        "hash": "10293347935247203558"
-      },
-      {
-        "file": "dist/controllers/print.controller.d.ts",
-        "hash": "3361850941287619138"
-      },
-      {
-        "file": "dist/controllers/print.controller.js",
-        "hash": "1712484285961678843"
-      },
-      {
-        "file": "dist/entities/MaxPerBoxSetting.d.ts",
-        "hash": "17872421677667790454"
-      },
-      {
-        "file": "dist/entities/MaxPerBoxSetting.js",
-        "hash": "10515789259598782418"
-      },
-      {
-        "file": "dist/factories/service.factory.d.ts",
-        "hash": "1641973525642965647"
-      },
-      {
-        "file": "dist/factories/service.factory.js",
-        "hash": "11302662178794123923"
-      },
-      {
-        "file": "dist/interfaces/ICacheService.d.ts",
-        "hash": "14516276488014322022"
-      },
-      {
-        "file": "dist/interfaces/ICacheService.js",
-        "hash": "10533815908077531553"
-      },
-      {
-        "file": "dist/interfaces/ILogger.d.ts",
-        "hash": "14455408067403697043"
-      },
-      {
-        "file": "dist/interfaces/ILogger.js",
-        "hash": "13119670008571976273"
-      },
-      {
-        "file": "dist/interfaces/IOrderRepository.d.ts",
-        "hash": "8932007999644238928"
-      },
-      {
-        "file": "dist/interfaces/IOrderRepository.js",
-        "hash": "10533815908077531553"
-      },
-      {
-        "file": "dist/interfaces/IPrinterService.d.ts",
-        "hash": "7838084082161424468"
-      },
-      {
-        "file": "dist/interfaces/IPrinterService.js",
-        "hash": "10533815908077531553"
-      },
-      {
-        "file": "dist/interfaces/IRivhitService.d.ts",
-        "hash": "6256141914832277306"
-      },
-      {
-        "file": "dist/interfaces/IRivhitService.js",
-        "hash": "10533815908077531553"
-      },
-      {
-        "file": "dist/interfaces/ISSLService.d.ts",
-        "hash": "5048905453858488056"
-      },
-      {
-        "file": "dist/interfaces/ISSLService.js",
-        "hash": "9436285725781213451"
-      },
-      {
-        "file": "dist/interfaces/index.d.ts",
-        "hash": "10346143541460989350"
-      },
-      {
-        "file": "dist/interfaces/index.js",
-        "hash": "10533304903177267411"
-      },
-      {
-        "file": "dist/middleware/auth.middleware.d.ts",
-        "hash": "14784298915078412744"
-      },
-      {
-        "file": "dist/middleware/auth.middleware.js",
-        "hash": "5060023861525372278"
-      },
-      {
-        "file": "dist/middleware/error.middleware.d.ts",
-        "hash": "16525105502341881328"
-      },
-      {
-        "file": "dist/middleware/error.middleware.js",
-        "hash": "1955847004067566760"
-      },
-      {
-        "file": "dist/middleware/security.middleware.d.ts",
-        "hash": "7853715553513189972"
-      },
-      {
-        "file": "dist/middleware/security.middleware.js",
-        "hash": "17540759673904465099"
-      },
-      {
-        "file": "dist/middleware/validation.middleware.d.ts",
-        "hash": "806191549166084240"
-      },
-      {
-        "file": "dist/middleware/validation.middleware.js",
-        "hash": "3883308536579901903"
-      },
-      {
-        "file": "dist/repositories/MaxPerBoxRepository.d.ts",
-        "hash": "7761542282016411415"
-      },
-      {
-        "file": "dist/repositories/MaxPerBoxRepository.js",
-        "hash": "2076443531417036691"
-      },
-      {
-        "file": "dist/routes/auth.routes.d.ts",
-        "hash": "4821638206370994868"
-      },
-      {
-        "file": "dist/routes/auth.routes.js",
-        "hash": "3319572829372816322"
-      },
-      {
-        "file": "dist/routes/customers.routes.d.ts",
-        "hash": "4821638206370994868"
-      },
-      {
-        "file": "dist/routes/customers.routes.js",
-        "hash": "14187290951833197946"
-      },
-      {
-        "file": "dist/routes/items.routes.d.ts",
-        "hash": "4821638206370994868"
-      },
-      {
-        "file": "dist/routes/items.routes.js",
-        "hash": "4761375941524454769"
-      },
-      {
-        "file": "dist/routes/orders.routes.d.ts",
-        "hash": "4821638206370994868"
-      },
-      {
-        "file": "dist/routes/orders.routes.js",
-        "hash": "14208480416876148854"
-      },
-      {
-        "file": "dist/routes/print.routes.d.ts",
-        "hash": "4821638206370994868"
-      },
-      {
-        "file": "dist/routes/print.routes.js",
-        "hash": "15412345823449299714"
-      },
-      {
-        "file": "dist/routes/settings.routes.d.ts",
-        "hash": "4821638206370994868"
-      },
-      {
-        "file": "dist/routes/settings.routes.js",
-        "hash": "15577270563112655152"
-      },
-      {
-        "file": "dist/schemas/api.schemas.d.ts",
-        "hash": "13820764426996824873"
-      },
-      {
-        "file": "dist/schemas/api.schemas.js",
-        "hash": "12519561090740581968"
-      },
-      {
-        "file": "dist/scripts/load-max-per-box-data.d.ts",
-        "hash": "14761844702866212349"
-      },
-      {
-        "file": "dist/scripts/load-max-per-box-data.js",
-        "hash": "10278258216087812997"
-      },
-      {
-        "file": "dist/server.d.ts",
-        "hash": "3303961800127394024"
-      },
-      {
-        "file": "dist/server.js",
-        "hash": "1388386695700472906"
-      },
-      {
-        "file": "dist/services/__tests__/cache.service.test.d.ts",
-        "hash": "4595979742548113990"
-      },
-      {
-        "file": "dist/services/__tests__/cache.service.test.js",
-        "hash": "4822382108889805863"
-      },
-      {
-        "file": "dist/services/__tests__/printer.service.test.d.ts",
-        "hash": "4595979742548113990"
-      },
-      {
-        "file": "dist/services/__tests__/printer.service.test.js",
-        "hash": "12366636829302729575"
-      },
-      {
-        "file": "dist/services/__tests__/rivhit.service.test.d.ts",
-        "hash": "4595979742548113990"
-      },
-      {
-        "file": "dist/services/__tests__/rivhit.service.test.js",
-        "hash": "6554028631075634988"
-      },
-      {
-        "file": "dist/services/cache.service.d.ts",
-        "hash": "9659963466611329178"
-      },
-      {
-        "file": "dist/services/cache.service.js",
-        "hash": "8754113632018356817"
-      },
-      {
-        "file": "dist/services/cache/memory.cache.service.d.ts",
-        "hash": "16689962128287356627"
-      },
-      {
-        "file": "dist/services/cache/memory.cache.service.js",
-        "hash": "5303259260851024316"
-      },
-      {
-        "file": "dist/services/cache/redis.cache.service.d.ts",
-        "hash": "273355511427830906"
-      },
-      {
-        "file": "dist/services/cache/redis.cache.service.js",
-        "hash": "11345875577753730344"
-      },
-      {
-        "file": "dist/services/logging/console.logger.service.d.ts",
-        "hash": "8003385333129570090"
-      },
-      {
-        "file": "dist/services/logging/console.logger.service.js",
-        "hash": "2913834735251620797"
-      },
-      {
-        "file": "dist/services/mock-rivhit.service.d.ts",
-        "hash": "13249830954192939067"
-      },
-      {
-        "file": "dist/services/mock-rivhit.service.js",
-        "hash": "1642647409890230988"
-      },
-      {
-        "file": "dist/services/printer.service.d.ts",
-        "hash": "11587329903586098688"
-      },
-      {
-        "file": "dist/services/printer.service.js",
-        "hash": "4430269695396358663"
-      },
-      {
-        "file": "dist/services/rivhit.service.d.ts",
-        "hash": "16302807656567106747"
-      },
-      {
-        "file": "dist/services/rivhit.service.js",
-        "hash": "17919627989259221145"
-      },
-      {
-        "file": "dist/services/safe-rivhit.service.d.ts",
-        "hash": "5690089815956987006"
-      },
-      {
-        "file": "dist/services/safe-rivhit.service.js",
-        "hash": "7367103093209803052"
-      },
-      {
-        "file": "dist/services/ssl.service.d.ts",
-        "hash": "5608902550994549367"
-      },
-      {
-        "file": "dist/services/ssl.service.js",
-        "hash": "8550111306704274150"
-      },
-      {
-        "file": "dist/services/winlabel-printer.service.d.ts",
-        "hash": "17941483792329400356"
-      },
-      {
-        "file": "dist/services/winlabel-printer.service.js",
-        "hash": "7740885438428431547"
-      },
-      {
-        "file": "dist/test-rivhit-integration.d.ts",
-        "hash": "13946174777311600962"
-      },
-      {
-        "file": "dist/test-rivhit-integration.js",
-        "hash": "8308061408561050795"
-      },
-      {
-        "file": "logs/combined.log",
-        "hash": "10897512905142570852"
-      },
-      {
-        "file": "logs/error.log",
-        "hash": "3244421341483603138"
+        "file": "find-godex-printer.sh",
+        "hash": "16976331998740558229"
       },
       {
         "file": "package.json",
-        "hash": "16504504328735402706"
+        "hash": "13686815306258523190"
+      },
+      {
+        "file": "print-godex-image.js",
+        "hash": "4098398467633769546"
+      },
+      {
+        "file": "print-label-image.js",
+        "hash": "1872229919638975597"
       },
       {
         "file": "printer-templates/blini.ezpl",
         "hash": "15695084569495137617"
+      },
+      {
+        "file": "printer-templates/box-label.ezpl",
+        "hash": "18101732309160926497"
       },
       {
         "file": "printer-templates/manty.ezpl",
@@ -442,6 +82,10 @@
         "hash": "10796754185685579327"
       },
       {
+        "file": "printer-templates/temp_print.ezpl",
+        "hash": "7675453204700399166"
+      },
+      {
         "file": "printer-templates/universal.ezpl",
         "hash": "18169404353605658600"
       },
@@ -450,16 +94,32 @@
         "hash": "14237210857872887240"
       },
       {
+        "file": "reset-order-statuses.ts",
+        "hash": "2004760087969207541"
+      },
+      {
+        "file": "scan-network.sh",
+        "hash": "10451932552818088888"
+      },
+      {
+        "file": "scan-port-9101.sh",
+        "hash": "2998177339606342059"
+      },
+      {
+        "file": "send-to-godex.js",
+        "hash": "8155657370286746763"
+      },
+      {
         "file": "src/app-instance.ts",
         "hash": "13500055103631354844"
       },
       {
         "file": "src/app.ts",
-        "hash": "4708631298972036404"
+        "hash": "11027271633917556799"
       },
       {
         "file": "src/config/database.config.ts",
-        "hash": "17097614495234770716"
+        "hash": "7057099221365268758"
       },
       {
         "file": "src/config/logger.ts",
@@ -474,8 +134,16 @@
         "hash": "4123138635627317070"
       },
       {
+        "file": "src/controllers/__tests__/customers.controller.test.ts",
+        "hash": "11514082295075898289"
+      },
+      {
+        "file": "src/controllers/__tests__/items.controller.test.ts",
+        "hash": "4669955432111065008"
+      },
+      {
         "file": "src/controllers/__tests__/orders.controller.test.ts",
-        "hash": "780465437317083967"
+        "hash": "2711446876124111552"
       },
       {
         "file": "src/controllers/auth.controller.ts",
@@ -491,19 +159,35 @@
       },
       {
         "file": "src/controllers/orders.controller.ts",
-        "hash": "14371368046845581337"
+        "hash": "17957276526810773459"
       },
       {
         "file": "src/controllers/print.controller.ts",
-        "hash": "9591842104696190588"
+        "hash": "9275534812377847483"
       },
       {
         "file": "src/entities/MaxPerBoxSetting.ts",
         "hash": "6005198758833030832"
       },
       {
+        "file": "src/entities/OrderBoxes.ts",
+        "hash": "10398903689961648733"
+      },
+      {
+        "file": "src/entities/OrderPackingDetails.ts",
+        "hash": "16267487327894033003"
+      },
+      {
+        "file": "src/entities/OrderStatus.ts",
+        "hash": "10047651406493256519"
+      },
+      {
+        "file": "src/factories/__tests__/service.factory.test.ts",
+        "hash": "13106673049491685368"
+      },
+      {
         "file": "src/factories/service.factory.ts",
-        "hash": "15922518415722822942"
+        "hash": "1082012355503239698"
       },
       {
         "file": "src/interfaces/ICacheService.ts",
@@ -550,6 +234,10 @@
         "hash": "1389481140548337204"
       },
       {
+        "file": "src/migrations/AddStatusToOrderStatus.ts",
+        "hash": "3598128959911363623"
+      },
+      {
         "file": "src/repositories/MaxPerBoxRepository.ts",
         "hash": "9944819014791916518"
       },
@@ -559,19 +247,31 @@
       },
       {
         "file": "src/routes/customers.routes.ts",
-        "hash": "5986038066940614627"
+        "hash": "4326878409514204129"
+      },
+      {
+        "file": "src/routes/invoice.routes.ts",
+        "hash": "17169281603220751145"
       },
       {
         "file": "src/routes/items.routes.ts",
-        "hash": "4724432109602118327"
+        "hash": "7082918760620921564"
+      },
+      {
+        "file": "src/routes/order-status.routes.ts",
+        "hash": "16208603001389030942"
       },
       {
         "file": "src/routes/orders.routes.ts",
-        "hash": "532490300235452379"
+        "hash": "2707017340629741129"
       },
       {
         "file": "src/routes/print.routes.ts",
-        "hash": "6137006796366580016"
+        "hash": "11174686716515465034"
+      },
+      {
+        "file": "src/routes/printer-discovery.routes.ts",
+        "hash": "10644470531237086939"
       },
       {
         "file": "src/routes/settings.routes.ts",
@@ -587,11 +287,23 @@
       },
       {
         "file": "src/server.ts",
-        "hash": "17633697546795771865"
+        "hash": "7327441752754052784"
+      },
+      {
+        "file": "src/services/__tests__/box-label-ezpl.service.test.ts",
+        "hash": "13118130772915746935"
       },
       {
         "file": "src/services/__tests__/cache.service.test.ts",
         "hash": "1753289475237787472"
+      },
+      {
+        "file": "src/services/__tests__/order-status.service.test.ts",
+        "hash": "5266324651048972268"
+      },
+      {
+        "file": "src/services/__tests__/printer-discovery.service.test.ts",
+        "hash": "9114717636615388436"
       },
       {
         "file": "src/services/__tests__/printer.service.test.ts",
@@ -599,11 +311,23 @@
       },
       {
         "file": "src/services/__tests__/rivhit.service.test.ts",
-        "hash": "14648080379344789558"
+        "hash": "13706962231380845078"
+      },
+      {
+        "file": "src/services/__tests__/safe-rivhit.service.test.ts",
+        "hash": "12757618236879119143"
+      },
+      {
+        "file": "src/services/box-label-ezpl.service.ts",
+        "hash": "12159020653888847407"
+      },
+      {
+        "file": "src/services/box-label-zpl.service.ts",
+        "hash": "11597490039886874053"
       },
       {
         "file": "src/services/box-label.service.ts",
-        "hash": "7303884462008730262"
+        "hash": "2642257206350468773"
       },
       {
         "file": "src/services/cache.service.ts",
@@ -618,6 +342,22 @@
         "hash": "12391627357534416869"
       },
       {
+        "file": "src/services/image-print.service.ts",
+        "hash": "17929158725698271071"
+      },
+      {
+        "file": "src/services/image-to-zpl.service.ts",
+        "hash": "9322625975995212286"
+      },
+      {
+        "file": "src/services/image-zpl-printer.service.ts",
+        "hash": "5267211710051461707"
+      },
+      {
+        "file": "src/services/invoice-creator.service.ts",
+        "hash": "12980714114051387279"
+      },
+      {
         "file": "src/services/logging/console.logger.service.ts",
         "hash": "15012773056084264057"
       },
@@ -626,8 +366,16 @@
         "hash": "9980713821858642339"
       },
       {
+        "file": "src/services/order-status.service.ts",
+        "hash": "1472139778384495279"
+      },
+      {
+        "file": "src/services/printer-discovery.service.ts",
+        "hash": "3910587939653234956"
+      },
+      {
         "file": "src/services/printer.service.ts",
-        "hash": "7833633429170964991"
+        "hash": "5420163408149708503"
       },
       {
         "file": "src/services/rivhit.service.ts",
@@ -635,15 +383,27 @@
       },
       {
         "file": "src/services/safe-rivhit.service.ts",
-        "hash": "14006088788385995184"
+        "hash": "7594295953939276634"
+      },
+      {
+        "file": "src/services/simple-zpl.service.ts",
+        "hash": "2466529180832966017"
       },
       {
         "file": "src/services/ssl.service.ts",
         "hash": "17958898853259109005"
       },
       {
+        "file": "src/services/windows-print.service.ts",
+        "hash": "7329109756328765497"
+      },
+      {
         "file": "src/services/winlabel-printer.service.ts",
         "hash": "4879874265876701273"
+      },
+      {
+        "file": "src/services/zpl-printer.service.ts",
+        "hash": "10464431748411886016"
       },
       {
         "file": "src/test-data/max-per-box-sample.json",
@@ -654,8 +414,48 @@
         "hash": "11590079743445619067"
       },
       {
+        "file": "temp-images/label_1755868498062_box1.png",
+        "hash": "10967465829412106656"
+      },
+      {
+        "file": "temp-images/label_1755868499084_box2.png",
+        "hash": "7615056248713317042"
+      },
+      {
+        "file": "temp-images/label_1755868500103_box3.png",
+        "hash": "16641923846159444990"
+      },
+      {
+        "file": "temp-labels/order_label_box1_1755869546873.png",
+        "hash": "15011853055121867526"
+      },
+      {
+        "file": "test-ezpl-generation.ts",
+        "hash": "11287261494186670787"
+      },
+      {
+        "file": "test-network-print.ts",
+        "hash": "10989691362933381484"
+      },
+      {
+        "file": "test-real-labels.ts",
+        "hash": "3450553924946673320"
+      },
+      {
+        "file": "tests/integration/rivhit-api.integration.test.ts",
+        "hash": "10025441207210961847"
+      },
+      {
+        "file": "tests/setup.ts",
+        "hash": "13896371750086153188"
+      },
+      {
         "file": "tsconfig.json",
         "hash": "4074714167495213079"
+      },
+      {
+        "file": "visualize-ezpl.html",
+        "hash": "9013467213591658596"
       }
     ]
   }

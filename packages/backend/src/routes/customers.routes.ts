@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import { CustomersController } from '../controllers/customers.controller';
-import { ApplicationServiceFactory } from '../factories/service.factory';
+import { Container } from '../app';
+import { IRivhitService } from '../interfaces/IRivhitService';
 
 const router = Router();
 
-// Initialize services
-const services = ApplicationServiceFactory.createServices();
-const customersController = new CustomersController(services.rivhitService);
+// Use dependency injection container
+const container = Container.getInstance();
+const rivhitService = container.get<IRivhitService>('rivhitService');
+const customersController = new CustomersController(rivhitService);
 
 /**
  * @route GET /api/customers

@@ -1,0 +1,28 @@
+^Q30,3
+^W100
+^H8
+^P1
+^S4
+^AD
+^C1
+^R0
+~Q+0
+^O0
+^D0
+^E20
+~R255
+^L
+
+; Simple test label - no overlapping elements
+R20,20,380,280,3
+
+; Simple text elements with safe spacing
+A50,50,0,4,2,2,N,"TEST"
+A50,100,0,3,1,1,N,"Simple Label"
+A50,130,0,3,1,1,N,"Order: 12345"
+A50,160,0,3,1,1,N,"Box: 1/2"
+
+; Safe barcode position
+B50,200,0,1,2,6,50,B,"123456789"
+
+E

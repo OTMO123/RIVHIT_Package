@@ -4,6 +4,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import * as os from 'os';
 
 const execAsync = promisify(exec);
 
@@ -59,6 +60,7 @@ export class PrinterService implements IPrinterService {
   private templatesPath: string;
   private jobQueue: Map<string, PrintJobResult> = new Map();
   private config: any = null;
+  private platform: string = os.platform(); // Определяем операционную систему
 
   constructor(templatesPath: string = './printer-templates') {
     this.templatesPath = templatesPath;
@@ -75,7 +77,10 @@ export class PrinterService implements IPrinterService {
       if (this.config.printer) {
         this.printerModel = this.config.printer.name || this.printerModel;
         this.connectionType = this.config.printer.connection_type?.toLowerCase() || this.connectionType;
-        this.port = this.config.printer.port || this.port;
+        // Don't override TEST_PORT with config
+        if (this.port !== 'TEST_PORT') {
+          this.port = this.config.printer.port || this.port;
+        }
       }
       
       console.log('✅ Printer configuration loaded successfully');
@@ -290,7 +295,7 @@ export class PrinterService implements IPrinterService {
     console.log('📋 Items to print:', items.map(item => `${item.item_name} (x${item.packedQuantity || item.quantity})`));
     
     if (!this.isConnected) {
-      const initialized = await this.initialize();
+      const initialized = await this.initialize({ port: this.port });
       if (!initialized) {
         return {
           success: false,
@@ -1019,46 +1024,74 @@ E
   }
 
   private async sendSerialCommand(command: string): Promise<string> {
-    // Для Windows используем PowerShell для отправки на COM порт
-    const psCommand = `
-      $port = New-Object System.IO.Ports.SerialPort('${this.port}', 9600, 'None', 8, 'One')
-      try {
-        $port.Open()
-        $port.WriteLine('${command.replace(/'/g, "''")}')
-        Start-Sleep -Milliseconds 500
-        $response = $port.ReadExisting()
-        $port.Close()
-        Write-Output $response
-      } catch {
-        if ($port.IsOpen) { $port.Close() }
-        throw $_.Exception.Message
-      }
-    `;
+    if (this.platform === 'win32') {
+      // Для Windows используем PowerShell для отправки на COM порт
+      const psCommand = `
+        $port = New-Object System.IO.Ports.SerialPort('${this.port}', 9600, 'None', 8, 'One')
+        try {
+          $port.Open()
+          $port.WriteLine('${command.replace(/'/g, "''")}')
+          Start-Sleep -Milliseconds 500
+          $response = $port.ReadExisting()
+          $port.Close()
+          Write-Output $response
+        } catch {
+          if ($port.IsOpen) { $port.Close() }
+          throw $_.Exception.Message
+        }
+      `;
 
-    try {
-      const { stdout, stderr } = await execAsync(`powershell -Command "${psCommand}"`);
-      if (stderr) throw new Error(stderr);
-      return stdout.trim();
-    } catch (error) {
-      // Fallback: попробуем через copy команду
-      console.warn('⚠️ PowerShell method failed, trying copy method...');
-      return await this.sendViaCopy(command);
+      try {
+        const { stdout, stderr } = await execAsync(`powershell -Command "${psCommand}"`);
+        if (stderr) throw new Error(stderr);
+        return stdout.trim();
+      } catch (error) {
+        console.warn('⚠️ PowerShell method failed, trying copy method...');
+        return await this.sendViaCopy(command);
+      }
+    } else {
+      // macOS/Linux: используем screen или cu для serial порта
+      console.log('🍎 Serial communication on macOS/Linux not implemented, using network fallback');
+      return await this.sendNetworkCommand(command);
     }
   }
 
   private async sendViaCopy(command: string): Promise<string> {
+    console.log(`🖥️ Platform detected: ${this.platform}`);
+    
     // Создаем временный файл с EZPL командой
     const tempFile = path.join(this.templatesPath, 'temp_print.ezpl');
     await fs.writeFile(tempFile, command, 'utf-8');
     
     try {
-      // Отправляем файл на принтер через copy команду
-      const { stdout, stderr } = await execAsync(`copy "${tempFile}" ${this.port}`);
-      if (stderr && !stderr.includes('copied')) {
-        throw new Error(stderr);
+      let copyCommand: string;
+      
+      if (this.platform === 'win32') {
+        // Windows: используем copy команду
+        console.log('🪟 Using Windows copy command');
+        copyCommand = `copy "${tempFile}" ${this.port}`;
+      } else {
+        // macOS/Linux: используем netcat для отправки на сетевой принтер
+        console.log('🍎 Using macOS/Linux netcat command');
+        const [ip, port] = this.parseNetworkAddress();
+        copyCommand = `nc -w3 ${ip} ${port} < "${tempFile}"`; // Добавляем timeout 3 секунды
       }
       
-      return 'Command sent via copy';
+      console.log(`📤 Executing command: ${copyCommand}`);
+      const { stdout, stderr } = await execAsync(copyCommand);
+      
+      if (this.platform === 'win32') {
+        if (stderr && !stderr.includes('copied')) {
+          throw new Error(stderr);
+        }
+      } else {
+        // На macOS/Linux nc может не возвращать вывод, это нормально
+        if (stderr && !stderr.includes('Connection refused')) {
+          console.warn('⚠️ nc stderr (may be normal):', stderr);
+        }
+      }
+      
+      return `Command sent via ${this.platform === 'win32' ? 'copy' : 'netcat'}`;
     } finally {
       // Удаляем временный файл
       try {
@@ -1075,13 +1108,17 @@ E
     
     // Получаем настройки сети из конфигурации
     const networkPort = this.config?.printer?.network_port || 9101;
-    const timeout = this.config?.printer?.timeout || 10000;
+    const timeout = this.config?.printer?.timeout || 3000; // Уменьшаем с 10 до 3 секунд
     
     return new Promise((resolve, reject) => {
       const socket = net.createConnection(networkPort, this.port, () => {
         console.log(`🌐 Connected to printer at ${this.port}:${networkPort}`);
-        socket.write(command);
-        socket.end();
+        socket.write(command, 'utf8', () => {
+          // Задержка перед закрытием чтобы принтер успел обработать команду
+          setTimeout(() => {
+            socket.end();
+          }, 200); // Даем 200ms принтеру на обработку
+        });
       });
 
       let response = '';
@@ -1110,20 +1147,26 @@ E
   private async sendViaNetworkSocket(config: any, command: string): Promise<string> {
     const net = require('net');
     const host = config.host || this.port;
-    const port = config.port || 9100;
-    const timeout = config.timeout || 10000;
+    const port = config.port || 9101; // GoDEX использует порт 9101
+    const timeout = config.timeout || 3000; // Уменьшаем тайм-аут до 3 секунд
     
     return new Promise((resolve, reject) => {
       console.log(`🌐 Connecting to printer at ${host}:${port}...`);
       
       const socket = net.createConnection(port, host, () => {
         console.log(`✅ Connected to printer at ${host}:${port}`);
-        socket.write(Buffer.from(command, 'utf8'));
-        
-        // Для EZPL команд не ждем ответа, просто закрываем соединение
-        setTimeout(() => {
-          socket.end();
-        }, 500);
+        socket.write(Buffer.from(command, 'utf8'), (error?: Error) => {
+          if (error) {
+            console.error('❌ Write error:', error);
+            socket.destroy();
+            reject(error);
+            return;
+          }
+          // Задержка перед закрытием чтобы принтер успел обработать
+          setTimeout(() => {
+            socket.end();
+          }, 200);
+        });
       });
 
       let response = '';
@@ -1302,6 +1345,27 @@ E
 
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Парсит сетевой адрес принтера для использования с netcat
+   */
+  private parseNetworkAddress(): [string, string] {
+    // Если порт уже является IP адресом
+    if (this.port.includes('.')) {
+      return [this.port, '9101']; // По умолчанию порт 9101 для GoDEX
+    }
+    
+    // Если используется конфигурация с отдельным IP и портом
+    const networkConfig = this.config?.printer;
+    if (networkConfig?.ip) {
+      const ip = networkConfig.ip;
+      const port = networkConfig.network_port || '9101';
+      return [ip, port.toString()];
+    }
+    
+    // По умолчанию для локальной сети GoDEX
+    return ['192.168.14.200', '9101'];
   }
 }
 

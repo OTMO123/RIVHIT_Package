@@ -40,38 +40,14 @@ export class PrintController {
     this.simpleZPLService = new SimpleZPLService();
     this.windowsPrintService = new WindowsPrintService();
     
-    if (printerService) {
-      this.printerService = printerService;
-      return;
-    }
-
-    // Создаем GoDEX ZX420 сервис с конфигурацией из env
-    const connectionType = (process.env.PRINTER_CONNECTION_TYPE as 'usb' | 'serial' | 'ethernet') || 'usb';
-    const port = process.env.PRINTER_PORT || 'COM1';
-    const templatesPath = process.env.PRINTER_TEMPLATES_PATH || './printer-templates';
-    
-    if (connectionType === 'ethernet') {
-      this.printerService = PrinterServiceFactory.createEthernetService(port, templatesPath);
-    } else {
-      this.printerService = PrinterServiceFactory.createUSBService(port, templatesPath);
+    // 🚨 CRITICAL FIX: Always use injected printer service from ApplicationServiceFactory
+    // Never create own printer service to avoid configuration conflicts
+    if (!printerService) {
+      throw new Error('PrintController requires a printer service from ApplicationServiceFactory');
     }
     
-    this.initializePrinter();
-  }
-
-  private async initializePrinter() {
-    try {
-      const connectionType = (process.env.PRINTER_CONNECTION_TYPE as 'usb' | 'serial' | 'ethernet') || 'usb';
-      const port = process.env.PRINTER_PORT || 'COM1';
-      
-      await this.printerService.initialize({
-        connectionType,
-        port
-      });
-      console.log('✅ GoDEX ZX420 printer service initialized successfully');
-    } catch (error) {
-      console.error('❌ Failed to initialize GoDEX ZX420 printer service:', error);
-    }
+    this.printerService = printerService;
+    console.log('✅ PrintController using injected ZPL printer service from ApplicationServiceFactory');
   }
 
   /**
@@ -211,18 +187,33 @@ export class PrintController {
    * POST /api/print/test
    */
   async testPrint(req: Request, res: Response): Promise<void> {
+    console.log('🚀 [BACKEND TEST PRINT] Получен запрос на тестовую печать');
+    console.log('📋 [BACKEND TEST PRINT] Request details:', {
+      method: req.method,
+      url: req.url,
+      headers: req.headers,
+      body: req.body
+    });
+    
     try {
-      console.log('🧪 Running printer test...');
+      console.log('🧪 [BACKEND TEST PRINT] Запускаем тестовую печать...');
+      console.log('🖨️ [BACKEND TEST PRINT] Printer service status:', {
+        isConnected: this.printerService.isConnected,
+        connectionInfo: this.printerService.getConnectionInfo()
+      });
       
       const result = await this.printerService.testPrint();
+      console.log('📊 [BACKEND TEST PRINT] Результат от printer service:', result);
 
       if (result.success) {
+        console.log('✅ [BACKEND TEST PRINT] Тестовая печать успешна');
         res.status(200).json({
           success: true,
           jobId: result.jobId,
           message: 'Test print completed successfully'
         });
       } else {
+        console.error('❌ [BACKEND TEST PRINT] Тестовая печать неудачна:', result.error);
         res.status(500).json({
           success: false,
           error: result.error || 'Test print failed'
@@ -230,7 +221,11 @@ export class PrintController {
       }
 
     } catch (error) {
-      console.error('❌ Error in test print:', error);
+      console.error('🚨 [BACKEND TEST PRINT] Критическая ошибка:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'UnknownError'
+      });
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Test print failed'
@@ -455,10 +450,18 @@ export class PrintController {
    * POST /api/print/shipping-label
    */
   async printShippingLabel(req: Request, res: Response): Promise<void> {
+    console.log('🚀 [BACKEND SHIPPING LABEL] Получен запрос на печать этикетки доставки');
+    console.log('📋 [BACKEND SHIPPING LABEL] Request details:', {
+      method: req.method,
+      url: req.url,
+      body: req.body
+    });
+    
     try {
       const { orderId, customerName, address, items, copies = 1 } = req.body;
 
       if (!orderId || !customerName) {
+        console.error('❌ [BACKEND SHIPPING LABEL] Отсутствуют обязательные параметры');
         res.status(400).json({
           success: false,
           error: 'Order ID and customer name are required'
@@ -466,7 +469,11 @@ export class PrintController {
         return;
       }
 
-      console.log(`📦 Printing shipping label for order: ${orderId}`);
+      console.log(`📦 [BACKEND SHIPPING LABEL] Printing shipping label for order: ${orderId}`);
+      console.log('👤 [BACKEND SHIPPING LABEL] Customer:', customerName);
+      console.log('📍 [BACKEND SHIPPING LABEL] Address:', address);
+      console.log('📦 [BACKEND SHIPPING LABEL] Items count:', items?.length || 0);
+      console.log('🔢 [BACKEND SHIPPING LABEL] Copies:', copies);
 
       // Создаем фиктивный товар для этикетки доставки
       const shippingLabelItem: PackingItem = {
@@ -499,6 +506,16 @@ export class PrintController {
         reason: 'shipping'
       };
 
+      console.log('🏷️ [BACKEND SHIPPING LABEL] Создан товар для этикетки доставки:', shippingLabelItem);
+      console.log('⚙️ [BACKEND SHIPPING LABEL] Параметры печати:', {
+        copies, 
+        labelSize: 'large',
+        includeText: true,
+        includeQuantity: false,
+        includePrices: false
+      });
+
+      console.log('🖨️ [BACKEND SHIPPING LABEL] Вызываем printBarcodeLabels...');
       const result = await this.printerService.printBarcodeLabels(
         [shippingLabelItem], 
         { 
@@ -510,13 +527,17 @@ export class PrintController {
         }
       );
 
+      console.log('📊 [BACKEND SHIPPING LABEL] Результат печати:', result);
+
       if (result.success) {
+        console.log('✅ [BACKEND SHIPPING LABEL] Печать успешна');
         res.status(200).json({
           success: true,
           jobId: result.jobId,
           message: `Shipping label printed for order ${orderId}`
         });
       } else {
+        console.error('❌ [BACKEND SHIPPING LABEL] Печать неудачна:', result.error);
         res.status(500).json({
           success: false,
           error: result.error || 'Failed to print shipping label'
@@ -524,7 +545,11 @@ export class PrintController {
       }
 
     } catch (error) {
-      console.error('❌ Error printing shipping label:', error);
+      console.error('🚨 [BACKEND SHIPPING LABEL] Критическая ошибка:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'UnknownError'
+      });
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Shipping label print failed'
@@ -537,6 +562,33 @@ export class PrintController {
    * POST /api/print/product-labels
    */
   async printProductLabels(req: Request, res: Response): Promise<void> {
+    // Capture all console logs for frontend forwarding
+    const debugLogs: any[] = [];
+    const originalConsoleLog = console.log;
+    const originalConsoleError = console.error;
+    const originalConsoleWarn = console.warn;
+    
+    // Override console methods to capture logs
+    console.log = (...args: any[]) => {
+      debugLogs.push({ level: 'info', message: args.join(' '), timestamp: new Date().toISOString() });
+      originalConsoleLog(...args);
+    };
+    console.error = (...args: any[]) => {
+      debugLogs.push({ level: 'error', message: args.join(' '), timestamp: new Date().toISOString() });
+      originalConsoleError(...args);
+    };
+    console.warn = (...args: any[]) => {
+      debugLogs.push({ level: 'warn', message: args.join(' '), timestamp: new Date().toISOString() });
+      originalConsoleWarn(...args);
+    };
+
+    console.log('🚀 [BACKEND PRODUCT LABELS] Получен запрос на печать этикеток товаров');
+    console.log('📋 [BACKEND PRODUCT LABELS] Request details:', {
+      method: req.method,
+      url: req.url,
+      body: req.body
+    });
+    
     try {
       const { orderId, items, options }: { 
         orderId: string, 
@@ -545,12 +597,29 @@ export class PrintController {
       } = req.body;
 
       if (!orderId || !items || !Array.isArray(items)) {
+        console.error('❌ [BACKEND PRODUCT LABELS] Отсутствуют обязательные параметры');
+        
+        // Restore original console methods
+        console.log = originalConsoleLog;
+        console.error = originalConsoleError;
+        console.warn = originalConsoleWarn;
+        
         res.status(400).json({
           success: false,
-          error: 'Order ID and items array are required'
+          error: 'Order ID and items array are required',
+          logs: debugLogs,
+          debug: {
+            totalLogs: debugLogs.length,
+            timestamp: new Date().toISOString(),
+            validationError: 'Missing required parameters'
+          }
         });
         return;
       }
+
+      console.log(`📦 [BACKEND PRODUCT LABELS] Order ID: ${orderId}`);
+      console.log(`📦 [BACKEND PRODUCT LABELS] Total items received: ${items.length}`);
+      console.log('⚙️ [BACKEND PRODUCT LABELS] Options:', options);
 
       // Фильтруем только упакованные и доступные товары
       const itemsToPrint = items.filter(item => 
@@ -559,47 +628,129 @@ export class PrintController {
         item.packedQuantity > 0
       );
 
+      console.log(`🔍 [BACKEND PRODUCT LABELS] Filtered items to print: ${itemsToPrint.length}`);
+      console.log('📋 [BACKEND PRODUCT LABELS] Items to print:', itemsToPrint.map(item => ({
+        id: item.item_id,
+        name: item.item_name,
+        quantity: item.packedQuantity,
+        isPacked: item.isPacked,
+        isAvailable: item.isAvailable
+      })));
+
       if (itemsToPrint.length === 0) {
+        console.warn('⚠️ [BACKEND PRODUCT LABELS] Нет товаров для печати');
+        
+        // Restore original console methods
+        console.log = originalConsoleLog;
+        console.error = originalConsoleError;
+        console.warn = originalConsoleWarn;
+        
         res.status(400).json({
           success: false,
-          error: 'No valid items found for printing'
+          error: 'No valid items found for printing',
+          logs: debugLogs,
+          debug: {
+            totalLogs: debugLogs.length,
+            timestamp: new Date().toISOString(),
+            orderId,
+            totalItemsReceived: items.length,
+            filteredItemsCount: 0,
+            validationError: 'No printable items found'
+          }
         });
         return;
       }
 
-      console.log(`🏷️ Printing product labels for order ${orderId}: ${itemsToPrint.length} items`);
+      console.log(`🏷️ [BACKEND PRODUCT LABELS] Printing product labels for order ${orderId}: ${itemsToPrint.length} items`);
 
-      const result = await this.printerService.printBarcodeLabels(itemsToPrint, {
+      const printOptions = {
         copies: 1,
-        labelSize: 'medium',
         includeBarcodes: true,
         includeText: true,
         includeQuantity: true,
         includePrices: true,
-        ...options
-      });
+        ...options,
+        // Ensure labelSize is one of the valid options
+        labelSize: (['small', 'medium', 'large'].includes(options?.labelSize as string) 
+          ? options?.labelSize 
+          : 'medium') as 'small' | 'medium' | 'large'
+      };
+      console.log('⚙️ [BACKEND PRODUCT LABELS] Final print options:', printOptions);
 
+      console.log('🖨️ [BACKEND PRODUCT LABELS] Вызываем printBarcodeLabels...');
+      const result = await this.printerService.printBarcodeLabels(itemsToPrint, printOptions);
+
+      console.log('📊 [BACKEND PRODUCT LABELS] Результат печати:', result);
+
+      // Restore original console methods before sending response
+      console.log = originalConsoleLog;
+      console.error = originalConsoleError;
+      console.warn = originalConsoleWarn;
+      
       if (result.success) {
+        console.log('✅ [BACKEND PRODUCT LABELS] Печать товарных этикеток успешна');
         res.status(200).json({
           success: true,
           jobId: result.jobId,
           printedItems: result.printedItems,
           estimatedTime: result.estimatedTime,
           ezplCommands: result.ezplCommands || [],
-          message: `Product labels printed for order ${orderId}`
+          message: `Product labels printed for order ${orderId}`,
+          // Forward comprehensive debug logs to frontend
+          logs: debugLogs,
+          debug: {
+            totalLogs: debugLogs.length,
+            timestamp: new Date().toISOString(),
+            orderId,
+            itemsCount: itemsToPrint.length,
+            printResult: result
+          }
         });
       } else {
+        console.error('❌ [BACKEND PRODUCT LABELS] Печать товарных этикеток неудачна:', result.error);
         res.status(500).json({
           success: false,
-          error: result.error || 'Failed to print product labels'
+          error: result.error || 'Failed to print product labels',
+          // Include debug logs even on failure
+          logs: debugLogs,
+          debug: {
+            totalLogs: debugLogs.length,
+            timestamp: new Date().toISOString(),
+            orderId,
+            itemsCount: itemsToPrint?.length || 0,
+            printResult: result
+          }
         });
       }
 
     } catch (error) {
-      console.error('❌ Error printing product labels:', error);
+      console.error('🚨 [BACKEND PRODUCT LABELS] Критическая ошибка:', {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'UnknownError'
+      });
+      
+      // Restore original console methods before sending response
+      console.log = originalConsoleLog;
+      console.error = originalConsoleError;
+      console.warn = originalConsoleWarn;
+      
       res.status(500).json({
         success: false,
-        error: error instanceof Error ? error.message : 'Product labels print failed'
+        error: error instanceof Error ? error.message : 'Product labels print failed',
+        // Include debug logs on critical error
+        logs: debugLogs,
+        debug: {
+          totalLogs: debugLogs.length,
+          timestamp: new Date().toISOString(),
+          errorType: error instanceof Error ? error.name : 'UnknownError',
+          orderId: req.body?.orderId || 'unknown',
+          errorDetails: error instanceof Error ? {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+          } : String(error)
+        }
       });
     }
   }
@@ -1034,6 +1185,33 @@ export class PrintController {
    * POST /api/print/box-labels-ezpl
    */
   async printBoxLabelsEZPL(req: Request, res: Response): Promise<void> {
+    // Capture all console logs for frontend forwarding
+    const debugLogs: any[] = [];
+    const originalConsoleLog = console.log;
+    const originalConsoleError = console.error;
+    const originalConsoleWarn = console.warn;
+    
+    // Override console methods to capture logs
+    console.log = (...args: any[]) => {
+      debugLogs.push({ level: 'info', message: args.join(' '), timestamp: new Date().toISOString() });
+      originalConsoleLog(...args);
+    };
+    console.error = (...args: any[]) => {
+      debugLogs.push({ level: 'error', message: args.join(' '), timestamp: new Date().toISOString() });
+      originalConsoleError(...args);
+    };
+    console.warn = (...args: any[]) => {
+      debugLogs.push({ level: 'warn', message: args.join(' '), timestamp: new Date().toISOString() });
+      originalConsoleWarn(...args);
+    };
+
+    console.log('🚀 [BACKEND BOX LABELS EZPL] Получен запрос на печать этикеток коробок');
+    console.log('📋 [BACKEND BOX LABELS EZPL] Request details:', {
+      method: req.method,
+      url: req.url,
+      body: req.body
+    });
+
     try {
       const { 
         orderId, 
@@ -1053,17 +1231,43 @@ export class PrintController {
 
       // Validation
       if (!orderId || !boxes || !Array.isArray(boxes) || boxes.length === 0) {
+        console.error('❌ [BACKEND BOX LABELS EZPL] Missing required parameters');
+        
+        // Restore original console methods
+        console.log = originalConsoleLog;
+        console.error = originalConsoleError;
+        console.warn = originalConsoleWarn;
+        
         res.status(400).json({
           success: false,
-          error: 'Order ID and boxes array are required'
+          error: 'Order ID and boxes array are required',
+          logs: debugLogs,
+          debug: {
+            totalLogs: debugLogs.length,
+            timestamp: new Date().toISOString(),
+            validationError: 'Missing required parameters'
+          }
         });
         return;
       }
 
       if (!customerName) {
+        console.error('❌ [BACKEND BOX LABELS EZPL] Customer name required');
+        
+        // Restore original console methods
+        console.log = originalConsoleLog;
+        console.error = originalConsoleError;
+        console.warn = originalConsoleWarn;
+        
         res.status(400).json({
           success: false,
-          error: 'Customer name is required'
+          error: 'Customer name is required',
+          logs: debugLogs,
+          debug: {
+            totalLogs: debugLogs.length,
+            timestamp: new Date().toISOString(),
+            validationError: 'Customer name required'
+          }
         });
         return;
       }
@@ -1103,31 +1307,18 @@ export class PrintController {
 
           ezplCommands.push(ezplCode);
 
-          // Send EZPL to printer
-          if (this.printerService && this.printerService.isConnected) {
-            await this.printerService.sendRawCommand(ezplCode);
-            
-            printResults.push({
-              boxNumber: i + 1,
-              success: true,
-              ezplLength: ezplCode.length
-            });
+          // Just collect EZPL for now - we'll send as batch later
+          printResults.push({
+            boxNumber: i + 1,
+            success: true, // Will be updated after batch send
+            ezplLength: ezplCode.length
+          });
 
-            // Mark box as printed
-            box.isPrinted = true;
-            box.printedAt = new Date().toISOString();
+          console.log(`✅ Box ${i + 1}/${boxes.length} EZPL generated (${ezplCode.length} chars)`);
 
-            // Delay between labels to prevent printer buffer overflow
-            await this.delay(1500);
-          } else {
-            // If printer not connected, just generate EZPL
-            printResults.push({
-              boxNumber: i + 1,
-              success: false,
-              ezplLength: ezplCode.length,
-              error: 'Printer not connected - EZPL generated but not sent'
-            });
-          }
+          // Mark box as printed
+          box.isPrinted = true;
+          box.printedAt = new Date().toISOString();
 
         } catch (error) {
           console.error(`❌ Failed to print EZPL label for box ${i + 1}:`, error);
@@ -1139,9 +1330,56 @@ export class PrintController {
         }
       }
 
+      // 🚨 CRITICAL: Send all labels in one batch to prevent printer calibration issues
+      if (this.printerService && this.printerService.isConnected && ezplCommands.length > 0) {
+        try {
+          console.log(`🔧 PRINTER FIX: Sending ${ezplCommands.length} labels as single batch to prevent calibration issues`);
+          
+          // Combine all EZPL commands with minimal spacing (just newlines)
+          const batchEZPL = ezplCommands.join('\n');
+          
+          console.log(`📤 Sending batch EZPL (${batchEZPL.length} chars total) to printer...`);
+          
+          // Send all labels in one network command to avoid multiple TCP connections
+          await this.printerService.sendRawCommand(batchEZPL);
+          
+          console.log(`✅ SUCCESS: All ${ezplCommands.length} labels sent in single batch - no calibration disruption`);
+          
+          // All successful since batch succeeded
+          printResults.forEach(result => {
+            if (result.success !== false) {
+              result.success = true;
+            }
+          });
+          
+        } catch (error) {
+          console.error(`❌ BATCH PRINT FAILED:`, error);
+          console.error(`This will cause printer calibration issues!`);
+          
+          // Mark all as failed since batch failed
+          printResults.forEach(result => {
+            result.success = false;
+            result.error = `Batch print failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+          });
+        }
+      } else if (!this.printerService?.isConnected) {
+        console.warn(`⚠️ Printer not connected - EZPL generated but not sent`);
+        printResults.forEach(result => {
+          result.success = false;
+          result.error = 'Printer not connected - EZPL generated but not sent';
+        });
+      } else if (ezplCommands.length === 0) {
+        console.warn(`⚠️ No EZPL commands generated`);
+      }
+
       // Calculate results
       const successCount = printResults.filter(r => r.success).length;
       const failedCount = printResults.filter(r => !r.success).length;
+
+      // Restore original console methods before sending response
+      console.log = originalConsoleLog;
+      console.error = originalConsoleError;
+      console.warn = originalConsoleWarn;
 
       res.status(200).json({
         success: successCount > 0,
@@ -1152,14 +1390,42 @@ export class PrintController {
           total: boxes.length,
           successful: successCount,
           failed: failedCount
+        },
+        // Forward comprehensive debug logs to frontend
+        logs: debugLogs,
+        debug: {
+          totalLogs: debugLogs.length,
+          timestamp: new Date().toISOString(),
+          orderId,
+          boxCount: boxes.length,
+          ezplCommandsGenerated: ezplCommands.length
         }
       });
 
     } catch (error) {
       console.error('❌ Error printing box labels with EZPL:', error);
+      
+      // Restore original console methods before sending response
+      console.log = originalConsoleLog;
+      console.error = originalConsoleError;
+      console.warn = originalConsoleWarn;
+      
       res.status(500).json({
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to print box labels'
+        error: error instanceof Error ? error.message : 'Failed to print box labels',
+        // Include debug logs on critical error
+        logs: debugLogs,
+        debug: {
+          totalLogs: debugLogs.length,
+          timestamp: new Date().toISOString(),
+          errorType: error instanceof Error ? error.name : 'UnknownError',
+          orderId: req.body?.orderId || 'unknown',
+          errorDetails: error instanceof Error ? {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+          } : String(error)
+        }
       });
     }
   }

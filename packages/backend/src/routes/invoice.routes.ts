@@ -12,12 +12,12 @@ router.post('/create-from-order', async (req: Request, res: Response) => {
   console.log('📋 Request body:', JSON.stringify(req.body, null, 2));
   
   try {
-    const { orderNumber, items, customerData } = req.body;
+    const { orderNumber, items, customer_id } = req.body;
 
     console.log('📝 [ROUTE] Extracted params:', {
       orderNumber,
       items_count: items?.length,
-      has_customer_data: !!customerData
+      customer_id: customer_id
     });
 
     if (!orderNumber) {
@@ -57,20 +57,17 @@ router.post('/create-from-order', async (req: Request, res: Response) => {
           message: 'Invoice data prepared but not sent to RIVHIT',
           orderNumber,
           items,
-          customerData
+          customer_id
         },
         instruction: 'Set ALLOW_RIVHIT_WRITES=true in .env to enable actual invoice creation'
       });
     }
-
-    // Extract customer_id if provided
-    const customerId = customerData?.customer_id;
     
     // Create invoice
     console.log('🚀 [ROUTE] Creating invoice service and calling createInvoiceFromOrder');
-    console.log('👤 [ROUTE] Customer ID:', customerId);
+    console.log('👤 [ROUTE] Customer ID:', customer_id);
     const invoiceService = new InvoiceCreatorService(apiUrl, apiToken);
-    const invoice = await invoiceService.createInvoiceFromOrder(orderNumber, items, customerId);
+    const invoice = await invoiceService.createInvoiceFromOrder(orderNumber, items, customer_id);
 
     console.log('✅ [ROUTE] Invoice created successfully');
     res.json({

@@ -38,13 +38,14 @@ import {
 import { useI18n } from '../i18n/i18n';
 import { apiService, Order } from '../services/api.service';
 import { SVGConnections, Connection } from '../components/SVGConnections';
-import { MaxPerBoxSettingsModal } from '../components/MaxPerBoxSettings';
+import { SettingsModal } from '../components/SettingsModal';
 import { RegionSelector } from '../components/RegionSelector';
 import { LabelPreview } from '../components/LabelPreview';
 import { InvoiceModal } from '../components/InvoiceModal';
 import { PackingWorkflowModal } from '../components/PackingWorkflowModal';
 import { SimpleProgressSteps, SimpleStep } from '../components/SimpleProgressSteps';
 import { DeliveryRegion, PackingBox } from '@packing/shared';
+import { orderStatusService, OrderStatus } from '../services/order-status.service';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -74,6 +75,62 @@ export const OrdersPage: React.FC = () => {
   
   const packingTableRef = useRef<HTMLDivElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const draftSaveTimeoutRef = useRef<number | null>(null);
+  const draftBoxesSaveTimeoutRef = useRef<number | null>(null);
+  
+  // Update connection positions after connections are restored
+  React.useEffect(() => {
+    if (connections.length > 0 && packingModalVisible) {
+      // Update connection positions after DOM updates
+      const updatePositions = () => {
+        const points = new Map<string, { x: number; y: number }>();
+        connections.forEach(conn => {
+          const fromButton = document.querySelector(`[data-connection-id="${conn.from}"]`);
+          const toButton = document.querySelector(`[data-connection-id="${conn.to}"]`);
+          
+          if (fromButton && toButton) {
+            const fromRect = fromButton.getBoundingClientRect();
+            const toRect = toButton.getBoundingClientRect();
+            const containerRect = canvasContainerRef.current?.getBoundingClientRect();
+            
+            if (containerRect) {
+              points.set(conn.from, {
+                x: fromRect.left + fromRect.width / 2 - containerRect.left,
+                y: fromRect.top + fromRect.height / 2 - containerRect.top
+              });
+              points.set(conn.to, {
+                x: toRect.left + toRect.width / 2 - containerRect.left,
+                y: toRect.top + toRect.height / 2 - containerRect.top
+              });
+            }
+          }
+        });
+        
+        if (points.size > 0) {
+          setConnectionPoints(points);
+          console.log('🔄 Updated connection positions');
+        }
+      };
+      
+      // Update positions multiple times to ensure correct rendering
+      setTimeout(updatePositions, 100);
+      setTimeout(updatePositions, 300);
+      setTimeout(updatePositions, 600);
+    }
+  }, [connections, packingModalVisible]);
+  
+  // Monitor packingData changes to verify box numbers update in UI
+  React.useEffect(() => {
+    if (packingModalVisible && Object.keys(packingData).length > 0) {
+      console.log('🔄 PackingData updated in UI, box numbers are:', 
+        Object.entries(packingData).map(([key, data]: [string, any]) => ({
+          item: key.split('_').pop(),
+          box: data.boxNumber,
+          qty: data.quantity
+        }))
+      );
+    }
+  }, [packingData, packingModalVisible]);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -92,16 +149,8 @@ export const OrdersPage: React.FC = () => {
   const [packingBoxes, setPackingBoxes] = useState<PackingBox[]>([]);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [showWorkflowModal, setShowWorkflowModal] = useState(false);
+  const [currentOrderStatus, setCurrentOrderStatus] = useState<OrderStatus | null>(null);
 
-  const getStatusColor = (status: string) => {
-    const colors = {
-      pending: 'orange',
-      processing: 'blue',
-      packed: 'green',
-      shipped: 'gray'
-    };
-    return colors[status as keyof typeof colors] || 'default';
-  };
 
   const getPriorityColor = (priority: string) => {
     const colors = {
@@ -125,30 +174,57 @@ export const OrdersPage: React.FC = () => {
         message.warning(locale === 'he' ? 'השרת לא זמין, מציג נתונים מקומיים' : 'Сервер недоступен, показываю локальные данные');
       }
       
-      // Use date range for filtering
+      // Use date range for filtering (don't filter by status on server - do it on client)
       const filters = {
         documentType: 7, // Orders only (RIVHIT type 7 = "הזמנה")
         fromDate: selectedDate.format('YYYY-MM-DD'),
         toDate: selectedDate.format('YYYY-MM-DD'),
-        ...(statusFilter !== 'all' && { status: getStatusNumber(statusFilter) }),
         ...(searchText && { searchText }),
-        page,
-        pageSize
+        page: 1,
+        pageSize: 200 // Always fetch all orders for the day
       };
       
-      // Always fetch all orders for the day (up to 200)
-      const allOrdersFilters = { ...filters, page: 1, pageSize: 200 };
       console.log(`🔄 Loading all orders for ${selectedDate.format('DD/MM/YYYY')}...`);
-      const result = await apiService.getOrdersPaginated(allOrdersFilters);
+      const result = await apiService.getOrdersPaginated(filters);
       
-      // Store all orders
-      setAllOrders(result.data);
-      setTotalOrders(result.data.length);
+      // Load status from database for each order
+      const ordersWithStatus = await Promise.all(
+        result.data.map(async (order) => {
+          const dbStatus = await orderStatusService.getOrderStatus(order.id);
+          if (dbStatus && dbStatus.status) {
+            // Use status from database if exists
+            return { ...order, status: normalizeStatus(dbStatus.status) };
+          }
+          return { ...order, status: 'pending' as Order['status'] }; // Default status
+        })
+      );
+      
+      // Apply client-side filtering by status
+      let filteredOrders = ordersWithStatus;
+      if (statusFilter !== 'all') {
+        filteredOrders = ordersWithStatus.filter(order => 
+          (order.status || 'pending') === statusFilter
+        );
+      }
+      
+      // Apply text search filtering if any
+      if (searchText) {
+        const searchLower = searchText.toLowerCase();
+        filteredOrders = filteredOrders.filter(order => 
+          order.customerName?.toLowerCase().includes(searchLower) ||
+          order.id?.toString().includes(searchLower) ||
+          order.totalAmount?.toString().includes(searchLower)
+        );
+      }
+      
+      // Store all filtered orders
+      setAllOrders(filteredOrders);
+      setTotalOrders(filteredOrders.length);
       
       // Do client-side pagination
       const startIndex = (page - 1) * pageSize;
       const endIndex = startIndex + pageSize;
-      const paginatedOrders = result.data.slice(startIndex, endIndex);
+      const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
       
       setOrders(paginatedOrders);
       setCurrentPage(page);
@@ -166,11 +242,36 @@ export const OrdersPage: React.FC = () => {
   const getStatusNumber = (status: string): number => {
     const statusMap: Record<string, number> = {
       pending: 0,
-      processing: 2,
-      packed: 4,
-      shipped: 6
+      packing: 1,
+      packed_pending_labels: 2,
+      labels_printed: 3,
+      completed: 4,
+      shipped: 5
     };
     return statusMap[status] || 0;
+  };
+
+  // Helper function to ensure status is a valid Order status type
+  const normalizeStatus = (status: string): Order['status'] => {
+    const validStatuses: Order['status'][] = [
+      'pending', 'processing', 'packed', 'shipped', 'packing', 
+      'completed', 'packed_pending_labels', 'labels_printed'
+    ];
+    return validStatuses.includes(status as Order['status']) 
+      ? (status as Order['status']) 
+      : 'pending';
+  };
+
+  const getStatusColor = (status: string): string => {
+    const colorMap: Record<string, string> = {
+      pending: 'default',
+      packing: 'processing',
+      packed_pending_labels: 'warning',
+      labels_printed: 'cyan',
+      completed: 'success',
+      shipped: 'green'
+    };
+    return colorMap[status] || 'default';
   };
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
@@ -351,9 +452,229 @@ export const OrdersPage: React.FC = () => {
     return splitItems;
   };
 
+  // Function to restore connections and box numbers from draft boxes
+  const restoreConnectionsFromDraftBoxes = (draftBoxes: any[], currentPackingData: any): { connections: Connection[], packingData: any } => {
+    const restoredConnections: Connection[] = [];
+    const updatedPackingData = { ...currentPackingData };
+    
+    console.log('🔍 Restoring from draft boxes. Initial packingData:', currentPackingData);
+    console.log('📦 Draft boxes to restore:', draftBoxes);
+    console.log('🔑 Current packingData keys:', Object.keys(currentPackingData));
+    
+    // Process each box and restore both connections and box numbers
+    draftBoxes.forEach(box => {
+      // Parse items from JSON if needed
+      let items = box.items;
+      if (typeof items === 'string') {
+        try {
+          items = JSON.parse(items);
+        } catch (e) {
+          console.error('Failed to parse items:', e);
+          return;
+        }
+      }
+      
+      const boxNumber = box.boxNumber;
+      console.log(`📦 Processing box ${boxNumber} with ${items?.length || 0} items`);
+      
+      if (!Array.isArray(items)) {
+        console.warn(`Box ${boxNumber} has no items array`);
+        return;
+      }
+      
+      // Update packingData with correct box numbers AND quantities from draft
+      items.forEach(item => {
+        const itemKey = item.itemId; // This is the key saved in draft boxes
+        console.log(`  - Looking for item key: ${itemKey} in packingData`);
+        
+        if (itemKey && updatedPackingData[itemKey]) {
+          console.log(`  ✅ Found item ${itemKey}: updating box number from ${updatedPackingData[itemKey].boxNumber} to ${boxNumber}, quantity: ${item.quantity}`);
+          updatedPackingData[itemKey] = {
+            ...updatedPackingData[itemKey],
+            boxNumber: boxNumber,
+            quantity: item.quantity // Restore the saved quantity
+          };
+        } else {
+          console.warn(`  ⚠️ Item ${itemKey} not found in packingData. Available keys:`, Object.keys(updatedPackingData).slice(0, 5));
+        }
+      });
+      
+      // If box has multiple items, create connections between them
+      if (items.length > 1) {
+        // Create chain of connections between items in the box
+        for (let i = 0; i < items.length - 1; i++) {
+          const fromId = items[i].itemId;
+          const toId = items[i + 1].itemId;
+          
+          // Skip if connection already exists
+          const exists = restoredConnections.some(conn =>
+            (conn.from === fromId && conn.to === toId) ||
+            (conn.from === toId && conn.to === fromId)
+          );
+          
+          if (!exists && fromId && toId) {
+            console.log(`  - Creating connection: ${fromId} -> ${toId}`);
+            restoredConnections.push({
+              id: `${fromId}_to_${toId}`,
+              from: fromId,
+              to: toId,
+              fromPosition: { x: 0, y: 0 }, // Will be updated after render
+              toPosition: { x: 0, y: 0 },   // Will be updated after render
+              color: '#1890ff'
+            });
+          }
+        }
+      }
+    });
+    
+    console.log('✅ Restoration complete. Updated packingData:', updatedPackingData);
+    console.log('🔗 Restored connections:', restoredConnections);
+    console.log('📊 Final box assignments:', Object.entries(updatedPackingData).map(([key, data]: [string, any]) => ({ key, boxNumber: data.boxNumber })));
+    
+    return { 
+      connections: restoredConnections,
+      packingData: updatedPackingData
+    };
+  };
+
+  // Function to save draft boxes based on connections and packing data
+  const saveDraftBoxesFromConnectionsInternal = async (currentConnections: Connection[], currentPackingData?: any) => {
+    if (!selectedOrder) return;
+    
+    // Use provided packingData or fallback to state
+    const dataToUse = currentPackingData || packingData;
+    
+    // Create boxes from connections and packing data
+    const boxes: any[] = [];
+    const itemGroups: string[][] = [];
+    const processedItems = new Set<string>();
+    
+    // Helper to find connected items
+    const findConnectedItems = (itemId: string, group: string[]) => {
+      if (processedItems.has(itemId)) return;
+      processedItems.add(itemId);
+      group.push(itemId);
+      
+      currentConnections.forEach(conn => {
+        if (conn.from === itemId) findConnectedItems(conn.to, group);
+        else if (conn.to === itemId) findConnectedItems(conn.from, group);
+      });
+    };
+    
+    // Group connected items
+    orderItems.forEach(item => {
+      const itemKey = item.unique_id || item.line_id || `${selectedOrder.id}_L${item.line || item.item_id}`;
+      if (!processedItems.has(itemKey)) {
+        const group: string[] = [];
+        findConnectedItems(itemKey, group);
+        if (group.length > 0) itemGroups.push(group);
+      }
+    });
+    
+    // Create boxes from groups of connected items
+    let nextBoxNumber = 1;
+    itemGroups.forEach(group => {
+      const boxNumber = nextBoxNumber++;
+      const items = group.map(itemKey => {
+        const item = orderItems.find(i => {
+          const key = i.unique_id || i.line_id || `${selectedOrder.id}_L${i.line || i.item_id}`;
+          return key === itemKey;
+        });
+        const packData = dataToUse[itemKey] || { quantity: 0, boxNumber };
+        
+        return {
+          itemId: itemKey,
+          catalogNumber: item?.item_part_num || item?.catalog_number || '',
+          name: item?.item_name || item?.description || '',
+          quantity: packData.quantity
+        };
+      });
+      
+      boxes.push({
+        boxNumber,
+        items,
+        totalWeight: items.reduce((sum, item) => sum + (item.quantity * 0.1), 0) // Estimated weight
+      });
+    });
+    
+    // IMPORTANT: Also add items that are NOT connected to any group
+    // Each unconnected item gets its own box from packingData
+    orderItems.forEach(item => {
+      const itemKey = item.unique_id || item.line_id || `${selectedOrder.id}_L${item.line || item.item_id}`;
+      if (!processedItems.has(itemKey)) {
+        // This item is not part of any connection group
+        const packData = dataToUse[itemKey];
+        if (packData) {
+          boxes.push({
+            boxNumber: packData.boxNumber || nextBoxNumber++,
+            items: [{
+              itemId: itemKey,
+              catalogNumber: item.item_part_num || item.catalog_number || '',
+              name: item.item_name || item.description || '',
+              quantity: packData.quantity
+            }],
+            totalWeight: packData.quantity * 0.1 // Estimated weight
+          });
+        }
+      }
+    });
+    
+    // Sort boxes by box number
+    boxes.sort((a, b) => a.boxNumber - b.boxNumber);
+    
+    // Save draft boxes
+    console.log('💾 Saving draft boxes:', boxes);
+    // Log each box's items to verify quantities being saved
+    boxes.forEach(box => {
+      console.log(`  📦 Box ${box.boxNumber}:`, box.items.map(item => ({
+        id: item.itemId,
+        qty: item.quantity
+      })));
+    });
+    await orderStatusService.saveDraftBoxes(selectedOrder.id, boxes);
+  };
+
+  // Debounced version to prevent multiple rapid calls
+  const saveDraftBoxesFromConnections = (currentConnections: Connection[], currentPackingData?: any) => {
+    if (draftBoxesSaveTimeoutRef.current) {
+      clearTimeout(draftBoxesSaveTimeoutRef.current);
+    }
+    
+    draftBoxesSaveTimeoutRef.current = window.setTimeout(async () => {
+      await saveDraftBoxesFromConnectionsInternal(currentConnections, currentPackingData);
+    }, 500); // 500ms delay to batch rapid updates
+  };
+
   const handlePackOrder = async (order: Order, isRetry: boolean = false) => {
     console.group(`🎯 Opening packing modal for order ${order.orderNumber}${isRetry ? ' (RETRY)' : ''}`);
     console.log('Order details:', order);
+    
+    // Update order status to 'packing' when packing starts
+    if (!order.status || order.status === 'pending') {
+      await orderStatusService.updateGeneralStatus(
+        order.id,
+        order.orderNumber,
+        'packing'
+      );
+      // Update local order object
+      order.status = 'packing';
+      // Update in all orders list too
+      setAllOrders(prev => prev.map(o => 
+        o.id === order.id ? { ...o, status: 'packing' } : o
+      ));
+    }
+    
+    // Fetch order status from database
+    const orderStatus = await orderStatusService.getOrderStatus(order.id);
+    console.log('Order status from DB:', orderStatus);
+    setCurrentOrderStatus(orderStatus);
+    
+    // Load draft data if exists
+    const draftPackingData = await orderStatusService.getDraftPackingData(order.id);
+    const draftBoxes = await orderStatusService.getDraftBoxes(order.id);
+    console.log('Draft packing data:', draftPackingData);
+    console.log('Draft boxes:', draftBoxes);
+    console.log(`📊 Draft data summary: ${Object.keys(draftPackingData || {}).length} packing items, ${draftBoxes?.length || 0} boxes`);
     
     if (order.status === 'packed' || order.status === 'shipped') {
       console.warn(`⚠️ Order ${order.orderNumber} is already packed or shipped`);
@@ -446,12 +767,100 @@ export const OrdersPage: React.FC = () => {
           });
           console.log(`📊 Final processed items: ${processedItems.length} rows`);
           setOrderItems(processedItems);
-          setPackingData(initialPackingData);
+          
+          // Set initial packing data first
+          let basePackingData = initialPackingData;
           
           // Clear any existing connections when opening new order
           console.log('🔗 Clearing existing connections...');
           setConnections([]);
           setConnectionPoints(new Map());
+          
+          // Restore connections and box numbers from draft boxes if they exist
+          if (draftBoxes.length > 0) {
+            console.log('📦 Restoring from draft boxes (prioritizing over draft packing data):', draftBoxes);
+            
+            // When we have draft boxes, they contain the most recent state including quantities
+            // So we use initialPackingData as base and let draft boxes override everything
+            const { connections: restoredConnections, packingData: restoredPackingData } = restoreConnectionsFromDraftBoxes(draftBoxes, initialPackingData);
+            console.log('🔗 Restored connections:', restoredConnections);
+            console.log('📦 Restored packing data with box numbers:', restoredPackingData);
+            
+            // Update both connections and packing data from draft boxes
+            setConnections(restoredConnections);
+            // Force React to recognize the state change by creating a new object
+            setPackingData({ ...restoredPackingData });
+            
+            // Also update after a small delay to ensure React processes the update
+            setTimeout(() => {
+              setPackingData(prev => ({ ...restoredPackingData }));
+              console.log('📊 Re-applied packingData after delay:', restoredPackingData);
+              
+              // Log each item's box number for verification
+              Object.entries(restoredPackingData).forEach(([itemKey, data]: [string, any]) => {
+                console.log(`  📦 Item ${itemKey}: Box ${data.boxNumber}, Qty: ${data.quantity}`);
+              });
+              
+              // Force update connection positions after table renders
+              setTimeout(() => {
+                if (canvasContainerRef.current && restoredConnections.length > 0) {
+                  const containerRect = canvasContainerRef.current.getBoundingClientRect();
+                  
+                  // Find all connection points and update their positions
+                  const connectionElements = document.querySelectorAll('[data-connection-point="true"]');
+                  const newConnectionPoints = new Map<string, { x: number; y: number }>();
+                  
+                  connectionElements.forEach((element) => {
+                    const pointId = element.getAttribute('data-point-id');
+                    if (pointId) {
+                      const rect = element.getBoundingClientRect();
+                      // Check if element is visible
+                      if (rect.width > 0 && rect.height > 0) {
+                        // Position relative to container viewport (no scroll offset needed)
+                        const position = {
+                          x: rect.left - containerRect.left + rect.width / 2,
+                          y: rect.top - containerRect.top + rect.height / 2
+                        };
+                        newConnectionPoints.set(pointId, position);
+                      }
+                    }
+                  });
+                  
+                  // Update connection points state
+                  setConnectionPoints(newConnectionPoints);
+                  
+                  // Update existing connections with new positions
+                  const updatedConnections = restoredConnections.map(conn => {
+                    const fromPos = newConnectionPoints.get(conn.from);
+                    const toPos = newConnectionPoints.get(conn.to);
+                    if (fromPos && toPos) {
+                      return { ...conn, fromPosition: fromPos, toPosition: toPos };
+                    }
+                    return conn;
+                  });
+                  setConnections(updatedConnections);
+                }
+              }, 400);
+            }, 100);
+            
+            console.log('📦 Box numbers and connections restored from draft boxes');
+            console.log('📊 Final packingData state:', restoredPackingData);
+          } else {
+            // No draft boxes, check if we have draft packing data
+            if (Object.keys(draftPackingData).length > 0) {
+              console.log('📝 Loading draft packing data (no draft boxes found)');
+              basePackingData = { ...initialPackingData, ...draftPackingData };
+            }
+            
+            // Set packing data
+            setPackingData(basePackingData);
+            
+            // Save initial draft boxes when no connections exist yet
+            setTimeout(() => {
+              saveDraftBoxesFromConnections([]);
+              console.log('💾 Triggered initial draft boxes save for unconnected items');
+            }, 200);
+          }
           
           console.log('✅ Packing modal setup complete!');
         } else {
@@ -481,13 +890,31 @@ export const OrdersPage: React.FC = () => {
   };
 
   const handlePackingDataChange = (itemKey: string, field: 'quantity' | 'boxNumber', value: number) => {
-    setPackingData(prev => ({
-      ...prev,
-      [itemKey]: {
-        ...prev[itemKey],
-        [field]: Math.max(field === 'quantity' ? 0 : 1, value) // Box numbers start from 1
+    setPackingData(prev => {
+      const updated = {
+        ...prev,
+        [itemKey]: {
+          ...prev[itemKey],
+          [field]: Math.max(field === 'quantity' ? 0 : 1, value) // Box numbers start from 1
+        }
+      };
+      
+      // Save draft data with debounce
+      if (draftSaveTimeoutRef.current) {
+        clearTimeout(draftSaveTimeoutRef.current);
       }
-    }));
+      draftSaveTimeoutRef.current = window.setTimeout(async () => {
+        if (selectedOrder) {
+          console.log('💾 Saving draft packing data');
+          await orderStatusService.saveDraftPackingData(selectedOrder.id, updated);
+          // Also save draft boxes when packing data changes - pass updated data!
+          saveDraftBoxesFromConnections(connections, updated);
+          console.log('💾 Triggered draft boxes save after packing data change');
+        }
+      }, 1000); // Save after 1 second of inactivity
+      
+      return updated;
+    });
   };
 
   const handleFinalizePacking = async () => {
@@ -506,6 +933,53 @@ export const OrdersPage: React.FC = () => {
     }
     
     setPackingBoxes(boxes);
+    
+    // Update order status to 'packed_pending_labels' when packing is completed
+    await orderStatusService.updateGeneralStatus(
+      selectedOrder.id,
+      selectedOrder.orderNumber,
+      'packed_pending_labels'
+    );
+    
+    // Update current order status
+    setCurrentOrderStatus(prev => prev ? { ...prev, status: 'packed_pending_labels', isPacked: true } : null);
+    
+    // Update in all orders list
+    setAllOrders(prev => prev.map(o => 
+      o.id === selectedOrder.id ? { ...o, status: 'packed_pending_labels' } : o
+    ));
+    setOrders(prev => prev.map(o => 
+      o.id === selectedOrder.id ? { ...o, status: 'packed_pending_labels' } : o
+    ));
+    
+    // Convert boxes to packed items format for the database
+    const packedItems = boxes.flatMap(box => 
+      box.items.map(item => ({
+        itemId: String(item.itemId),
+        catalogNumber: item.catalogNumber,
+        itemName: item.name || item.nameHebrew || item.nameRussian || '',
+        orderedQuantity: item.quantity,
+        packedQuantity: item.quantity,
+        boxNumber: box.boxNumber
+      }))
+    );
+    
+    // Update packing status in database
+    await orderStatusService.updatePackingStatus(
+      selectedOrder.id,
+      selectedOrder.orderNumber,
+      true,
+      packedItems,
+      'User' // You can replace this with actual user name if available
+    );
+    
+    // Keep draft data for historical reference - don't delete it
+    // Draft data should be available even after months
+    console.log('✅ Keeping draft data for historical reference');
+    
+    // Refresh order status
+    const updatedStatus = await orderStatusService.getOrderStatus(selectedOrder.id);
+    setCurrentOrderStatus(updatedStatus);
     
     // Открываем выбор региона
     setShowRegionSelector(true);
@@ -547,6 +1021,8 @@ export const OrdersPage: React.FC = () => {
             quantity: itemPacking.quantity,
             catalogNumber: item.catalog_number,
             barcode: item.barcode || item.catalog_number || '',
+            price: item.price || item.sale_nis || 0,
+            sale_nis: item.sale_nis || item.price || 0,
             unique_id: lineId, // Keep unique_id for reference
             is_split: item.is_split || false,
             split_index: item.split_index,
@@ -677,6 +1153,24 @@ export const OrdersPage: React.FC = () => {
   const handlePrintComplete = async () => {
     if (!selectedOrder) return;
     
+    // Update barcode printing status in database
+    await orderStatusService.updateBarcodeStatus(
+      selectedOrder.id,
+      selectedOrder.orderNumber,
+      true
+    );
+    
+    // Update status to 'labels_printed'
+    await orderStatusService.updateGeneralStatus(
+      selectedOrder.id,
+      selectedOrder.orderNumber,
+      'labels_printed'
+    );
+    
+    // Refresh order status
+    const updatedStatus = await orderStatusService.getOrderStatus(selectedOrder.id);
+    setCurrentOrderStatus(updatedStatus);
+    
     // Показываем сообщение об успешной печати
     message.success(
       locale === 'he' 
@@ -691,7 +1185,28 @@ export const OrdersPage: React.FC = () => {
     }, 500);
   };
 
-  const handleInvoiceComplete = () => {
+  const handleInvoiceComplete = async (invoiceLink?: string) => {
+    if (!selectedOrder) return;
+    
+    // Update invoice status in database
+    await orderStatusService.updateInvoiceStatus(
+      selectedOrder.id,
+      selectedOrder.orderNumber,
+      true,
+      invoiceLink
+    );
+    
+    // Update status to 'completed' when all stages are done
+    await orderStatusService.updateGeneralStatus(
+      selectedOrder.id,
+      selectedOrder.orderNumber,
+      'completed'
+    );
+    
+    // Refresh order status
+    const updatedStatus = await orderStatusService.getOrderStatus(selectedOrder.id);
+    setCurrentOrderStatus(updatedStatus);
+    
     // Закрываем все модальные окна
     setShowInvoiceModal(false);
     setShowLabelPreview(false);
@@ -730,13 +1245,10 @@ export const OrdersPage: React.FC = () => {
       const containerRect = canvasContainerRef.current.getBoundingClientRect();
       const elementRect = startElement.getBoundingClientRect();
       
-      // Calculate position relative to the container
-      const scrollTop = canvasContainerRef.current.scrollTop || 0;
-      const scrollLeft = canvasContainerRef.current.scrollLeft || 0;
-      
+      // Calculate position relative to the container viewport
       const startPos = {
-        x: elementRect.left - containerRect.left + elementRect.width / 2 + scrollLeft,
-        y: elementRect.top - containerRect.top + elementRect.height / 2 + scrollTop
+        x: elementRect.left - containerRect.left + elementRect.width / 2,
+        y: elementRect.top - containerRect.top + elementRect.height / 2
       };
       
       setDragStartPosition(startPos);
@@ -747,12 +1259,11 @@ export const OrdersPage: React.FC = () => {
     const handleMouseMove = (e: MouseEvent) => {
       if (canvasContainerRef.current) {
         const containerRect = canvasContainerRef.current.getBoundingClientRect();
-        const scrollTop = canvasContainerRef.current.scrollTop || 0;
-        const scrollLeft = canvasContainerRef.current.scrollLeft || 0;
         
+        // Mouse position relative to container viewport
         const newPos = { 
-          x: e.clientX - containerRect.left + scrollLeft, 
-          y: e.clientY - containerRect.top + scrollTop
+          x: e.clientX - containerRect.left, 
+          y: e.clientY - containerRect.top
         };
         setDragPosition(newPos);
       }
@@ -821,27 +1332,25 @@ export const OrdersPage: React.FC = () => {
       const fromRect = fromElement.getBoundingClientRect();
       const toRect = toElement.getBoundingClientRect();
       
-      const scrollTop = canvasContainerRef.current.scrollTop || 0;
-      const scrollLeft = canvasContainerRef.current.scrollLeft || 0;
-      
+      // Positions relative to container viewport
       const fromPosition = {
-        x: fromRect.left - containerRect.left + fromRect.width / 2 + scrollLeft,
-        y: fromRect.top - containerRect.top + fromRect.height / 2 + scrollTop
+        x: fromRect.left - containerRect.left + fromRect.width / 2,
+        y: fromRect.top - containerRect.top + fromRect.height / 2
       };
       
       const toPosition = {
-        x: toRect.left - containerRect.left + toRect.width / 2 + scrollLeft,
-        y: toRect.top - containerRect.top + toRect.height / 2 + scrollTop
+        x: toRect.left - containerRect.left + toRect.width / 2,
+        y: toRect.top - containerRect.top + toRect.height / 2
       };
       
       // Find indices of the connected items
       const fromIndex = orderItems.findIndex(item => {
-        const itemId = item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
+        const itemId = item.unique_id || item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
         return itemId === activeConnectionStart;
       });
       
       const toIndex = orderItems.findIndex(item => {
-        const itemId = item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
+        const itemId = item.unique_id || item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
         return itemId === targetPointId;
       });
       
@@ -884,17 +1393,16 @@ export const OrdersPage: React.FC = () => {
         setTimeout(() => {
           // Trigger position update for all connection points
           newOrderItems.forEach((item, index) => {
-            const lineId = item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
+            const lineId = item.unique_id || item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
             const element = document.querySelector(`[data-point-id="${lineId}"]`);
             if (element && canvasContainerRef.current) {
               const containerRect = canvasContainerRef.current.getBoundingClientRect();
               const elementRect = element.getBoundingClientRect();
-              const scrollTop = canvasContainerRef.current.scrollTop || 0;
-              const scrollLeft = canvasContainerRef.current.scrollLeft || 0;
               
+              // Position relative to container viewport
               const position = {
-                x: elementRect.left - containerRect.left + elementRect.width / 2 + scrollLeft,
-                y: elementRect.top - containerRect.top + elementRect.height / 2 + scrollTop
+                x: elementRect.left - containerRect.left + elementRect.width / 2,
+                y: elementRect.top - containerRect.top + elementRect.height / 2
               };
               
               setConnectionPoints(prev => new Map(prev).set(lineId, position));
@@ -917,12 +1425,17 @@ export const OrdersPage: React.FC = () => {
         
         // Renumber all boxes after creating connection
         setTimeout(() => {
-          const totalBoxes = renumberBoxesWithConnections(updated);
+          const result = renumberBoxesWithConnections(updated);
           message.success(
             locale === 'he' 
-              ? `חיבור נוצר בהצלחה. סה"כ ${totalBoxes} קופסאות` 
-              : `Соединение установлено. Всего ${totalBoxes} коробок`
+              ? `חיבור נוצר בהצלחה. סה"כ ${result.totalBoxes} קופסאות` 
+              : `Соединение установлено. Всего ${result.totalBoxes} коробок`
           );
+          
+          // Save draft boxes after packingData is updated - use the returned packingData!
+          setTimeout(() => {
+            saveDraftBoxesFromConnections(updated, result.packingData);
+          }, 100); // Additional delay to ensure packingData is updated
         }, 100);
         
         return updated;
@@ -965,7 +1478,8 @@ export const OrdersPage: React.FC = () => {
     
     // Build groups of connected items
     orderItems.forEach(item => {
-      const itemId = item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
+      // For split items use unique_id, for regular items use line_id
+      const itemId = item.unique_id || item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
       if (!processedItems.has(itemId)) {
         const group: string[] = [];
         findConnectedItems(itemId, group);
@@ -977,11 +1491,11 @@ export const OrdersPage: React.FC = () => {
     // Sort groups by their position in the table (by first item index)
     itemGroups.sort((a, b) => {
       const indexA = orderItems.findIndex(item => {
-        const itemId = item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
+        const itemId = item.unique_id || item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
         return a.includes(itemId);
       });
       const indexB = orderItems.findIndex(item => {
-        const itemId = item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
+        const itemId = item.unique_id || item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
         return b.includes(itemId);
       });
       return indexA - indexB;
@@ -1001,7 +1515,10 @@ export const OrdersPage: React.FC = () => {
     
     setPackingData(updatedPackingData);
     
-    return itemGroups.length; // Return total number of boxes
+    return { 
+      totalBoxes: itemGroups.length, // Return total number of boxes
+      packingData: updatedPackingData // Also return updated packingData
+    };
   };
 
   // Update connection point positions when table renders
@@ -1063,43 +1580,132 @@ export const OrdersPage: React.FC = () => {
 
   // Update connection positions on resize or when modal opens
   useEffect(() => {
-    if (!packingModalVisible) return;
+    if (!packingModalVisible || !canvasContainerRef.current) return;
+    
+    let animationFrameId: number | null = null;
     
     const updateAllPositions = () => {
-      // Update positions for all items
-      orderItems.forEach((item) => {
-        const lineId = item.line_id || `${selectedOrder?.id}_L${item.line || item.item_id}`;
-        const element = document.querySelector(`[data-row-key="${lineId}"]`);
-        if (element) {
-          const connectionCell = element.querySelector('[data-connection-cell]');
-          if (connectionCell) {
-            updateConnectionPointPosition(lineId, connectionCell as HTMLElement);
-          }
+      if (!canvasContainerRef.current) return;
+      
+      // Update positions for all connection points
+      const containerRect = canvasContainerRef.current.getBoundingClientRect();
+      
+      // Find all connection points and update their positions
+      const connectionElements = document.querySelectorAll('[data-connection-point="true"]');
+      const newConnectionPoints = new Map<string, { x: number; y: number }>();
+      
+      connectionElements.forEach((element) => {
+        const pointId = element.getAttribute('data-point-id');
+        if (pointId) {
+          const rect = element.getBoundingClientRect();
+          // Position relative to container viewport (no scroll offset needed)
+          const position = {
+            x: rect.left - containerRect.left + rect.width / 2,
+            y: rect.top - containerRect.top + rect.height / 2
+          };
+          newConnectionPoints.set(pointId, position);
         }
       });
       
-      // Update existing connections with new positions
-      setConnections(prev => prev.map(conn => {
-        const fromPos = connectionPoints.get(conn.from);
-        const toPos = connectionPoints.get(conn.to);
-        if (fromPos && toPos) {
-          return { ...conn, fromPosition: fromPos, toPosition: toPos };
-        }
-        return conn;
-      }));
+      // Only update if positions actually changed (with tolerance)
+      let hasChanges = false;
+      const tolerance = 0.5; // pixel tolerance
+      
+      if (connectionPoints.size !== newConnectionPoints.size) {
+        hasChanges = true;
+      } else {
+        newConnectionPoints.forEach((pos, id) => {
+          const oldPos = connectionPoints.get(id);
+          if (!oldPos || 
+              Math.abs(oldPos.x - pos.x) > tolerance || 
+              Math.abs(oldPos.y - pos.y) > tolerance) {
+            hasChanges = true;
+          }
+        });
+      }
+      
+      if (hasChanges) {
+        // Batch state updates to prevent blocking
+        requestAnimationFrame(() => {
+          // Update connection points state
+          setConnectionPoints(newConnectionPoints);
+          
+          // Update existing connections with new positions
+          setConnections(prev => prev.map(conn => {
+            const fromPos = newConnectionPoints.get(conn.from);
+            const toPos = newConnectionPoints.get(conn.to);
+            if (fromPos && toPos) {
+              return { ...conn, fromPosition: fromPos, toPosition: toPos };
+            }
+            return conn;
+          }));
+        });
+      }
     };
 
-    // Delay to ensure DOM is rendered
-    const timer = setTimeout(updateAllPositions, 100);
+    // Reduced initial updates to prevent blocking
+    const timers = [
+      setTimeout(updateAllPositions, 100),
+      setTimeout(updateAllPositions, 500)
+    ];
     
-    // Add resize listener
-    window.addEventListener('resize', updateAllPositions);
+    // Add resize listener with debouncing
+    let resizeTimeout: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(updateAllPositions, 200);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Optimized scroll handler - only update on actual scroll
+    let lastScrollTime = 0;
+    const scrollHandler = () => {
+      const now = performance.now();
+      
+      // Throttle updates to max 60fps (16ms)
+      if (now - lastScrollTime >= 16) {
+        lastScrollTime = now;
+        updateAllPositions();
+      }
+    };
+    
+    // Add scroll listener to the modal body only
+    const modalBody = canvasContainerRef.current?.closest('.ant-modal-body');
+    if (modalBody) {
+      modalBody.addEventListener('scroll', scrollHandler, { passive: true });
+    }
+    
+    // Observe DOM mutations with debouncing
+    let mutationTimeout: NodeJS.Timeout | null = null;
+    const observer = new MutationObserver(() => {
+      if (mutationTimeout) clearTimeout(mutationTimeout);
+      mutationTimeout = setTimeout(() => {
+        updateAllPositions();
+      }, 50); // Debounce mutations
+    });
+    
+    if (canvasContainerRef.current) {
+      observer.observe(canvasContainerRef.current, {
+        childList: true,
+        subtree: true,
+        attributes: true, // Must be true when using attributeFilter
+        attributeFilter: ['data-connection-point'] // Only observe connection-specific changes
+      });
+    }
     
     return () => {
-      clearTimeout(timer);
-      window.removeEventListener('resize', updateAllPositions);
+      timers.forEach(clearTimeout);
+      clearTimeout(resizeTimeout);
+      if (mutationTimeout) clearTimeout(mutationTimeout);
+      window.removeEventListener('resize', handleResize);
+      observer.disconnect();
+      const cleanupModalBody = canvasContainerRef.current?.closest('.ant-modal-body');
+      if (cleanupModalBody) {
+        cleanupModalBody.removeEventListener('scroll', scrollHandler);
+      }
     };
-  }, [packingModalVisible, orderItems, selectedOrder, connectionPoints]);
+  }, [packingModalVisible, orderItems.length, connections.length]); // Removed connectionPoints to prevent loops
   
   // Update connection positions when connectionPoints change
   useEffect(() => {
@@ -1114,6 +1720,95 @@ export const OrdersPage: React.FC = () => {
       }));
     }
   }, [connectionPoints]);
+
+  // Update connection positions when connections or items change with MutationObserver
+  useEffect(() => {
+    if (!packingModalVisible || !canvasContainerRef.current) return;
+    
+    const updatePositions = () => {
+      if (!canvasContainerRef.current || connections.length === 0) return;
+      
+      const containerRect = canvasContainerRef.current.getBoundingClientRect();
+      
+      const updatedConnections = connections.map(conn => {
+        const fromElement = document.querySelector(`[data-point-id="${conn.from}"]`);
+        const toElement = document.querySelector(`[data-point-id="${conn.to}"]`);
+        
+        if (fromElement && toElement) {
+          const fromRect = fromElement.getBoundingClientRect();
+          const toRect = toElement.getBoundingClientRect();
+          
+          // Connection points relative to container viewport
+          const fromX = fromRect.left - containerRect.left + fromRect.width / 2;
+          const fromY = fromRect.top - containerRect.top + fromRect.height / 2;
+          const toX = toRect.left - containerRect.left + toRect.width / 2;
+          const toY = toRect.top - containerRect.top + toRect.height / 2;
+          
+          console.log(`Connection ${conn.id}: from(${fromX}, ${fromY}) to(${toX}, ${toY})`);
+          console.log(`Element rects: from(${fromRect.left}, ${fromRect.top}) to(${toRect.left}, ${toRect.top})`);
+          
+          return {
+            ...conn,
+            fromPosition: { x: fromX, y: fromY },
+            toPosition: { x: toX, y: toY }
+          };
+        }
+        console.warn(`Elements not found for connection ${conn.id}`);
+        return conn;
+      });
+      
+      if (JSON.stringify(updatedConnections) !== JSON.stringify(connections)) {
+        setConnections(updatedConnections);
+      }
+    };
+    
+    // Use MutationObserver to detect when DOM changes
+    const observer = new MutationObserver((mutations) => {
+      // Check if any mutations affect connection points
+      const hasConnectionChanges = mutations.some(mutation => {
+        if (mutation.type === 'childList') {
+          const addedNodes = Array.from(mutation.addedNodes);
+          const removedNodes = Array.from(mutation.removedNodes);
+          const allNodes = [...addedNodes, ...removedNodes];
+          
+          return allNodes.some(node => {
+            if (node instanceof Element) {
+              return node.querySelector('[data-connection-point]') || 
+                     node.hasAttribute?.('data-connection-point');
+            }
+            return false;
+          });
+        }
+        return false;
+      });
+      
+      if (hasConnectionChanges) {
+        requestAnimationFrame(updatePositions);
+      }
+    });
+    
+    // Start observing the table container for changes
+    if (packingTableRef.current) {
+      observer.observe(packingTableRef.current, {
+        childList: true,
+        subtree: true,
+        attributes: false
+      });
+    }
+    
+    // Initial position updates
+    const timers = [
+      setTimeout(updatePositions, 100),
+      setTimeout(updatePositions, 300),
+      setTimeout(updatePositions, 600),
+      setTimeout(updatePositions, 1000)
+    ];
+    
+    return () => {
+      observer.disconnect();
+      timers.forEach(clearTimeout);
+    };
+  }, [packingModalVisible, connections, orderItems.length]); // Update when modal opens, connections or items change
 
   // Remove auto-refresh to protect RIVHIT API
   // useEffect(() => {
@@ -1145,15 +1840,37 @@ export const OrdersPage: React.FC = () => {
       title: locale === 'he' ? 'סטטוס' : 'Статус',
       dataIndex: 'status',
       key: 'status',
-      sorter: (a: Order, b: Order) => a.status.localeCompare(b.status),
-      render: (status: string) => (
-        <Tag color={getStatusColor(status)}>
-          {locale === 'he' 
-            ? { pending: 'ממתין', processing: 'בעיבוד', packed: 'ארוז', shipped: 'נשלח' }[status]
-            : { pending: 'Ожидает', processing: 'В обработке', packed: 'Упакован', shipped: 'Отправлен' }[status]
-          }
-        </Tag>
-      )
+      sorter: (a: Order, b: Order) => {
+        const statusA = a.status || 'pending';
+        const statusB = b.status || 'pending';
+        return getStatusNumber(statusA) - getStatusNumber(statusB);
+      },
+      render: (status: string) => {
+        // Default to pending if status is undefined
+        const displayStatus = status || 'pending';
+        return (
+          <Tag color={getStatusColor(displayStatus)}>
+            {locale === 'he' 
+              ? { 
+                  pending: 'ממתין',
+                  packing: 'נארז',
+                  packed_pending_labels: 'ארוז - ממתין למדבקות',
+                  labels_printed: 'מדבקות הודפסו',
+                  completed: 'הושלם',
+                  shipped: 'נשלח'
+                }[displayStatus] || 'ממתין'
+              : { 
+                  pending: 'Ожидает',
+                  packing: 'Упаковывается',
+                  packed_pending_labels: 'Упакован - ждет этикеток',
+                  labels_printed: 'Этикетки напечатаны',
+                  completed: 'Завершен',
+                  shipped: 'Отправлен'
+                }[displayStatus] || 'Ожидает'
+            }
+          </Tag>
+        );
+      }
     },
     {
       title: locale === 'he' ? 'פריטים' : 'Товары',
@@ -1199,7 +1916,7 @@ export const OrdersPage: React.FC = () => {
             type="primary" 
             icon={<ContainerOutlined />}
             size="small"
-            disabled={record.status === 'packed' || record.status === 'shipped'}
+            disabled={record.status === 'completed' || record.status === 'shipped'}
             onClick={() => handlePackOrder(record)}
           >
             {locale === 'he' ? 'ארוז' : 'Упаковать'}
@@ -1265,8 +1982,10 @@ export const OrdersPage: React.FC = () => {
               >
                 <Option value="all">{locale === 'he' ? 'כל הסטטוסים' : 'Все статусы'}</Option>
                 <Option value="pending">{locale === 'he' ? 'ממתין' : 'Ожидает'}</Option>
-                <Option value="processing">{locale === 'he' ? 'בעיבוד' : 'В обработке'}</Option>
-                <Option value="packed">{locale === 'he' ? 'ארוז' : 'Упакован'}</Option>
+                <Option value="packing">{locale === 'he' ? 'נארז' : 'Упаковывается'}</Option>
+                <Option value="packed_pending_labels">{locale === 'he' ? 'ארוז - ממתין למדבקות' : 'Упакован - ждет этикеток'}</Option>
+                <Option value="labels_printed">{locale === 'he' ? 'מדבקות הודפסו' : 'Этикетки напечатаны'}</Option>
+                <Option value="completed">{locale === 'he' ? 'הושלם' : 'Завершен'}</Option>
                 <Option value="shipped">{locale === 'he' ? 'נשלח' : 'Отправлен'}</Option>
               </Select>
             </Col>
@@ -1396,8 +2115,22 @@ export const OrdersPage: React.FC = () => {
                   <Descriptions.Item label={locale === 'he' ? 'סטטוס' : 'Статус'}>
                     <Tag color={getStatusColor(orderDetails.status)}>
                       {locale === 'he' 
-                        ? { pending: 'ממתין', processing: 'בעיבוד', packed: 'ארוז', shipped: 'נשלח' }[orderDetails.status]
-                        : { pending: 'Ожидает', processing: 'В обработке', packed: 'Упакован', shipped: 'Отправлен' }[orderDetails.status]
+                        ? { 
+                            pending: 'ממתין',
+                            packing: 'נארז',
+                            packed_pending_labels: 'ארוז - ממתין למדבקות',
+                            labels_printed: 'מדבקות הודפסו',
+                            completed: 'הושלם',
+                            shipped: 'נשלח'
+                          }[orderDetails.status]
+                        : { 
+                            pending: 'Ожидает',
+                            packing: 'Упаковывается',
+                            packed_pending_labels: 'Упакован - ждет этикеток',
+                            labels_printed: 'Этикетки напечатаны',
+                            completed: 'Завершен',
+                            shipped: 'Отправлен'
+                          }[orderDetails.status]
                       }
                     </Tag>
                   </Descriptions.Item>
@@ -1464,19 +2197,21 @@ export const OrdersPage: React.FC = () => {
                     key: 'packing',
                     title: 'Упаковка',
                     titleHe: 'אריזה',
-                    status: 'active' as const
+                    status: currentOrderStatus?.isPacked ? 'completed' : 'active' as const
                   },
                   {
                     key: 'labels',
                     title: 'Этикетки',
                     titleHe: 'תוויות',
-                    status: packingBoxes.length > 0 ? 'completed' : 'pending' as const
+                    status: currentOrderStatus?.barcodesPrinted ? 'completed' : 
+                            currentOrderStatus?.isPacked ? 'active' : 'pending' as const
                   },
                   {
                     key: 'invoice',
                     title: 'Счет',
-                    titleHe: 'חשבונית',
-                    status: 'pending' as const
+                    titleHe: 'חשбונית',
+                    status: currentOrderStatus?.invoiceCreated ? 'completed' : 
+                            currentOrderStatus?.barcodesPrinted ? 'active' : 'pending' as const
                   }
                 ]}
                 locale={locale as 'ru' | 'he'}
@@ -1544,11 +2279,17 @@ export const OrdersPage: React.FC = () => {
                       
                       // Renumber boxes after removing connection
                       setTimeout(() => {
-                        const totalBoxes = renumberBoxesWithConnections(updated);
+                        const result = renumberBoxesWithConnections(updated);
+                        
+                        // Save the updated draft boxes after connection removal
+                        if (selectedOrder) {
+                          saveDraftBoxesFromConnections(updated, result.packingData);
+                        }
+                        
                         message.info(
                           locale === 'he' 
-                            ? `חיבור הוסר. סה"כ ${totalBoxes} קופסאות` 
-                            : `Соединение удалено. Всего ${totalBoxes} коробок`
+                            ? `חיבור הוסר. סה"כ ${result.totalBoxes} קופסאות` 
+                            : `Соединение удалено. Всего ${result.totalBoxes} коробок`
                         );
                       }, 100);
                       
@@ -1769,7 +2510,7 @@ export const OrdersPage: React.FC = () => {
                       key: 'connection',
                       width: 60,
                       render: (_, record) => {
-                        const lineId = record.line_id || `${selectedOrder?.id}_L${record.line || record.item_id}`;
+                        const lineId = record.unique_id || record.line_id || `${selectedOrder?.id}_L${record.line || record.item_id}`;
                         const isConnected = connections.some(conn => conn.from === lineId || conn.to === lineId);
                         const isActive = activeConnectionStart === lineId;
                         
@@ -1972,7 +2713,7 @@ export const OrdersPage: React.FC = () => {
       `}</style>
 
       {/* Settings Modal */}
-      <MaxPerBoxSettingsModal
+      <SettingsModal
         visible={settingsModalVisible}
         onClose={() => setSettingsModalVisible(false)}
       />
@@ -2017,7 +2758,10 @@ export const OrdersPage: React.FC = () => {
           orderNumber={selectedOrder.orderNumber}
           boxes={packingBoxes}
           customerName={selectedOrder.customerName || ''}
-          customerData={orderDetails?.customer}
+          customerData={selectedOrder.customer_id ? {
+            customer_id: selectedOrder.customer_id,
+            customer_name: selectedOrder.customerName
+          } : orderDetails?.customer}
           onClose={() => setShowInvoiceModal(false)}
           onInvoiceCreated={handleInvoiceComplete}
         />

@@ -1,0 +1,863 @@
+{
+  "version": "6.0",
+  "nxVersion": "20.8.2",
+  "pathMappings": {},
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {},
+    "nonProjectFiles": [
+      {
+        "file": "backend/LPT1",
+        "hash": "8052130512150300025"
+      },
+      {
+        "file": "backend/PRINTER_NETWORK_SETUP.md",
+        "hash": "9979881817240321421"
+      },
+      {
+        "file": "backend/PRINTER_SETTINGS_CHECKLIST.md",
+        "hash": "990833933717474161"
+      },
+      {
+        "file": "backend/check-network.sh",
+        "hash": "14321137234620224706"
+      },
+      {
+        "file": "backend/check-printer-info.js",
+        "hash": "16592915892504501381"
+      },
+      {
+        "file": "backend/config/scripts/print-image.ps1",
+        "hash": "533610293975903014"
+      },
+      {
+        "file": "backend/convert-image-to-zpl.js",
+        "hash": "12872743078045650025"
+      },
+      {
+        "file": "backend/ezpl-to-image.js",
+        "hash": "17681147543460416148"
+      },
+      {
+        "file": "backend/find-all-printers.sh",
+        "hash": "2682721258589841801"
+      },
+      {
+        "file": "backend/find-godex-printer.sh",
+        "hash": "16976331998740558229"
+      },
+      {
+        "file": "backend/package.json",
+        "hash": "13686815306258523190"
+      },
+      {
+        "file": "backend/print-godex-image.js",
+        "hash": "4098398467633769546"
+      },
+      {
+        "file": "backend/print-label-image.js",
+        "hash": "1872229919638975597"
+      },
+      {
+        "file": "backend/printer-templates/blini.ezpl",
+        "hash": "15695084569495137617"
+      },
+      {
+        "file": "backend/printer-templates/box-label.ezpl",
+        "hash": "18101732309160926497"
+      },
+      {
+        "file": "backend/printer-templates/manty.ezpl",
+        "hash": "18132692111724202119"
+      },
+      {
+        "file": "backend/printer-templates/pelmeni.ezpl",
+        "hash": "10796754185685579327"
+      },
+      {
+        "file": "backend/printer-templates/temp_print.ezpl",
+        "hash": "7675453204700399166"
+      },
+      {
+        "file": "backend/printer-templates/universal.ezpl",
+        "hash": "18169404353605658600"
+      },
+      {
+        "file": "backend/printer-templates/vareniki.ezpl",
+        "hash": "14237210857872887240"
+      },
+      {
+        "file": "backend/reset-order-statuses.ts",
+        "hash": "2004760087969207541"
+      },
+      {
+        "file": "backend/scan-network.sh",
+        "hash": "10451932552818088888"
+      },
+      {
+        "file": "backend/scan-port-9101.sh",
+        "hash": "2998177339606342059"
+      },
+      {
+        "file": "backend/send-to-godex.js",
+        "hash": "8155657370286746763"
+      },
+      {
+        "file": "backend/src/app-instance.ts",
+        "hash": "13500055103631354844"
+      },
+      {
+        "file": "backend/src/app.ts",
+        "hash": "11027271633917556799"
+      },
+      {
+        "file": "backend/src/config/database.config.ts",
+        "hash": "7057099221365268758"
+      },
+      {
+        "file": "backend/src/config/logger.ts",
+        "hash": "6296888475310965065"
+      },
+      {
+        "file": "backend/src/config/safe-test.config.ts",
+        "hash": "5198036101411010161"
+      },
+      {
+        "file": "backend/src/config/swagger.ts",
+        "hash": "4123138635627317070"
+      },
+      {
+        "file": "backend/src/controllers/__tests__/orders.controller.test.ts",
+        "hash": "780465437317083967"
+      },
+      {
+        "file": "backend/src/controllers/auth.controller.ts",
+        "hash": "6440115476855926734"
+      },
+      {
+        "file": "backend/src/controllers/customers.controller.ts",
+        "hash": "17888279920981299530"
+      },
+      {
+        "file": "backend/src/controllers/items.controller.ts",
+        "hash": "5636126792929355274"
+      },
+      {
+        "file": "backend/src/controllers/orders.controller.ts",
+        "hash": "17957276526810773459"
+      },
+      {
+        "file": "backend/src/controllers/print.controller.ts",
+        "hash": "9275534812377847483"
+      },
+      {
+        "file": "backend/src/entities/MaxPerBoxSetting.ts",
+        "hash": "6005198758833030832"
+      },
+      {
+        "file": "backend/src/entities/OrderBoxes.ts",
+        "hash": "10398903689961648733"
+      },
+      {
+        "file": "backend/src/entities/OrderPackingDetails.ts",
+        "hash": "16267487327894033003"
+      },
+      {
+        "file": "backend/src/entities/OrderStatus.ts",
+        "hash": "10047651406493256519"
+      },
+      {
+        "file": "backend/src/factories/service.factory.ts",
+        "hash": "8630697183942415775"
+      },
+      {
+        "file": "backend/src/interfaces/ICacheService.ts",
+        "hash": "11547908951304368405"
+      },
+      {
+        "file": "backend/src/interfaces/ILogger.ts",
+        "hash": "10979753254262472103"
+      },
+      {
+        "file": "backend/src/interfaces/IOrderRepository.ts",
+        "hash": "6369206690903870347"
+      },
+      {
+        "file": "backend/src/interfaces/IPrinterService.ts",
+        "hash": "7972537775935145836"
+      },
+      {
+        "file": "backend/src/interfaces/IRivhitService.ts",
+        "hash": "969160571441118473"
+      },
+      {
+        "file": "backend/src/interfaces/ISSLService.ts",
+        "hash": "7073293782013824228"
+      },
+      {
+        "file": "backend/src/interfaces/index.ts",
+        "hash": "13855755224863805934"
+      },
+      {
+        "file": "backend/src/middleware/auth.middleware.ts",
+        "hash": "69948317553207413"
+      },
+      {
+        "file": "backend/src/middleware/error.middleware.ts",
+        "hash": "12990319464024616235"
+      },
+      {
+        "file": "backend/src/middleware/security.middleware.ts",
+        "hash": "258507388706037498"
+      },
+      {
+        "file": "backend/src/middleware/validation.middleware.ts",
+        "hash": "1389481140548337204"
+      },
+      {
+        "file": "backend/src/migrations/AddStatusToOrderStatus.ts",
+        "hash": "3598128959911363623"
+      },
+      {
+        "file": "backend/src/repositories/MaxPerBoxRepository.ts",
+        "hash": "9944819014791916518"
+      },
+      {
+        "file": "backend/src/routes/auth.routes.ts",
+        "hash": "3931088359985521360"
+      },
+      {
+        "file": "backend/src/routes/customers.routes.ts",
+        "hash": "4326878409514204129"
+      },
+      {
+        "file": "backend/src/routes/invoice.routes.ts",
+        "hash": "17169281603220751145"
+      },
+      {
+        "file": "backend/src/routes/items.routes.ts",
+        "hash": "7082918760620921564"
+      },
+      {
+        "file": "backend/src/routes/order-status.routes.ts",
+        "hash": "16208603001389030942"
+      },
+      {
+        "file": "backend/src/routes/orders.routes.ts",
+        "hash": "2707017340629741129"
+      },
+      {
+        "file": "backend/src/routes/print.routes.ts",
+        "hash": "11174686716515465034"
+      },
+      {
+        "file": "backend/src/routes/printer-discovery.routes.ts",
+        "hash": "10644470531237086939"
+      },
+      {
+        "file": "backend/src/routes/settings.routes.ts",
+        "hash": "1312093950572670070"
+      },
+      {
+        "file": "backend/src/schemas/api.schemas.ts",
+        "hash": "994210889766090996"
+      },
+      {
+        "file": "backend/src/scripts/load-max-per-box-data.ts",
+        "hash": "12857470904799260859"
+      },
+      {
+        "file": "backend/src/server.ts",
+        "hash": "13740948563688338903"
+      },
+      {
+        "file": "backend/src/services/__tests__/cache.service.test.ts",
+        "hash": "1753289475237787472"
+      },
+      {
+        "file": "backend/src/services/__tests__/printer.service.test.ts",
+        "hash": "1907754145765547133"
+      },
+      {
+        "file": "backend/src/services/__tests__/rivhit.service.test.ts",
+        "hash": "14648080379344789558"
+      },
+      {
+        "file": "backend/src/services/box-label-ezpl.service.ts",
+        "hash": "12159020653888847407"
+      },
+      {
+        "file": "backend/src/services/box-label-zpl.service.ts",
+        "hash": "11597490039886874053"
+      },
+      {
+        "file": "backend/src/services/box-label.service.ts",
+        "hash": "2642257206350468773"
+      },
+      {
+        "file": "backend/src/services/cache.service.ts",
+        "hash": "13846473624299992818"
+      },
+      {
+        "file": "backend/src/services/cache/memory.cache.service.ts",
+        "hash": "798235795611886528"
+      },
+      {
+        "file": "backend/src/services/cache/redis.cache.service.ts",
+        "hash": "12391627357534416869"
+      },
+      {
+        "file": "backend/src/services/image-print.service.ts",
+        "hash": "17929158725698271071"
+      },
+      {
+        "file": "backend/src/services/image-to-zpl.service.ts",
+        "hash": "9322625975995212286"
+      },
+      {
+        "file": "backend/src/services/image-zpl-printer.service.ts",
+        "hash": "5267211710051461707"
+      },
+      {
+        "file": "backend/src/services/invoice-creator.service.ts",
+        "hash": "12980714114051387279"
+      },
+      {
+        "file": "backend/src/services/logging/console.logger.service.ts",
+        "hash": "15012773056084264057"
+      },
+      {
+        "file": "backend/src/services/mock-rivhit.service.ts",
+        "hash": "9980713821858642339"
+      },
+      {
+        "file": "backend/src/services/order-status.service.ts",
+        "hash": "1472139778384495279"
+      },
+      {
+        "file": "backend/src/services/printer-discovery.service.ts",
+        "hash": "3910587939653234956"
+      },
+      {
+        "file": "backend/src/services/printer.service.ts",
+        "hash": "5420163408149708503"
+      },
+      {
+        "file": "backend/src/services/rivhit.service.ts",
+        "hash": "6507534639666400609"
+      },
+      {
+        "file": "backend/src/services/safe-rivhit.service.ts",
+        "hash": "7594295953939276634"
+      },
+      {
+        "file": "backend/src/services/simple-zpl.service.ts",
+        "hash": "2466529180832966017"
+      },
+      {
+        "file": "backend/src/services/ssl.service.ts",
+        "hash": "17958898853259109005"
+      },
+      {
+        "file": "backend/src/services/windows-print.service.ts",
+        "hash": "7329109756328765497"
+      },
+      {
+        "file": "backend/src/services/winlabel-printer.service.ts",
+        "hash": "4879874265876701273"
+      },
+      {
+        "file": "backend/src/services/zpl-printer.service.ts",
+        "hash": "10464431748411886016"
+      },
+      {
+        "file": "backend/src/test-data/max-per-box-sample.json",
+        "hash": "10872884012835279479"
+      },
+      {
+        "file": "backend/src/test-rivhit-integration.ts",
+        "hash": "11590079743445619067"
+      },
+      {
+        "file": "backend/temp-images/label_1755868498062_box1.png",
+        "hash": "10967465829412106656"
+      },
+      {
+        "file": "backend/temp-images/label_1755868499084_box2.png",
+        "hash": "7615056248713317042"
+      },
+      {
+        "file": "backend/temp-images/label_1755868500103_box3.png",
+        "hash": "16641923846159444990"
+      },
+      {
+        "file": "backend/temp-labels/order_label_box1_1755869546873.png",
+        "hash": "15011853055121867526"
+      },
+      {
+        "file": "backend/test-ezpl-generation.ts",
+        "hash": "11287261494186670787"
+      },
+      {
+        "file": "backend/test-network-print.ts",
+        "hash": "10989691362933381484"
+      },
+      {
+        "file": "backend/test-real-labels.ts",
+        "hash": "3450553924946673320"
+      },
+      {
+        "file": "backend/tsconfig.json",
+        "hash": "4074714167495213079"
+      },
+      {
+        "file": "backend/visualize-ezpl.html",
+        "hash": "9013467213591658596"
+      },
+      {
+        "file": "frontend/assets/create-icon.js",
+        "hash": "15056813888840035402"
+      },
+      {
+        "file": "frontend/assets/generate-bravo-icons.js",
+        "hash": "12030390693405250813"
+      },
+      {
+        "file": "frontend/assets/icons/icon-128.png",
+        "hash": "11805785816833438075"
+      },
+      {
+        "file": "frontend/assets/icons/icon-16.png",
+        "hash": "5153889854150830752"
+      },
+      {
+        "file": "frontend/assets/icons/icon-24.png",
+        "hash": "17812727947992214362"
+      },
+      {
+        "file": "frontend/assets/icons/icon-256.png",
+        "hash": "15017494888091292860"
+      },
+      {
+        "file": "frontend/assets/icons/icon-32.png",
+        "hash": "6235082704606194483"
+      },
+      {
+        "file": "frontend/assets/icons/icon-48.png",
+        "hash": "12191302864115897345"
+      },
+      {
+        "file": "frontend/assets/icons/icon-512.png",
+        "hash": "6344647169669154993"
+      },
+      {
+        "file": "frontend/assets/icons/icon-64.png",
+        "hash": "12899340972923239388"
+      },
+      {
+        "file": "frontend/assets/icons/icon.icns",
+        "hash": "8071726303413664867"
+      },
+      {
+        "file": "frontend/assets/icons/icon.ico",
+        "hash": "15017494888091292860"
+      },
+      {
+        "file": "frontend/assets/icons/icon.png",
+        "hash": "6344647169669154993"
+      },
+      {
+        "file": "frontend/assets/icons/icon@2x.png",
+        "hash": "314084259835235682"
+      },
+      {
+        "file": "frontend/assets/remove-background.html",
+        "hash": "6271105899297403596"
+      },
+      {
+        "file": "frontend/package.json",
+        "hash": "14972675003529561125"
+      },
+      {
+        "file": "frontend/public/index.html",
+        "hash": "11844974068880236673"
+      },
+      {
+        "file": "frontend/resources/backend/package-lock.json",
+        "hash": "4815984603759181670"
+      },
+      {
+        "file": "frontend/resources/backend/package.json",
+        "hash": "9624206000219812761"
+      },
+      {
+        "file": "frontend/resources/backend/printer-templates/blini.ezpl",
+        "hash": "15695084569495137617"
+      },
+      {
+        "file": "frontend/resources/backend/printer-templates/box-label.ezpl",
+        "hash": "18101732309160926497"
+      },
+      {
+        "file": "frontend/resources/backend/printer-templates/manty.ezpl",
+        "hash": "18132692111724202119"
+      },
+      {
+        "file": "frontend/resources/backend/printer-templates/pelmeni.ezpl",
+        "hash": "10796754185685579327"
+      },
+      {
+        "file": "frontend/resources/backend/printer-templates/universal.ezpl",
+        "hash": "18169404353605658600"
+      },
+      {
+        "file": "frontend/resources/backend/printer-templates/vareniki.ezpl",
+        "hash": "14237210857872887240"
+      },
+      {
+        "file": "frontend/resources/backend/server.js",
+        "hash": "16685502046597115108"
+      },
+      {
+        "file": "frontend/scripts/build-backend.js",
+        "hash": "1116234722598529723"
+      },
+      {
+        "file": "frontend/scripts/build-windows.js",
+        "hash": "16677284905604710687"
+      },
+      {
+        "file": "frontend/src/assets/bravo-icon.png",
+        "hash": "15618317801849306624"
+      },
+      {
+        "file": "frontend/src/assets/icon.jpg",
+        "hash": "56013655880303658"
+      },
+      {
+        "file": "frontend/src/components/OrderActions.tsx",
+        "hash": "1409234780407931180"
+      },
+      {
+        "file": "frontend/src/components/OrderList.tsx",
+        "hash": "16952708864989417769"
+      },
+      {
+        "file": "frontend/src/components/OrderSearch.tsx",
+        "hash": "8198052394404338470"
+      },
+      {
+        "file": "frontend/src/components/OrderTable.tsx",
+        "hash": "18203399912767459601"
+      },
+      {
+        "file": "frontend/src/components/__tests__/OrderList.test.tsx",
+        "hash": "5760953662891821747"
+      },
+      {
+        "file": "frontend/src/main/backend-manager.ts",
+        "hash": "8724264495633390708"
+      },
+      {
+        "file": "frontend/src/main/ipc-handlers.ts",
+        "hash": "3642978899836765849"
+      },
+      {
+        "file": "frontend/src/main/main.ts",
+        "hash": "9690597907364171866"
+      },
+      {
+        "file": "frontend/src/main/preload.ts",
+        "hash": "2258275516648192357"
+      },
+      {
+        "file": "frontend/src/main/setup-dialog.ts",
+        "hash": "15618146359026497016"
+      },
+      {
+        "file": "frontend/src/renderer/App.tsx",
+        "hash": "16672297410848630584"
+      },
+      {
+        "file": "frontend/src/renderer/components/AssemblyLineProgress.css",
+        "hash": "9083515252148312243"
+      },
+      {
+        "file": "frontend/src/renderer/components/AssemblyLineProgress.tsx",
+        "hash": "10848343860016475545"
+      },
+      {
+        "file": "frontend/src/renderer/components/BoxLabelPrint.tsx",
+        "hash": "3437938406020991654"
+      },
+      {
+        "file": "frontend/src/renderer/components/ConnectionCanvas.tsx",
+        "hash": "13159524784120772587"
+      },
+      {
+        "file": "frontend/src/renderer/components/ConnectionPoint.tsx",
+        "hash": "634728363472906161"
+      },
+      {
+        "file": "frontend/src/renderer/components/InvoiceModal.tsx",
+        "hash": "7650005364535390977"
+      },
+      {
+        "file": "frontend/src/renderer/components/ItemSelector.tsx",
+        "hash": "14493393727201192073"
+      },
+      {
+        "file": "frontend/src/renderer/components/LabelPreview.tsx",
+        "hash": "2418202417679323844"
+      },
+      {
+        "file": "frontend/src/renderer/components/LanguageSwitcher.tsx",
+        "hash": "3441752566481357650"
+      },
+      {
+        "file": "frontend/src/renderer/components/Layout/Layout.tsx",
+        "hash": "5174172624491243199"
+      },
+      {
+        "file": "frontend/src/renderer/components/MaxPerBoxSettings.tsx",
+        "hash": "17279670847180683841"
+      },
+      {
+        "file": "frontend/src/renderer/components/MaxPerBoxSettingsContent.tsx",
+        "hash": "8607587566744060762"
+      },
+      {
+        "file": "frontend/src/renderer/components/PackingWorkflowModal.tsx",
+        "hash": "4692802529251577773"
+      },
+      {
+        "file": "frontend/src/renderer/components/PrintActions.tsx",
+        "hash": "16364565694030691831"
+      },
+      {
+        "file": "frontend/src/renderer/components/PrinterDiscovery.tsx",
+        "hash": "15432227891107840343"
+      },
+      {
+        "file": "frontend/src/renderer/components/PrinterSettings.tsx",
+        "hash": "16741848622992330816"
+      },
+      {
+        "file": "frontend/src/renderer/components/RegionSelector.tsx",
+        "hash": "12996353473375893142"
+      },
+      {
+        "file": "frontend/src/renderer/components/SVGConnections.tsx",
+        "hash": "7402098748003964903"
+      },
+      {
+        "file": "frontend/src/renderer/components/SettingsModal.tsx",
+        "hash": "17310663763562108263"
+      },
+      {
+        "file": "frontend/src/renderer/components/SimpleProgressSteps.css",
+        "hash": "15410516634351330126"
+      },
+      {
+        "file": "frontend/src/renderer/components/SimpleProgressSteps.tsx",
+        "hash": "9040022641475916647"
+      },
+      {
+        "file": "frontend/src/renderer/i18n/i18n.tsx",
+        "hash": "14410449285391501956"
+      },
+      {
+        "file": "frontend/src/renderer/i18n/translations.ts",
+        "hash": "3345180411347498844"
+      },
+      {
+        "file": "frontend/src/renderer/index.css",
+        "hash": "14139148335348714089"
+      },
+      {
+        "file": "frontend/src/renderer/index.tsx",
+        "hash": "14850182791168590299"
+      },
+      {
+        "file": "frontend/src/renderer/pages/MainDashboard.tsx",
+        "hash": "2436962403931623524"
+      },
+      {
+        "file": "frontend/src/renderer/pages/OrderDetailsPage.tsx",
+        "hash": "8037998026260202121"
+      },
+      {
+        "file": "frontend/src/renderer/pages/OrdersPage.tsx",
+        "hash": "6851849054329460384"
+      },
+      {
+        "file": "frontend/src/renderer/pages/PackingPage.tsx",
+        "hash": "5297967191747384036"
+      },
+      {
+        "file": "frontend/src/renderer/pages/PackingTestPage.tsx",
+        "hash": "9917040340434399704"
+      },
+      {
+        "file": "frontend/src/renderer/pages/PrintConfirmationPage.tsx",
+        "hash": "4991387345889895883"
+      },
+      {
+        "file": "frontend/src/renderer/pages/PrinterTestPage.tsx",
+        "hash": "466284775075049708"
+      },
+      {
+        "file": "frontend/src/renderer/pages/PrintingPage.tsx",
+        "hash": "4112021572065478165"
+      },
+      {
+        "file": "frontend/src/renderer/services/api.service.ts",
+        "hash": "5035052683072639834"
+      },
+      {
+        "file": "frontend/src/renderer/services/ipc.service.ts",
+        "hash": "10733979796600820320"
+      },
+      {
+        "file": "frontend/src/renderer/services/order-status.service.ts",
+        "hash": "12830946196351925238"
+      },
+      {
+        "file": "frontend/src/renderer/store/orders.store.ts",
+        "hash": "2191589121400443198"
+      },
+      {
+        "file": "frontend/src/services/__tests__/order.services.test.ts",
+        "hash": "12440195882081877395"
+      },
+      {
+        "file": "frontend/src/services/mock-printer.service.ts",
+        "hash": "11545470780967353031"
+      },
+      {
+        "file": "frontend/src/services/order.services.ts",
+        "hash": "18426596295440699557"
+      },
+      {
+        "file": "frontend/src/shared/ipc-channels.ts",
+        "hash": "333047875104734979"
+      },
+      {
+        "file": "frontend/src/types/order.interfaces.ts",
+        "hash": "2408033411198356809"
+      },
+      {
+        "file": "frontend/tsconfig.json",
+        "hash": "18137684801908560178"
+      },
+      {
+        "file": "frontend/webpack.config.js",
+        "hash": "3342752836521505327"
+      },
+      {
+        "file": "shared/package.json",
+        "hash": "10194469091765172923"
+      },
+      {
+        "file": "shared/src/constants/api.constants.ts",
+        "hash": "10256771058731005940"
+      },
+      {
+        "file": "shared/src/constants/app.constants.ts",
+        "hash": "7308162164427751346"
+      },
+      {
+        "file": "shared/src/constants/index.ts",
+        "hash": "9822497045140152617"
+      },
+      {
+        "file": "shared/src/constants/printer.constants.ts",
+        "hash": "5266003263427405847"
+      },
+      {
+        "file": "shared/src/index.ts",
+        "hash": "7901105346709937323"
+      },
+      {
+        "file": "shared/src/types/api.types.ts",
+        "hash": "16403803615424527705"
+      },
+      {
+        "file": "shared/src/types/config.types.ts",
+        "hash": "14697510393522830533"
+      },
+      {
+        "file": "shared/src/types/index.ts",
+        "hash": "18273990046642157097"
+      },
+      {
+        "file": "shared/src/types/order.types.ts",
+        "hash": "18329010850376861841"
+      },
+      {
+        "file": "shared/src/types/printer.types.ts",
+        "hash": "12636686132730473665"
+      },
+      {
+        "file": "shared/src/types/rivhit.types.ts",
+        "hash": "14420180230185100384"
+      },
+      {
+        "file": "shared/src/utils/date.utils.ts",
+        "hash": "14843493407179865776"
+      },
+      {
+        "file": "shared/src/utils/hebrew.utils.ts",
+        "hash": "3862768594405822927"
+      },
+      {
+        "file": "shared/src/utils/index.ts",
+        "hash": "13139558402420837955"
+      },
+      {
+        "file": "shared/src/utils/mock-data.utils.ts",
+        "hash": "7166156201874189261"
+      },
+      {
+        "file": "shared/src/utils/rivhit-converter.utils.ts",
+        "hash": "5065221078048588456"
+      },
+      {
+        "file": "shared/src/utils/string.utils.ts",
+        "hash": "18031012556962362034"
+      },
+      {
+        "file": "shared/src/validators/config.validator.ts",
+        "hash": "8807644522592465309"
+      },
+      {
+        "file": "shared/src/validators/index.ts",
+        "hash": "5749976035789970460"
+      },
+      {
+        "file": "shared/src/validators/order.validator.ts",
+        "hash": "6899637920127735073"
+      },
+      {
+        "file": "shared/src/validators/printer.validator.ts",
+        "hash": "12898766452439073118"
+      },
+      {
+        "file": "shared/tests/utils/hebrew.utils.test.ts",
+        "hash": "7286028859787248818"
+      },
+      {
+        "file": "shared/tests/utils/string.utils.test.ts",
+        "hash": "18392182859299951839"
+      },
+      {
+        "file": "shared/tests/validators/order.validator.test.ts",
+        "hash": "8456611347316574179"
+      },
+      {
+        "file": "shared/tsconfig.json",
+        "hash": "11074265457217664265"
+      }
+    ]
+  }
+}

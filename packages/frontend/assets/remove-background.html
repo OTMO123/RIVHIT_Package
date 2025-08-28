@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove Background - BRAVO Icon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #B91C3C;
+            text-align: center;
+        }
+        canvas {
+            border: 2px dashed #ddd;
+            display: block;
+            margin: 20px auto;
+            background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWNgYGCQwoKxgqGgcJA5h3yFAAs8BRWVSwooAAAAAElFTkSuQmCC') repeat;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            background: #B91C3C;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #9a1830;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .file-label {
+            background: #2C5282;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+            margin: 5px;
+        }
+        .file-label:hover {
+            background: #1e3a5f;
+        }
+        .info {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 BRAVO Box Icon Creator</h1>
+        
+        <div class="info">
+            <p>Upload your BRAVO image and this tool will remove the white/gray background automatically.</p>
+        </div>
+
+        <div class="controls">
+            <label for="fileInput" class="file-label">📁 Choose Image</label>
+            <input type="file" id="fileInput" accept="image/*">
+            <button onclick="removeBackground()">🪄 Remove Background</button>
+            <button onclick="downloadImage()">💾 Download PNG</button>
+        </div>
+
+        <canvas id="canvas" width="512" height="512"></canvas>
+
+        <div class="info">
+            <h3>Icon Sizes for Electron:</h3>
+            <ul>
+                <li><strong>icon.png</strong> - 512x512 (main icon)</li>
+                <li><strong>icon.ico</strong> - Windows (multiple sizes)</li>
+                <li><strong>icon.icns</strong> - macOS (multiple sizes)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let imageData = null;
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        canvas.width = 512;
+                        canvas.height = 512;
+                        
+                        // Clear canvas
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        
+                        // Calculate scaling to fit
+                        const scale = Math.min(512 / img.width, 512 / img.height);
+                        const width = img.width * scale;
+                        const height = img.height * scale;
+                        const x = (512 - width) / 2;
+                        const y = (512 - height) / 2;
+                        
+                        // Draw image centered
+                        ctx.drawImage(img, x, y, width, height);
+                        imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function removeBackground() {
+            if (!imageData) {
+                alert('Please upload an image first!');
+                return;
+            }
+
+            const data = imageData.data;
+            
+            // Process each pixel
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                
+                // Check if pixel is white/light gray (background)
+                // Adjust threshold as needed
+                const threshold = 240;
+                if (r > threshold && g > threshold && b > threshold) {
+                    // Make pixel transparent
+                    data[i + 3] = 0; // alpha channel
+                }
+                
+                // Also check for very light colors
+                const brightness = (r + g + b) / 3;
+                if (brightness > 245) {
+                    data[i + 3] = 0;
+                }
+            }
+            
+            // Put the modified image back
+            ctx.putImageData(imageData, 0, 0);
+            
+            alert('Background removed! You can now download the image.');
+        }
+
+        function downloadImage() {
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'bravo-icon.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 'image/png');
+        }
+
+        // Draw initial placeholder
+        ctx.fillStyle = '#f0f0f0';
+        ctx.font = '24px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('Upload BRAVO image', 256, 256);
+    </script>
+</body>
+</html>

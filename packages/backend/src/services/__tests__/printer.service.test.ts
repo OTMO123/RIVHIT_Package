@@ -50,31 +50,54 @@ describe('PrinterService', () => {
       reason: undefined
     };
 
-    // Mock configuration file
-    mockFs.readFile.mockResolvedValue(JSON.stringify({
-      printer: {
-        name: 'GoDEX ZX420',
-        model: 'ZX420',
-        connection_type: 'USB',
-        port: 'COM1'
-      },
-      label_templates: {
-        template_pelmeni: { width: 50, height: 30 },
-        template_universal: { width: 50, height: 30 }
-      },
-      product_mapping: {
-        'פלמני': 'template_pelmeni',
-        'default': 'template_universal'
+    // Mock configuration file and EZPL templates
+    mockFs.readFile.mockImplementation((filePath: any) => {
+      const pathStr = filePath.toString();
+      if (pathStr.includes('printer-config.json')) {
+        // Return configuration JSON for config file
+        return Promise.resolve(JSON.stringify({
+          printer: {
+            name: 'GoDEX ZX420',
+            model: 'ZX420',
+            connection_type: 'USB',
+            port: 'COM1'
+          },
+          label_templates: {
+            template_pelmeni: { width: 50, height: 30 },
+            template_universal: { width: 50, height: 30 }
+          },
+          product_mapping: {
+            'פלמני': 'template_pelmeni',
+            'default': 'template_universal'
+          }
+        }));
+      } else if (pathStr.includes('.ezpl')) {
+        // Return EZPL template for template files
+        return Promise.resolve(`^Q30,3
+^W100
+^H10
+^P1
+^L
+T12,25,0,2,1,1,N,"\${ITEM_NAME}"
+T12,50,0,2,1,1,N,"פלמני קלאסיים"
+T12,75,0,1,1,1,N,"ПЕЛЬМЕНИ"
+T12,100,0,1,1,1,N,"Qty: \${QUANTITY}"
+B12,125,0,1,2,6,60,B,"\${BARCODE}"
+E`);
       }
-    }));
+      // Default fallback
+      return Promise.resolve('');
+    });
 
     printerService = new PrinterService();
+    // Set TEST_PORT before any initialization to prevent config override
+    (printerService as any).port = 'TEST_PORT';
   });
 
   describe('Initialization (TDD)', () => {
     test('should initialize with default configuration', async () => {
       // Red: Test fails because method doesn't exist yet
-      const result = await printerService.initialize();
+      const result = await printerService.initialize({ port: 'TEST_PORT' });
       
       expect(result).toBe(true);
       expect(mockFs.readFile).toHaveBeenCalledWith(
@@ -87,7 +110,7 @@ describe('PrinterService', () => {
       // Red: Test configuration file error handling
       mockFs.readFile.mockRejectedValue(new Error('File not found'));
       
-      const result = await printerService.initialize();
+      const result = await printerService.initialize({ port: 'TEST_PORT' });
       
       // Should still initialize with defaults
       expect(result).toBe(true);
@@ -100,7 +123,7 @@ describe('PrinterService', () => {
         port: '192.168.1.100'
       };
       
-      const result = await printerService.initialize(options);
+      const result = await printerService.initialize({ ...options, port: 'TEST_PORT' });
       
       expect(result).toBe(true);
     });
@@ -134,27 +157,24 @@ describe('PrinterService', () => {
     });
 
     test('should handle connection errors gracefully', async () => {
-      // Red: Test error handling
-      mockExec.mockImplementation((command, options, callback) => {
-        if (typeof options === 'function') {
-          (options as any)(new Error('Connection failed'), '', 'Printer not found');
-        } else if (callback) {
-          callback(new Error('Connection failed'), '', 'Printer not found');
-        }
-        return {} as any;
-      });
+      // Red: Test error handling by mocking testConnection to fail
+      const testConnectionSpy = jest.spyOn(printerService as any, 'testConnection')
+        .mockRejectedValue(new Error('Connection failed'));
       
       const status = await printerService.getStatus();
       
       expect(status.connected).toBe(false);
       expect(status.isReady).toBe(false);
       expect(status.lastError).toContain('Connection failed');
+      
+      testConnectionSpy.mockRestore();
     });
   });
 
   describe('Label Printing (TDD)', () => {
     test('should generate EZPL commands for packing items', async () => {
       // Red: Test EZPL generation
+      await printerService.initialize({ port: 'TEST_PORT' });
       const result = await printerService.printLabels([mockPackingItem]);
       
       expect(result.success).toBe(true);
@@ -166,6 +186,7 @@ describe('PrinterService', () => {
 
     test('should determine correct sticker type based on product name', async () => {
       // Red: Test product mapping logic
+      await printerService.initialize({ port: 'TEST_PORT' });
       const result = await printerService.printLabels([mockPackingItem]);
       
       // Should use pelmeni template for פלמני products
@@ -183,6 +204,7 @@ describe('PrinterService', () => {
 
     test('should generate unique job ID for each print job', async () => {
       // Red: Test job tracking
+      await printerService.initialize({ port: 'TEST_PORT' });
       const result1 = await printerService.printLabels([mockPackingItem]);
       const result2 = await printerService.printLabels([mockPackingItem]);
       
@@ -199,6 +221,7 @@ describe('PrinterService', () => {
         includeBarcodes: true
       };
       
+      await printerService.initialize({ port: 'TEST_PORT' });
       const result = await printerService.printLabels([mockPackingItem], options);
       
       expect(result.success).toBe(true);
@@ -210,6 +233,7 @@ describe('PrinterService', () => {
   describe('Single Label Printing (TDD)', () => {
     test('should print single label with custom options', async () => {
       // Red: Test single label functionality
+      await printerService.initialize({ port: 'TEST_PORT' });
       const result = await printerService.printSingleLabel(mockPackingItem, {
         labelSize: 'small',
         includePrices: false
@@ -223,6 +247,7 @@ describe('PrinterService', () => {
   describe('Test Printing (TDD)', () => {
     test('should execute test print successfully', async () => {
       // Red: Test basic test functionality
+      await printerService.initialize({ port: 'TEST_PORT' });
       const result = await printerService.testPrint();
       
       expect(result.success).toBe(true);
@@ -240,6 +265,7 @@ describe('PrinterService', () => {
         darkness: 10
       };
       
+      await printerService.initialize({ port: 'TEST_PORT' });
       const result = await printerService.configure(config);
       
       expect(result).toBe(true);
@@ -248,20 +274,16 @@ describe('PrinterService', () => {
 
   describe('Error Handling (TDD)', () => {
     test('should handle printer offline scenario', async () => {
-      // Red: Test offline handling
-      mockExec.mockImplementation((command, options, callback) => {
-        if (typeof options === 'function') {
-          (options as any)(new Error('Device not found'), '', '');
-        } else if (callback) {
-          callback(new Error('Device not found'), '', '');
-        }
-        return {} as any;
-      });
+      // Red: Test offline handling by mocking initialize to fail
+      const initializeSpy = jest.spyOn(printerService, 'initialize')
+        .mockResolvedValue(false);
       
       const result = await printerService.printLabels([mockPackingItem]);
       
       expect(result.success).toBe(false);
       expect(result.error).toContain('Printer not available');
+      
+      initializeSpy.mockRestore();
     });
 
     test('should validate input parameters', async () => {

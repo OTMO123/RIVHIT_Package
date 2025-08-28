@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoDEX Printer Discovery Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #1890ff, #40a9ff);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .test-section h3 {
+            color: #1890ff;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            border: 2px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            background: #40a9ff;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #d9d9d9;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-auto {
+            background: #52c41a;
+            width: 100%;
+            font-size: 18px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .btn-auto:hover {
+            background: #73d13d;
+        }
+
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #52c41a;
+        }
+
+        .printer-info h4 {
+            color: #1890ff;
+            margin-bottom: 5px;
+        }
+
+        .printer-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .status.error {
+            background: #fff2f0;
+            color: #ff4d4f;
+            border: 1px solid #ffccc7;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #1890ff;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #1890ff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .info-box h4 {
+            color: #1890ff;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+        }
+
+        .info-box li {
+            margin: 5px 0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖨️ GoDEX Printer Discovery</h1>
+            <p>Автоматический поиск принтеров этикеток в сети</p>
+        </div>
+
+        <div class="content">
+            <!-- Автоматический поиск -->
+            <div class="test-section">
+                <h3>Автоматический поиск</h3>
+                <button class="btn btn-auto" onclick="startAutoSearch()">
+                    🔍 Найти все принтеры в сети
+                </button>
+                <div id="autoResults"></div>
+            </div>
+
+            <!-- Тест конкретного IP -->
+            <div class="test-section">
+                <h3>Тест конкретного IP адреса</h3>
+                <div class="input-group">
+                    <input type="text" id="testIP" placeholder="192.168.014.200" value="192.168.014.200">
+                    <input type="number" id="testPort" placeholder="9101" value="9101">
+                    <button class="btn" onclick="testSpecificIP()">Тестировать</button>
+                </div>
+                <div id="testResults"></div>
+            </div>
+
+            <!-- Статус известного принтера -->
+            <div class="test-section">
+                <h3>Статус настроенного принтера</h3>
+                <button class="btn" onclick="checkKnownPrinter()" style="width: 100%;">
+                    📡 Проверить статус (192.168.14.200:9101)
+                </button>
+                <div id="statusResults"></div>
+            </div>
+
+            <!-- Справочная информация -->
+            <div class="info-box">
+                <h4>ℹ️ Информация</h4>
+                <ul>
+                    <li><strong>Поддерживаемые форматы IP:</strong> 192.168.14.200 или 192.168.014.200</li>
+                    <li><strong>Порты принтеров:</strong> 9100, 9101, 9102 (по умолчанию 9101)</li>
+                    <li><strong>Автопоиск:</strong> сканирует типичные IP адреса принтеров</li>
+                    <li><strong>Статус:</strong> зеленый = подключен, красный = недоступен</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api/printers';
+
+        async function makeRequest(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('Request error:', error);
+                return { success: false, error: 'Ошибка подключения к серверу' };
+            }
+        }
+
+        function showLoading(containerId) {
+            document.getElementById(containerId).innerHTML = '<div class="loading">Поиск принтеров...</div>';
+        }
+
+        function formatPrinterResults(printers, containerId) {
+            const container = document.getElementById(containerId);
+            
+            if (!printers || printers.length === 0) {
+                container.innerHTML = '<div class="results">❌ Принтеры не найдены</div>';
+                return;
+            }
+
+            const resultsHtml = printers.map(printer => `
+                <div class="result-item">
+                    <div class="printer-info">
+                        <h4>🖨️ ${printer.model || 'GoDEX Label Printer'}</h4>
+                        <p><strong>IP:</strong> ${printer.ip}:${printer.port}</p>
+                        <p><strong>Отклик:</strong> ${printer.responseTime || 'N/A'}ms</p>
+                    </div>
+                    <div class="status success">Подключен</div>
+                </div>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="results">
+                    <h4>✅ Найдено принтеров: ${printers.length}</h4>
+                    ${resultsHtml}
+                </div>
+            `;
+        }
+
+        async function startAutoSearch() {
+            showLoading('autoResults');
+            
+            const result = await makeRequest('/quick-scan');
+            
+            if (result.success) {
+                formatPrinterResults(result.data, 'autoResults');
+            } else {
+                document.getElementById('autoResults').innerHTML = 
+                    `<div class="results">❌ Ошибка: ${result.error || result.message}</div>`;
+            }
+        }
+
+        async function testSpecificIP() {
+            const ip = document.getElementById('testIP').value;
+            const port = document.getElementById('testPort').value || 9101;
+            
+            if (!ip) {
+                alert('Введите IP адрес');
+                return;
+            }
+
+            showLoading('testResults');
+            
+            const result = await makeRequest('/test', {
+                method: 'POST',
+                body: JSON.stringify({ ip, port: parseInt(port) })
+            });
+            
+            if (result.success && result.data) {
+                formatPrinterResults([result.data], 'testResults');
+            } else {
+                document.getElementById('testResults').innerHTML = 
+                    `<div class="results">❌ ${result.message || 'Принтер недоступен'}</div>`;
+            }
+        }
+
+        async function checkKnownPrinter() {
+            showLoading('statusResults');
+            
+            const result = await makeRequest('/status');
+            
+            const container = document.getElementById('statusResults');
+            
+            if (result.success) {
+                const { configured, status, printer } = result.data;
+                
+                if (status === 'connected' && printer) {
+                    formatPrinterResults([printer], 'statusResults');
+                } else {
+                    container.innerHTML = `
+                        <div class="results">
+                            <div class="result-item" style="border-left-color: #ff4d4f;">
+                                <div class="printer-info">
+                                    <h4>🖨️ Настроенный принтер</h4>
+                                    <p><strong>IP:</strong> ${configured.ip}:${configured.port}</p>
+                                    <p><strong>Статус:</strong> Не отвечает</p>
+                                </div>
+                                <div class="status error">Отключен</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                container.innerHTML = `<div class="results">❌ Ошибка проверки статуса</div>`;
+            }
+        }
+
+        // Автоматическая проверка при загрузке страницы
+        window.addEventListener('load', () => {
+            console.log('🖨️ GoDEX Printer Discovery Test Page загружена');
+            console.log('Доступные API endpoints:');
+            console.log('- GET /api/printers/quick-scan - быстрый поиск');
+            console.log('- POST /api/printers/test - тест конкретного IP');
+            console.log('- GET /api/printers/status - статус принтера');
+        });
+    </script>
+</body>
+</html>

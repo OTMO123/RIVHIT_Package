@@ -20,17 +20,35 @@ export const sanitizeHebrewText = (text: string): string => {
   if (!text) return '';
   
   // Remove control characters but keep Hebrew characters
-  return text.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim();
+  let result = '';
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const code = char.charCodeAt(0);
+    // Skip control characters (0x0001, 0x0002, etc.)
+    if (code >= 0x0000 && code <= 0x001F && code !== 0x0020) {
+      continue; // Skip control characters except space
+    }
+    result += char;
+  }
+  return result.trim();
 };
 
 export const normalizeHebrewText = (text: string): string => {
   if (!text) return '';
   
   // Normalize Hebrew text for consistent display
-  return text
-    .replace(/[\u200E\u200F\u202A-\u202E]/g, '') // Remove bidirectional marks
-    .replace(/\s+/g, ' ') // Normalize whitespace
-    .trim();
+  let result = '';
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const code = char.charCodeAt(0);
+    // Skip bidirectional control characters
+    if (code === 0x200E || code === 0x200F || 
+        (code >= 0x202A && code <= 0x202E)) {
+      continue;
+    }
+    result += char;
+  }
+  return result.replace(/\s+/g, ' ').trim();
 };
 
 export const isRTL = (text: string): boolean => {

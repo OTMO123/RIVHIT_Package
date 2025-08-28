@@ -7,6 +7,7 @@ import { MainDashboard } from './pages/MainDashboard';
 import { OrdersPage } from './pages/OrdersPage';
 import { PackingPage } from './pages/PackingPage';
 import { PrintingPage } from './pages/PrintingPage';
+import { PrinterTestPage } from './pages/PrinterTestPage';
 
 const AppContent: React.FC = () => {
   const { dir } = useI18n();
@@ -16,10 +17,13 @@ const AppContent: React.FC = () => {
       <Router>
         <Layout>
           <Routes>
-            <Route path="/" element={<MainDashboard />} />
+            <Route path="/" element={<OrdersPage />} />
             <Route path="/orders" element={<OrdersPage />} />
-            <Route path="/packing" element={<PackingPage />} />
-            <Route path="/printing" element={<PrintingPage />} />
+            <Route path="/printer-test" element={<PrinterTestPage />} />
+            {/* Temporarily disabled routes */}
+            {/* <Route path="/dashboard" element={<MainDashboard />} /> */}
+            {/* <Route path="/packing" element={<PackingPage />} /> */}
+            {/* <Route path="/printing" element={<PrintingPage />} /> */}
           </Routes>
         </Layout>
       </Router>

@@ -97,7 +97,64 @@ class MainProcess {
   }
 
   private createWindow(): void {
-    this.mainWindow = new BrowserWindow({
+    // Try multiple icon paths based on platform
+    let iconPath: string | undefined;
+    const fs = require('fs');
+    
+    // Platform-specific icon selection
+    if (process.platform === 'darwin') {
+      // macOS prefers .icns
+      const iconPaths = [
+        path.join(__dirname, 'assets/icon.icns'),
+        path.join(process.cwd(), 'assets/icons/icon.icns'),
+        path.join(process.cwd(), 'dist/assets/icon.icns'),
+        path.join(__dirname, 'assets/icon.png'),
+        path.join(process.cwd(), 'dist/assets/icon.png')
+      ];
+      
+      for (const testPath of iconPaths) {
+        if (fs.existsSync(testPath)) {
+          iconPath = testPath;
+          console.log('Using macOS icon from:', iconPath);
+          break;
+        }
+      }
+    } else if (process.platform === 'win32') {
+      // Windows prefers .ico
+      const iconPaths = [
+        path.join(__dirname, 'assets/icon.ico'),
+        path.join(process.cwd(), 'assets/icons/icon.ico'),
+        path.join(process.cwd(), 'dist/assets/icon.ico'),
+        path.join(__dirname, 'assets/icon.png'),
+        path.join(process.cwd(), 'dist/assets/icon.png')
+      ];
+      
+      for (const testPath of iconPaths) {
+        if (fs.existsSync(testPath)) {
+          iconPath = testPath;
+          console.log('Using Windows icon from:', iconPath);
+          break;
+        }
+      }
+    } else {
+      // Linux uses PNG
+      const iconPaths = [
+        path.join(__dirname, 'assets/icon.png'),
+        path.join(process.cwd(), 'assets/icons/icon.png'),
+        path.join(process.cwd(), 'dist/assets/icon.png')
+      ];
+      
+      for (const testPath of iconPaths) {
+        if (fs.existsSync(testPath)) {
+          iconPath = testPath;
+          console.log('Using Linux icon from:', iconPath);
+          break;
+        }
+      }
+    }
+    
+    // Create window configuration
+    const windowConfig: Electron.BrowserWindowConstructorOptions = {
       width: 1200,
       height: 800,
       webPreferences: {
@@ -105,9 +162,15 @@ class MainProcess {
         contextIsolation: true,
         preload: path.join(__dirname, 'preload.js'),
       },
-      icon: path.join(__dirname, 'assets/icon.jpg'),
       show: false,
-    });
+    };
+    
+    // Add icon only if found
+    if (iconPath) {
+      windowConfig.icon = iconPath;
+    }
+    
+    this.mainWindow = new BrowserWindow(windowConfig);
 
     // Set CSP to allow localhost connections
     this.mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {

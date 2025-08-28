@@ -69,10 +69,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
       const requestData = {
         orderNumber: cleanOrderNumber,
         items: invoiceItems,
-        customerData: customerData || { 
-          customer_id: orderId,
-          customer_name: customerName 
-        }
+        customer_id: customerData?.customer_id // Отправляем только customer_id напрямую
       };
 
       console.log('📡 Sending invoice request:', requestData);

@@ -116,30 +116,38 @@ export class PrinterServiceFactory {
   /**
    * Создание ZPL принтер-сервиса (для GoDEX с ZPL)
    */
-  static createZPL(): IPrinterService {
-    return new ZPLPrinterService();
+  static async createZPL(): Promise<IPrinterService> {
+    const service = new ZPLPrinterService();
+    
+    // 🚨 CRITICAL: Initialize the printer service to test connection
+    await service.initialize({
+      printerIP: '192.168.14.200',
+      printerPort: 9101
+    });
+    
+    return service;
   }
 
   /**
    * Создание принтер-сервиса по умолчанию
    */
-  static createDefault(): IPrinterService {
-    // Используем ZPL для GoDEX принтера
-    if (process.env.USE_ZPL === 'true' || true) { // По умолчанию ZPL
-      console.log('🖨️ Using ZPL printer service for GoDEX');
-      return this.createZPL();
-    }
-
-    const config: PrinterConfig = {
-      templatesPath: process.env.PRINTER_TEMPLATES_PATH || './printer-templates',
-      connectionType: (process.env.PRINTER_CONNECTION_TYPE as any) || 'usb',
-      port: process.env.PRINTER_PORT || 'COM1'
-    };
-
+  static async createDefault(): Promise<IPrinterService> {
     // Если WinLabel доступен, используем его
     if (process.env.USE_WINLABEL === 'true') {
       return this.createWinLabelForRivhit();
     }
+    
+    // Используем ZPL для GoDEX принтера
+    if (process.env.USE_ZPL === 'true') {
+      console.log('🖨️ Using ZPL printer service for GoDEX');
+      return await this.createZPL();
+    }
+
+    const config: PrinterConfig = {
+      templatesPath: process.env.PRINTER_TEMPLATES_PATH || './printer-templates',
+      connectionType: (process.env.PRINTER_CONNECTION_TYPE as any) || 'ethernet', // GoDEX использует ethernet
+      port: process.env.PRINTER_PORT || '192.168.14.200' // IP адрес GoDEX по умолчанию
+    };
 
     return this.create(config);
   }
@@ -195,6 +203,14 @@ export class RivhitServiceFactory {
     
     console.log('🔗 Using Real SafeRivhitService with production API');
 
+    // Debug current environment variables
+    console.log('🔧 Factory Debug - Environment Variables:', {
+      RIVHIT_API_TOKEN: process.env.RIVHIT_API_TOKEN ? `***${process.env.RIVHIT_API_TOKEN.slice(-4)}` : 'NOT_SET',
+      RIVHIT_API_URL: process.env.RIVHIT_API_URL,
+      RIVHIT_TIMEOUT: process.env.RIVHIT_TIMEOUT,
+      NODE_ENV: process.env.NODE_ENV
+    });
+
     const config = {
       baseUrl: process.env.RIVHIT_API_URL || 'https://api.rivhit.com',
       apiToken: process.env.RIVHIT_API_TOKEN || '',
@@ -215,6 +231,7 @@ export interface ApplicationServices {
   cacheService: ICacheService;
   printerService: IPrinterService;
   rivhitService: IRivhitService;
+  zplPrinterService: import('../services/zpl-printer.service').ZPLPrinterService;
 }
 
 export class ApplicationServiceFactory {
@@ -223,27 +240,33 @@ export class ApplicationServiceFactory {
    * Facade Pattern - предоставляет простой интерфейс для создания всех сервисов
    * Dependency Injection - все сервисы создаются с правильными зависимостями
    */
-  static createServices(): ApplicationServices {
+  static async createServices(): Promise<ApplicationServices> {
     console.log('🏭 Creating application services...');
 
     // Создание кэш-сервиса
     const cacheService = CacheServiceFactory.createDefault();
     console.log('✅ Cache service created');
 
-    // Создание принтер-сервиса
-    const printerService = PrinterServiceFactory.createDefault();
+    // Создание принтер-сервиса (async для инициализации подключения)
+    const printerService = await PrinterServiceFactory.createDefault();
     console.log('✅ Printer service created');
 
     // Создание RIVHIT сервиса с кэшем
     const rivhitService = RivhitServiceFactory.createDefault();
     console.log('✅ RIVHIT service created');
 
+    // Создание ZPL принтер-сервиса
+    const { ZPLPrinterService } = await import('../services/zpl-printer.service');
+    const zplPrinterService = new ZPLPrinterService();
+    console.log('✅ ZPL printer service created');
+
     console.log('🎉 All services created successfully');
 
     return {
       cacheService,
       printerService,
-      rivhitService
+      rivhitService,
+      zplPrinterService
     };
   }
 
@@ -261,10 +284,16 @@ export class ApplicationServiceFactory {
     const rivhitService = new MockRivhitService();
     console.log('✅ Mock RIVHIT service created for testing');
 
+    // Создание ZPL принтер-сервиса для тестов
+    const { ZPLPrinterService } = require('../services/zpl-printer.service');
+    const zplPrinterService = new ZPLPrinterService();
+    console.log('✅ Mock ZPL printer service created for testing');
+
     return {
       cacheService,
       printerService,
-      rivhitService: rivhitService as IRivhitService
+      rivhitService: rivhitService as IRivhitService,
+      zplPrinterService
     };
   }
 

@@ -17,14 +17,9 @@ npx lerna run dev              # Start both backend and frontend
 npx lerna run dev --scope=@packing/backend    # Backend server only (port 3001)
 npx lerna run dev --scope=@packing/frontend   # Frontend Electron app only
 
-# Web frontend server
-npm run server                 # Start the root server.js (port 3000)
-npm run start                  # Alias for server
-npm run serve                  # Alias for server
-
-# PowerShell scripts (Windows)
-.\start-server.ps1             # Start web server with dependency check
-.\load-token.ps1               # Load RIVHIT API token
+# Build scripts
+./scripts/build-and-run.sh     # Complete build and setup guide (Linux/macOS)
+./scripts/start-test-environment.sh  # Start test environment
 ```
 
 ### Testing (TDD Approach)
@@ -54,21 +49,30 @@ npm run validate               # Full validation: type-check + lint + unit tests
 
 ### Build and Packaging
 ```bash
-# Building
+# Automated build and setup
+./scripts/build-and-run.sh    # Complete build process with dependency checks
+./scripts/start-test-environment.sh  # Setup testing environment
+
+# Manual building
 npm run build                  # Build all packages
 npm run package               # Create Electron installer
 npm run clean                 # Clean build artifacts
+
+# Development diagnostics
+npm run diagnose              # Run system diagnostics
+npm run test:system           # System health checks
+npm run test:api              # API endpoint testing
 ```
 
 ## Architecture Overview
 
 ### Project Structure
-This is a **monorepo** with multiple frontend options:
+This is a **monorepo** focused on Electron desktop application:
 
 - **`packages/backend/`** - Express.js API server with TypeScript
 - **`packages/frontend/`** - Electron desktop application with React
 - **`packages/shared/`** - Common TypeScript types and utilities
-- **Root HTML files** - Standalone web frontend demos and production interfaces
+- **`scripts/`** - Build and setup automation scripts
 
 ### Key Design Patterns
 - **SOLID Principles**: All services follow single responsibility, dependency inversion
@@ -86,32 +90,71 @@ This is a **monorepo** with multiple frontend options:
 
 ## Key Components
 
-### Frontend Options
+### Frontend Architecture
 - **Electron App**: Desktop application in `packages/frontend/` with React + Ant Design
-- **Web Interface**: HTML demos in root directory for browser-based access
-- **Multi-language Support**: Hebrew RTL, English, Russian interfaces
-- **Demo Variants**: Mock data, real API integration, CORS solutions
+- **Multi-language Support**: Hebrew RTL, English, Russian interfaces with i18n
+- **Component System**: Modular React components with TypeScript
+- **State Management**: Zustand for global state, React hooks for local state
+- **UI Components**: Ant Design 5 with custom Hebrew RTL adaptations
+- **IPC Communication**: Secure main-renderer process communication
 
-### Web Frontend Files
-- `multilingual-orders-demo.html` - Production interface with real API
-- `real-orders-demo.html` - Complete packing system with printer integration
-- `full-orders-demo.html` - Order management with dual-tab interface
-- `standalone-packing-demo.html` - Interactive packing demonstration
-- `quick-start-guide.html` - Getting started launcher
-- `cors-solution-demo.html` - CORS workaround solutions
+### Key Frontend Components (Updated)
+- **MaxPerBoxSettings.tsx**: Configurable packaging rules interface
+- **PrinterDiscovery.tsx**: Network printer detection and management
+- **PrinterSettings.tsx**: Printer configuration and diagnostics
+- **AssemblyLineProgress.tsx**: Visual packing workflow progress
+- **SimpleProgressSteps.tsx**: Minimalist step indicator
+- **InvoiceModal.tsx**: Invoice creation and management
+- **PackingWorkflowModal.tsx**: Multi-step packing process
+- **LabelPreview.tsx**: Print preview and barcode generation
+- **ConnectionCanvas.tsx**: Visual item connections in packing
 
-### RIVHIT Integration
+### RIVHIT Integration & API Endpoints
 - **SafeRivhitService**: Read-only RIVHIT API client with caching
 - **Circuit Breaker**: API protection with retry logic
 - **Offline Mode**: Local data caching with TTL
-- **Web Server**: Root server.js provides API proxy with CORS support
+- **Backend API**: Express.js server in packages/backend with comprehensive endpoints
 - **Document Type 7**: Always contains order items (פרטי הזמנה)
 
+### API Routes (Updated)
+- **orders.routes.ts**: Order management and processing
+- **items.routes.ts**: Product and item management
+- **customers.routes.ts**: Customer data handling
+- **print.routes.ts**: Printing and label generation
+- **printer-discovery.routes.ts**: Network printer detection
+- **invoice.routes.ts**: Invoice creation and management
+- **order-status.routes.ts**: Order state management
+- **settings.routes.ts**: Application configuration
+- **auth.routes.ts**: Authentication endpoints
+
 ### Printer System
-- **GoDEX/Zebra Support**: EZPL template-based printing
-- **WinLabel Integration**: Windows printer service
+- **Enhanced Printer Discovery**: Intelligent network printer detection with progressive scanning
+- **GoDEX/Zebra Support**: EZPL and ZPL template-based printing with visualization
+- **Image-to-ZPL Conversion**: Convert images to ZPL format for direct printing
+- **Network Detection**: Automatic printer discovery on network subnets with caching
+- **Parallel Discovery**: Concurrent printer scanning for faster detection
+- **Printer Cache System**: Cache discovered printers for improved performance
+- **Connection Management**: Robust printer connection handling with diagnostics
 - **Template System**: Product-specific label templates in `packages/backend/printer-templates/`
-- **PowerShell Scripts**: print*.ps1 files for direct printer commands
+- **EZPL Debug Tools**: Visualization and debugging of EZPL templates
+- **WinLabel Integration**: Windows printer service support
+
+### Advanced Services (Recently Added)
+- **Enhanced Printer Discovery Service**: Multi-stage printer detection with caching and progress tracking
+- **Image-to-ZPL Service**: Canvas-based image conversion for direct printer communication
+- **Network Detection Service**: Automatic subnet scanning and network topology detection
+- **Parallel Discovery Service**: Concurrent device scanning for improved performance
+- **Printer Connection Service**: Connection management with health checks and diagnostics
+- **Printer Cache Service**: Intelligent caching of printer information with TTL
+- **EZPL Debug Service**: Template visualization and debugging tools
+- **Invoice Creator Service**: Automated invoice generation and status management
+- **MaxPerBox Settings Service**: Configurable packaging rules per product type
+
+### Database Entities
+- **OrderStatus**: Order processing states and metadata
+- **OrderBoxes**: Box information and packing details
+- **OrderPackingDetails**: Item-level packing information
+- **MaxPerBoxSetting**: Product packaging configuration rules
 
 ### Security Features
 - **SSL/TLS**: Certificate management in `packages/backend/certs/`
@@ -131,51 +174,68 @@ This is a **monorepo** with multiple frontend options:
 - Unit tests execution
 - Prettier formatting
 
-### Testing Strategy
-- **Unit Tests**: 85%+ coverage requirement
+### Testing Strategy (Updated)
+- **Unit Tests**: 80%+ coverage threshold (jest.config.js)
 - **Integration Tests**: API and service integration
 - **E2E Tests**: Full workflow testing with Playwright
+- **Test Files**: 21+ test files across all packages
+- **TDD Approach**: Test-first development methodology
 
 ## Configuration
 
 ### Environment Setup
 ```bash
-# Backend configuration
+# Backend configuration (required)
 cp packages/backend/.env.example packages/backend/.env
-# Configure RIVHIT_API_TOKEN in .env file
-
-# Web server configuration (required for HTML frontends)
-# Create .env.local in root directory with:
-# RIVHIT_API_TOKEN=your_token_here
+# Edit packages/backend/.env with your settings:
+# RIVHIT_API_TOKEN=YOUR_API_TOKEN_HERE
 # RIVHIT_API_URL=https://api.rivhit.co.il/online/RivhitOnlineAPI.svc
+# RIVHIT_TEST_MODE=true
+# RIVHIT_READ_ONLY=true
+# PRINTER_CONNECTION_TYPE=usb
+# PRINTER_PORT=COM1 (Windows) or USB001
+# USE_WINLABEL=false
+
+# Root .env.local (optional for additional settings)
+# PRINTER_NAME=GoDEX ZX420i
+# PRINTER_TYPE=godex
+# PRINTER_ENABLED=true
+# LOG_LEVEL=info
 ```
 
 ### Quick Start Options
 ```bash
-# Option 1: PowerShell launcher (Windows)
-.\start-server.ps1             # Auto-installs deps and starts server
+# Option 1: Automated build and setup (Linux/macOS)
+./scripts/build-and-run.sh     # Complete setup with dependencies and build
 
-# Option 2: Manual web server
-node server.js                # Requires .env.local with API token
+# Option 2: Manual step-by-step
+npm install                    # Install dependencies
+npx lerna run build --scope=@packing/shared  # Build shared package first
+npx lerna run dev             # Start both backend and frontend
 
-# Option 3: Direct HTML access (requires CORS handling)
-# Open any .html file directly in browser
+# Option 3: Individual services
+npx lerna run dev --scope=@packing/backend   # Backend only
+npx lerna run dev --scope=@packing/frontend  # Frontend only
 ```
 
 ### Printer Configuration
-- Default: GoDEX ZX420 on USB001
-- Templates: Located in `packages/backend/printer-templates/`
-- Supported formats: EZPL, WinLabel integration
+- **Default**: GoDEX ZX420i on USB001 or network IP
+- **Templates**: Located in `packages/backend/printer-templates/` (EZPL format)
+- **Supported Formats**: EZPL, ZPL, WinLabel integration
+- **Network Support**: Automatic discovery on port 9101
+- **Debug Tools**: EZPL visualization in `packages/backend/visualize-ezpl.html`
+- **Test Files**: Multiple test utilities in backend root directory
 
 ## Important Notes
 
+- **Electron Only**: This is a desktop-focused application - no web interface available
 - **Windows Only**: Printer integration requires Windows 10+
-- **Hebrew RTL**: Both Electron and web frontends support Hebrew interface with RTL layout
+- **Hebrew RTL**: Electron frontend supports Hebrew interface with RTL layout
 - **Cache Duration**: 5 minutes for RIVHIT API responses
 - **API Rate Limiting**: Circuit breaker protects RIVHIT API
-- **Test Coverage**: Minimum 85% required for all packages
-- **Dual Frontend**: Choose between Electron app (packages/frontend) or web interface (HTML files)
-- **CORS Solutions**: Web frontend includes multiple CORS workaround options
+- **Test Coverage**: Minimum 80% required for all packages (jest.config.js)
+- **Monorepo Structure**: Lerna-managed packages with shared dependencies
+- **Network Printing**: Enhanced printer discovery supports network printers
 
 ## Common Issues
 
@@ -189,22 +249,24 @@ node server.js                # Requires .env.local with API token
 - **macOS/Linux warnings are normal**: Printer features only work on Windows
 - Check USB connection and printer status
 - Verify EZPL template compatibility
-- Test with `npm run test:printer`
+- Test with printer diagnostic scripts in backend directory
+- Use Enhanced Printer Discovery for network detection
+- Check `packages/backend/printer-config.json` for saved settings
 
 ### API Issues
 - Validate RIVHIT_API_TOKEN in .env
 - Check network connectivity
 - Clear cache with `/api/cache/clear`
 
-### Web Frontend Issues
-- **CORS Errors**: Use `cors-solution-demo.html` for workarounds
+### Build and Setup Issues
+- **Build Failures**: Use `./scripts/build-and-run.sh` for automated setup
 - **API Token**: Ensure .env.local exists with valid RIVHIT_API_TOKEN
-- **Server Not Starting**: Run `.\start-server.ps1` for dependency checks
+- **Environment Setup**: Use `./scripts/start-test-environment.sh` for testing
 
 ### Development Setup Checklist
 1. Ensure Node.js 18+ is installed
 2. Run `npm install` after cloning
 3. **CRITICAL**: Run `npx lerna run build --scope=@packing/shared` before starting services
-4. Create .env.local for web frontend
+4. Create .env.local for additional configuration (optional)
 5. Use `npx lerna` commands for monorepo operations
 6. Start with `npm run test:watch` for TDD workflow

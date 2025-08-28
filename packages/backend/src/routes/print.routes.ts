@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { PrintController } from '../controllers/print.controller';
 import { validateRequest } from '../middleware/validation.middleware';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import * as path from 'path';
 import {
   PrintLabelsBodySchema,
   PrintSingleLabelBodySchema,
@@ -11,6 +14,7 @@ import {
 } from '../schemas/api.schemas';
 
 const router = Router();
+const execAsync = promisify(exec);
 
 // 🚨 CRITICAL FIX: Use PrintController with proper dependency injection from app.locals
 // This ensures we use the ZPL printer service from ApplicationServiceFactory
@@ -307,6 +311,101 @@ router.post('/box-label-html', async (req, res) => {
  */
 router.post('/box-labels-html', async (req, res) => {
   await getPrintController(req).generateMultipleBoxLabelsHTML(req, res);
+});
+
+/**
+ * @route POST /api/print/test-usb
+ * @desc Test USB printer on Windows/macOS platforms
+ * @body { platform?: 'windows' | 'macos', printerName?: string }
+ */
+router.post('/test-usb', async (req, res) => {
+  try {
+    console.log('🔌 Testing USB printer...');
+    
+    const platform = process.platform;
+    const { printerName = 'GODEX_ZX420i' } = req.body;
+    
+    if (platform === 'win32') {
+      // Windows: Use PowerShell to print test page
+      const scriptPath = path.join(__dirname, '../../scripts/print-test-usb.ps1');
+      const command = `powershell -ExecutionPolicy Bypass -File "${scriptPath}" -PrinterName "${printerName}"`;
+      
+      const { stdout, stderr } = await execAsync(command, { timeout: 15000 });
+      
+      return res.json({
+        success: !stderr || !stderr.includes('Error'),
+        data: {
+          platform: 'Windows',
+          output: stdout,
+          warnings: stderr || null,
+          printerName,
+          method: 'powershell-test-page'
+        },
+        message: !stderr || !stderr.includes('Error') 
+          ? `Test page sent to ${printerName}` 
+          : `Failed to send test page: ${stderr}`,
+        timestamp: new Date().toISOString()
+      });
+      
+    } else if (platform === 'darwin') {
+      // macOS: Use lp command to print test
+      try {
+        const command = `echo "🧪 USB Test Print - $(date)" | lp -d "${printerName}" -o media=Custom.4x3in`;
+        const { stdout, stderr } = await execAsync(command, { timeout: 10000 });
+        
+        return res.json({
+          success: true,
+          data: {
+            platform: 'macOS',
+            output: stdout,
+            warnings: stderr || null,
+            printerName,
+            method: 'cups-lp-command'
+          },
+          message: `Test print sent to ${printerName} via CUPS`,
+          timestamp: new Date().toISOString()
+        });
+        
+      } catch (cupsError) {
+        return res.json({
+          success: false,
+          error: 'CUPS printing failed',
+          data: {
+            platform: 'macOS',
+            cupsError: cupsError.message,
+            printerName,
+            suggestions: [
+              'Ensure printer is added in System Preferences > Printers & Scanners',
+              'Check printer name matches exactly',
+              'Verify CUPS service is running: sudo launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist'
+            ]
+          },
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+    } else {
+      return res.json({
+        success: false,
+        error: 'USB printing not supported on this platform',
+        data: {
+          platform: platform,
+          supportedPlatforms: ['win32', 'darwin']
+        },
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+  } catch (error) {
+    console.error('❌ USB test print error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'USB test print failed',
+      details: error.message,
+      platform: process.platform,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 export default router;

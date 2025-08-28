@@ -3,6 +3,9 @@
  */
 
 import { Router, Request, Response } from 'express';
+import * as path from 'path';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 import { printerDiscoveryService } from '../services/printer-discovery.service';
 import { NetworkDetectionService } from '../services/network-detection.service';
 import { PrinterConnectionService } from '../services/printer-connection.service';
@@ -11,6 +14,7 @@ import { PrinterCacheService } from '../services/printer-cache.service';
 import { EnhancedPrinterDiscoveryService } from '../services/enhanced-printer-discovery.service';
 
 const router = Router();
+const execAsync = promisify(exec);
 
 // Initialize enhanced services
 const networkService = new NetworkDetectionService();
@@ -352,6 +356,91 @@ router.get('/status', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: 'Ошибка проверки статуса принтера'
+    });
+  }
+});
+
+/**
+ * GET /api/printers/usb-check - проверка USB принтеров через PowerShell
+ */
+router.get('/usb-check', async (req: Request, res: Response) => {
+  try {
+    console.log('🔌 Checking USB printers via PowerShell...');
+    
+    // Handle different platforms
+    if (process.platform === 'win32') {
+      // Windows PowerShell script
+      const scriptPath = path.join(__dirname, '../../scripts/check-usb-printers.ps1');
+      const command = `powershell -ExecutionPolicy Bypass -File "${scriptPath}"`;
+      
+      const { stdout, stderr } = await execAsync(command, { timeout: 10000 });
+      
+      if (stderr && stderr.trim()) {
+        console.warn('⚠️ PowerShell warnings:', stderr);
+      }
+      
+      // Try to parse JSON output from PowerShell
+      let parsedResult;
+      try {
+        parsedResult = JSON.parse(stdout.trim());
+      } catch (parseError) {
+        parsedResult = {
+          rawOutput: stdout,
+          parseError: parseError.message
+        };
+      }
+      
+      return res.json({
+        success: true,
+        data: parsedResult,
+        method: 'windows-powershell',
+        platform: process.platform,
+        message: parsedResult.godexPrinters > 0 
+          ? `Found ${parsedResult.godexPrinters} GoDEX USB printers` 
+          : 'No USB GoDEX printers detected',
+        timestamp: new Date().toISOString()
+      });
+    } else if (process.platform === 'darwin') {
+      // macOS bash script
+      const scriptPath = path.join(__dirname, '../../scripts/check-macos-printers.sh');
+      const command = `bash "${scriptPath}"`;
+      
+      const { stdout, stderr } = await execAsync(command, { timeout: 10000 });
+      
+      return res.json({
+        success: true,
+        data: {
+          platform: 'macOS',
+          output: stdout,
+          warnings: stderr || null,
+          message: 'USB printer detection on macOS requires CUPS configuration',
+          instructions: [
+            'Open System Preferences > Printers & Scanners',
+            'Connect USB printer and click "+" to add',
+            'For GoDEX printers, consider Ethernet connection',
+            'Check printer appears in System Preferences'
+          ]
+        },
+        method: 'macos-bash',
+        platform: process.platform,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      return res.json({
+        success: false,
+        error: 'USB printer detection not implemented for this platform',
+        platform: process.platform,
+        message: `Platform ${process.platform} not supported for USB printer detection`
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ USB printer check error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'USB printer detection failed',
+      details: error.message,
+      platform: process.platform
     });
   }
 });

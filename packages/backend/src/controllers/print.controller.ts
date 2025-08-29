@@ -12,9 +12,6 @@ import { PackingItem, PackingBox } from '@packing/shared';
 import { BoxLabelService, BoxLabelData } from '../services/box-label.service';
 import { BoxLabelZPLService } from '../services/box-label-zpl.service';
 import { BoxLabelEZPLService, BoxLabelEZPLData } from '../services/box-label-ezpl.service';
-import { ImagePrintService } from '../services/image-print.service';
-import { SimpleZPLService } from '../services/simple-zpl.service';
-import { WindowsPrintService } from '../services/windows-print.service';
 import { ILogger } from '../interfaces/ILogger';
 import { ConsoleLoggerService } from '../services/logging/console.logger.service';
 
@@ -23,12 +20,9 @@ export class PrintController {
   private boxLabelService: BoxLabelService;
   private boxLabelZPLService: BoxLabelZPLService;
   private boxLabelEZPLService: BoxLabelEZPLService;
-  private imagePrintService: ImagePrintService;
-  private simpleZPLService: SimpleZPLService;
-  private windowsPrintService: WindowsPrintService;
   private logger: ILogger;
 
-  constructor(printerService?: PrinterService) {
+  constructor(printerService?: PrinterService | IPrinterService) {
     // Initialize logger
     this.logger = new ConsoleLoggerService('PrintController');
     
@@ -36,9 +30,6 @@ export class PrintController {
     this.boxLabelService = new BoxLabelService(this.logger);
     this.boxLabelZPLService = new BoxLabelZPLService();
     this.boxLabelEZPLService = new BoxLabelEZPLService(this.logger);
-    this.imagePrintService = new ImagePrintService();
-    this.simpleZPLService = new SimpleZPLService();
-    this.windowsPrintService = new WindowsPrintService();
     
     // 🚨 CRITICAL FIX: Always use injected printer service from ApplicationServiceFactory
     // Never create own printer service to avoid configuration conflicts
@@ -46,8 +37,19 @@ export class PrintController {
       throw new Error('PrintController requires a printer service from ApplicationServiceFactory');
     }
     
-    this.printerService = printerService;
-    console.log('✅ PrintController using injected ZPL printer service from ApplicationServiceFactory');
+    // Support both PrinterService and IPrinterService (GodexPrinterService)
+    if ('printBarcodeLabels' in printerService) {
+      // It's a PrinterService or compatible IPrinterService
+      this.printerService = printerService as PrinterService;
+      console.log('✅ PrintController using injected printer service from ApplicationServiceFactory');
+      
+      // Log the printer type for debugging
+      if ('getCurrentMethod' in printerService) {
+        console.log(`🖨️ Printer service type: ${(printerService as any).getCurrentMethod()}`);
+      }
+    } else {
+      throw new Error('Provided printer service does not implement required IPrinterService interface');
+    }
   }
 
   /**
@@ -1557,6 +1559,208 @@ export class PrintController {
         success: false,
         error: 'Failed to generate multiple box labels HTML',
         details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  }
+
+  /**
+   * Generate box label for GoLabel
+   * POST /api/print/box-label/golabel
+   */
+  async generateBoxLabelGoLabel(req: Request, res: Response): Promise<void> {
+    try {
+      const { 
+        orderId, 
+        boxNumber, 
+        totalBoxes,
+        customerName, 
+        customerCity,
+        items,
+        region
+      } = req.body;
+
+      // Validation
+      if (!orderId || !boxNumber || !customerName) {
+        res.status(400).json({
+          success: false,
+          error: 'Order ID, box number and customer name are required'
+        });
+        return;
+      }
+
+      // Try template service first, fall back to generator if template not available
+      const { BoxLabelTemplateService } = require('../services/golabel/generators/box-label-template-service');
+      const templateService = new BoxLabelTemplateService(this.logger);
+      
+      let useTemplate = false;
+      let generator: any = null;
+      
+      if (templateService.isTemplateAvailable()) {
+        useTemplate = true;
+        this.logger.info('Using EZPX template for box label');
+      } else {
+        const { BoxLabelGoLabelGeneratorService } = require('../services/golabel/generators/box-label-golabel-generator.service');
+        generator = new BoxLabelGoLabelGeneratorService(this.logger);
+        this.logger.info('Using dynamic generator for box label');
+      }
+      
+      // Prepare box data
+      const boxData = {
+        orderId,
+        boxNumber,
+        totalBoxes: totalBoxes || 1,
+        customerName,
+        customerCity,
+        items: items || [],
+        region,
+        deliveryDate: new Date().toLocaleDateString('he-IL')
+      };
+      
+      // Generate EZPX content
+      const ezpxContent = useTemplate 
+        ? templateService.generateBoxLabel(boxData)
+        : generator.generateBoxLabel(boxData);
+      
+      // Save to file
+      const fs = require('fs');
+      const path = require('path');
+      const timestamp = Date.now();
+      const filename = `box_label_${orderId}_${boxNumber}_${timestamp}.ezpx`;
+      const filepath = path.join(process.cwd(), 'temp', 'labels', filename);
+      
+      // Ensure directory exists
+      const dir = path.dirname(filepath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      
+      // Write file
+      fs.writeFileSync(filepath, ezpxContent, 'utf8');
+      
+      console.log('✅ Generated GoLabel box label:', filename);
+      
+      res.status(200).json({
+        success: true,
+        filename,
+        filepath,
+        format: 'ezpx',
+        content: ezpxContent
+      });
+      
+    } catch (error) {
+      console.error('❌ Error generating GoLabel box label:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to generate GoLabel label'
+      });
+    }
+  }
+
+  /**
+   * Print box label via GoLabel
+   * POST /api/print/box-label/golabel/print
+   */
+  async printBoxLabelGoLabel(req: Request, res: Response): Promise<void> {
+    try {
+      const { 
+        orderId, 
+        boxNumber, 
+        totalBoxes,
+        customerName, 
+        customerCity,
+        items,
+        region
+      } = req.body;
+
+      // Generate label first - try template service, then fall back to generator
+      const { BoxLabelTemplateService } = require('../services/golabel/generators/box-label-template-service');
+      const templateService = new BoxLabelTemplateService(this.logger);
+      
+      let useTemplate = false;
+      let generator: any = null;
+      
+      if (templateService.isTemplateAvailable()) {
+        useTemplate = true;
+      } else {
+        const { BoxLabelGoLabelGeneratorService } = require('../services/golabel/generators/box-label-golabel-generator.service');
+        generator = new BoxLabelGoLabelGeneratorService(this.logger);
+      }
+      
+      const boxData = {
+        orderId,
+        boxNumber,
+        totalBoxes: totalBoxes || 1,
+        customerName,
+        customerCity,
+        items: items || [],
+        region,
+        deliveryDate: new Date().toLocaleDateString('he-IL')
+      };
+      
+      const ezpxContent = useTemplate 
+        ? templateService.generateBoxLabel(boxData)
+        : generator.generateBoxLabel(boxData);
+      
+      // Save to temp file
+      const fs = require('fs');
+      const path = require('path');
+      const os = require('os');
+      const tempDir = path.join(os.tmpdir(), 'golabel-labels');
+      
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
+      }
+      
+      const timestamp = Date.now();
+      const filename = `box_${orderId}_${boxNumber}_${timestamp}.ezpx`;
+      const filepath = path.join(tempDir, filename);
+      
+      fs.writeFileSync(filepath, ezpxContent, 'utf8');
+      
+      // Try to print using GoLabel CLI service
+      try {
+        const { GoLabelCliService } = require('../services/golabel/cli/golabel-cli.service');
+        const golabelService = new GoLabelCliService(this.logger);
+        
+        if (await golabelService.initialize()) {
+          const printResult = await golabelService.print(filepath);
+          
+          res.status(200).json({
+            success: printResult.success,
+            message: printResult.message || 'Label sent to GoLabel',
+            method: printResult.method,
+            filename,
+            filepath
+          });
+        } else {
+          // GoLabel not available, return file for manual printing
+          res.status(200).json({
+            success: false,
+            message: 'GoLabel not available. Please open the file manually.',
+            filename,
+            filepath,
+            content: ezpxContent
+          });
+        }
+      } catch (printError) {
+        console.error('Failed to print via GoLabel:', printError);
+        
+        // Return file info for manual handling
+        res.status(200).json({
+          success: false,
+          message: 'Could not print automatically. File saved for manual printing.',
+          filename,
+          filepath,
+          content: ezpxContent,
+          error: printError instanceof Error ? printError.message : String(printError)
+        });
+      }
+      
+    } catch (error) {
+      console.error('❌ Error printing GoLabel box label:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to print GoLabel label'
       });
     }
   }

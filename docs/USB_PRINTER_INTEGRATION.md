@@ -2,20 +2,31 @@
 
 ## Overview
 
-This document describes the USB printer detection and printing functionality implemented for the RIVHIT Package system. The system supports automatic USB printer discovery and testing on both Windows and macOS platforms.
+This document describes the USB printer detection and printing functionality implemented for the RIVHIT Package system. The system now includes **GoLabel integration** for reliable Godex printer communication.
+
+## Update: GoLabel Integration 🆕
+
+As of version 3.0, the system uses GoLabel integration as the primary method for USB printing on Godex printers, with automatic fallback to direct USB methods.
+
+### GoLabel Print Methods (Priority Order)
+1. **GoLabel.exe CLI** - Official Godex tool with full feature support
+2. **EZio32.dll SDK** - Direct DLL integration via FFI
+3. **Direct USB** - Legacy fallback method
 
 ## Features
 
 ### USB Printer Discovery
 - **Cross-platform detection**: Windows (PowerShell) and macOS (bash/CUPS)
 - **Automatic platform detection**: System automatically chooses appropriate method
-- **GODEX printer support**: Specialized detection for GODEX ZX420i printers
+- **GODEX printer support**: Enhanced with GoLabel integration
 - **Real-time status**: Live USB connection monitoring
 
 ### USB Printing
-- **Direct USB printing**: Platform-specific printing methods
+- **GoLabel integration** 🆕: Official Godex printing methods
+- **EZPX format support** 🆕: Modern XML-based label format
+- **Direct USB printing**: Platform-specific printing methods (fallback)
 - **EZPL command support**: Native GODEX label printer commands
-- **Test printing**: Automated test print functionality
+- **Test printing**: Automated test print functionality with method detection
 - **Error handling**: Comprehensive error reporting and diagnostics
 
 ## API Endpoints
@@ -91,14 +102,53 @@ Content-Type: application/json
   - CUPS-based printing via lp command
   - Network port monitoring
 
+## GoLabel Configuration 🆕
+
+### Prerequisites
+
+1. **GoLabel II Software**
+   - Download from [Godex website](https://www.godex.com)
+   - Install to default location: `C:\Program Files (x86)\Godex\GoLabel`
+   - Version 2.x or higher recommended
+
+2. **Godex SDK (Optional)**
+   - Download Godex SDK package
+   - Extract to: `C:\Program Files (x86)\Godex\SDK`
+   - Contains EZio32.dll and QLabelSDK.DLL
+
+### Environment Variables
+
+Add to your `.env` file:
+```bash
+# GoLabel Integration
+USE_GOLABEL=true
+GOLABEL_PATH=C:\Program Files (x86)\Godex\GoLabel\GoLabel.exe
+GODEX_SDK_PATH=C:\Program Files (x86)\Godex\SDK
+GOLABEL_INTERFACE=USB
+GOLABEL_DEFAULT_DARKNESS=10
+GOLABEL_DEFAULT_SPEED=4
+GOLABEL_CLI_TIMEOUT=30000
+```
+
+### Testing GoLabel Integration
+
+Run the test script:
+```bash
+npm run test:golabel
+# or
+npx ts-node test-golabel-integration.ts
+```
+
 ## Setup Instructions
 
 ### Windows Setup
-1. Connect GODEX ZX420i via USB
-2. Install GODEX drivers
-3. Verify printer appears in Windows Settings > Printers & Scanners
-4. Test detection: `GET /api/printers/usb-check`
-5. Test printing: `POST /api/print/test-usb`
+1. **Install GoLabel II** (required for GoLabel integration)
+2. Connect GODEX ZX420i via USB
+3. Install GODEX drivers (included with GoLabel)
+4. Verify printer appears in Windows Settings > Printers & Scanners
+5. Configure GoLabel settings (see above)
+6. Test detection: `GET /api/printers/usb-check`
+7. Test printing: `POST /api/print/test-usb`
 
 ### macOS Setup
 1. Connect GODEX ZX420i via USB
@@ -107,6 +157,7 @@ Content-Type: application/json
 4. Select GODEX ZX420i from USB devices
 5. Test detection: `GET /api/printers/usb-check`
 6. Test printing: `POST /api/print/test-usb`
+   - Note: GoLabel integration is Windows-only; uses fallback methods on macOS
 
 ## Technical Details
 

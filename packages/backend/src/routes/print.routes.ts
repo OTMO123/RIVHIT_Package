@@ -408,4 +408,22 @@ router.post('/test-usb', async (req, res) => {
   }
 });
 
+/**
+ * @route POST /api/print/box-label/golabel
+ * @desc Generate box label in GoLabel format
+ * @body { orderId, boxNumber, totalBoxes, customerName, customerCity?, items, region? }
+ */
+router.post('/box-label/golabel', async (req, res) => {
+  await getPrintController(req).generateBoxLabelGoLabel(req, res);
+});
+
+/**
+ * @route POST /api/print/box-label/golabel/print
+ * @desc Generate and print box label via GoLabel
+ * @body { orderId, boxNumber, totalBoxes, customerName, customerCity?, items, region? }
+ */
+router.post('/box-label/golabel/print', async (req, res) => {
+  await getPrintController(req).printBoxLabelGoLabel(req, res);
+});
+
 export default router;

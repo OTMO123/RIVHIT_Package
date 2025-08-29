@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DiagramRoot>
+  <Diagram Version="1.00" Width="80" Height="50" Units="mm" DPI="200" Orientation="0">
+    <Page Width="80" Height="50" BGColor="16777215" Rotate="0">
+      <!-- Text element -->
+      <Shape Type="Text" Name="Text1" Left="5" Top="5" Width="70" Height="10">
+        <Brush Color="0" Style="1"/>
+        <Pen Color="0" Width="1"/>
+        <Font Name="Arial" Size="12" Bold="1" Italic="0" Underline="0" Strikeout="0"/>
+        <Text>RIVHIT Label Test</Text>
+        <Alignment Horizontal="1" Vertical="1"/>
+      </Shape>
+      
+      <!-- Barcode element -->
+      <Shape Type="Barcode" Name="Barcode1" Left="5" Top="20" Width="60" Height="20">
+        <BarcodeType>Code128</BarcodeType>
+        <BarcodeData>TEST123456</BarcodeData>
+        <ShowText>1</ShowText>
+        <TextPosition>0</TextPosition>
+        <Checksum>1</Checksum>
+      </Shape>
+      
+      <!-- Additional text -->
+      <Shape Type="Text" Name="Text2" Left="5" Top="42" Width="70" Height="5">
+        <Brush Color="0" Style="1"/>
+        <Pen Color="0" Width="1"/>
+        <Font Name="Arial" Size="8" Bold="0" Italic="0" Underline="0" Strikeout="0"/>
+        <Text>29.08.2025, 18:26:26</Text>
+        <Alignment Horizontal="0" Vertical="1"/>
+      </Shape>
+    </Page>
+    
+    <!-- Printer settings -->
+    <PrintSettings>
+      <Printer>GoDEX ZX420i</Printer>
+      <Speed>3</Speed>
+      <Darkness>10</Darkness>
+      <MediaType>1</MediaType>
+      <PrintMethod>0</PrintMethod>
+    </PrintSettings>
+  </Diagram>
+</DiagramRoot>

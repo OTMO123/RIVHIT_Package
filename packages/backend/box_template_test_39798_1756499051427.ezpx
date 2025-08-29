@@ -1,0 +1,1919 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PrintJob xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <GraphicMode>false</GraphicMode>
+  <FormatVersion>1</FormatVersion>
+  <QLabelSDKVersion>1.5.9203.30912</QLabelSDKVersion>
+  <GoLabelZoomFactor>0.64</GoLabelZoomFactor>
+  <Label>
+    <Scale>
+      <ComName>COM1</ComName>
+      <Baudrate>9600</Baudrate>
+      <Parity>N</Parity>
+      <DataBit>8</DataBit>
+      <StopBit>1</StopBit>
+    </Scale>
+    <SerialFormat>
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+    </SerialFormat>
+    <SerialLeadingCode>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+      <int>0</int>
+    </SerialLeadingCode>
+    <SerialCustomSequence>
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+    </SerialCustomSequence>
+    <bSerialSpecialCarry>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+      <boolean>false</boolean>
+    </bSerialSpecialCarry>
+    <VariableFormat>
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+    </VariableFormat>
+    <VariableDisplayName>
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+      <string xsi:nil="true" />
+    </VariableDisplayName>
+    <GroupList />
+    <UnitPriceType>None</UnitPriceType>
+    <UnitPrice>0</UnitPrice>
+    <TaraType>None</TaraType>
+    <Tara>0</Tara>
+    <qlabel>
+      <GraphicShape xsi:type="BarCode" Style="Cross" IsPrint="true" PageAlignment="None" Locked="false" bStroke="true" bFill="true" Direction="Angle0" X="144.8099" Y="623" Alignment="Left" AlignPointX="144.8099" AlignPointY="623" FontScript="Default" FontCmd="Arial,12&#xD;&#xA;" Symbology="EAN13" CaptionAlignment="BottomAndJustify" Height="80.63626" Width="8" Narrow="3" BearerBarStyle="2" BearerBarWidth="5" QuietZoneWidth="9" Offset="1" bDisplayChecksum="false" bDisplayStartStopChar="false" bBuiltinFont="true" bSetBuiltinFontSize="false" Code128Subset="Auto">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>4</Id>
+        <ItemLabel>BarCode_4</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>B</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>325</BoundRectWidth>
+        <DispData>7290011505877</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>7290011505877</Data>
+        <ItemInfoList />
+        <BoundRectHeight>97</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>144.8099</X>
+            <Y>623</Y>
+          </Location>
+          <Size>
+            <Width>325</Width>
+            <Height>97</Height>
+          </Size>
+          <X>144.8099</X>
+          <Y>623</Y>
+          <Width>325</Width>
+          <Height>97</Height>
+        </BoundRect>
+        <CheckDigitType>MOD_43</CheckDigitType>
+        <Use_ITF_T2>true</Use_ITF_T2>
+        <CustomizeGuardBar>false</CustomizeGuardBar>
+        <GuardBarHeight>0</GuardBarHeight>
+      </GraphicShape>
+      <GraphicShape xsi:type="BarCode" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="142.8099" Y="465" Alignment="Left" AlignPointX="142.8099" AlignPointY="465" FontScript="Default" FontCmd="Arial,12&#xD;&#xA;" Symbology="EAN13" CaptionAlignment="BottomAndJustify" Height="80.63626" Width="8" Narrow="3" BearerBarStyle="2" BearerBarWidth="5" QuietZoneWidth="9" Offset="1" bDisplayChecksum="false" bDisplayStartStopChar="false" bBuiltinFont="true" bSetBuiltinFontSize="false" Code128Subset="Auto">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>4</Id>
+        <ItemLabel>BarCode_45574</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>B</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>325</BoundRectWidth>
+        <DispData>7290011505891</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>7290011505891</Data>
+        <ItemInfoList />
+        <BoundRectHeight>97</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>142.8099</X>
+            <Y>465</Y>
+          </Location>
+          <Size>
+            <Width>325</Width>
+            <Height>97</Height>
+          </Size>
+          <X>142.8099</X>
+          <Y>465</Y>
+          <Width>325</Width>
+          <Height>97</Height>
+        </BoundRect>
+        <CheckDigitType>MOD_43</CheckDigitType>
+        <Use_ITF_T2>true</Use_ITF_T2>
+        <CustomizeGuardBar>false</CustomizeGuardBar>
+        <GuardBarHeight>0</GuardBarHeight>
+      </GraphicShape>
+      <GraphicShape xsi:type="GdiWindowTextBox" Style="Cross" IsPrint="true" PageAlignment="None" Locked="false" bStroke="true" bFill="true" Direction="Angle0" X="47.87234" Y="191.106369" Alignment="Center" AlignPointX="246.808533" AlignPointY="185.106369" FontScript="Hebrew" AutoFontResize="false" FontCmd="Arial,12&#xD;&#xA;" LineSpacing="Single" bSpaceCropping="false" LineHeight="40" Multiple="10" DotBeforePara="0" DotAfterPara="0" FontWidth="12" TextSpace="0" BoundingAlignment="Top">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>50</Id>
+        <ItemLabel>GdiWindowTextBox_50</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>W</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>718.0852</BoundRectWidth>
+        <DispData>מעדני לאון יוליה</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>מעדני לאון יוליה</Data>
+        <ItemInfoList>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData>מעדני לאון יוליה</ItemData>
+          </Item>
+        </ItemInfoList>
+        <BoundRectHeight>42.5532074</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>47.87234</X>
+            <Y>191.106369</Y>
+          </Location>
+          <Size>
+            <Width>718.0852</Width>
+            <Height>42.5532074</Height>
+          </Size>
+          <X>47.87234</X>
+          <Y>191.106369</Y>
+          <Width>718.0852</Width>
+          <Height>42.5532074</Height>
+        </BoundRect>
+        <WrapMode>WordWrap</WrapMode>
+        <BTrueType>true</BTrueType>
+        <IsInverse>false</IsInverse>
+      </GraphicShape>
+      <GraphicShape xsi:type="GdiWindowTextBox" Style="Cross" IsPrint="true" PageAlignment="None" Locked="false" bStroke="true" bFill="true" Direction="Angle0" X="15.5172415" Y="759.722351" Alignment="Center" AlignPointX="312.499939" AlignPointY="759.722351" FontScript="Default" AutoFontResize="true" FontCmd="Arial,12&#xD;&#xA;" LineSpacing="Single" bSpaceCropping="false" LineHeight="26" Multiple="10" DotBeforePara="0" DotAfterPara="0" FontWidth="28" TextSpace="0" BoundingAlignment="Center">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>48</Id>
+        <ItemLabel>GdiWindowTextBox_48</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>W</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <DateFormat>dd/mn/y2</DateFormat>
+        <BoundRectWidth>784.4828</BoundRectWidth>
+        <DispData>29/08/25</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>^D</Data>
+        <ItemInfoList>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData />
+          </Item>
+          <Item>
+            <ItemSymbol>6</ItemSymbol>
+            <ItemData>^D</ItemData>
+          </Item>
+        </ItemInfoList>
+        <BoundRectHeight>27.7776489</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>15.5172415</X>
+            <Y>759.722351</Y>
+          </Location>
+          <Size>
+            <Width>784.4828</Width>
+            <Height>27.7776489</Height>
+          </Size>
+          <X>15.5172415</X>
+          <Y>759.722351</Y>
+          <Width>784.4828</Width>
+          <Height>27.7776489</Height>
+        </BoundRect>
+        <WrapMode>WordWrap</WrapMode>
+        <BTrueType>true</BTrueType>
+        <IsInverse>false</IsInverse>
+      </GraphicShape>
+      <GraphicShape xsi:type="GdiWindowTextBox" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="43.6666641" Y="310.7779" Alignment="Center" AlignPointX="43.6666641" AlignPointY="310.7779" FontScript="Default" AutoFontResize="true" FontCmd="Arial,28&#xD;&#xA;" LineSpacing="Single" bSpaceCropping="false" LineHeight="78" Multiple="10" DotBeforePara="0" DotAfterPara="0" FontWidth="12" TextSpace="0" BoundingAlignment="Center">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>43</Id>
+        <ItemLabel>GdiWindowTextBox_43</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>W</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>97</BoundRectWidth>
+        <DispData>5</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>5</Data>
+        <ItemInfoList>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData>5</ItemData>
+          </Item>
+        </ItemInfoList>
+        <BoundRectHeight>79</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>43.6666641</X>
+            <Y>310.7779</Y>
+          </Location>
+          <Size>
+            <Width>97</Width>
+            <Height>79</Height>
+          </Size>
+          <X>43.6666641</X>
+          <Y>310.7779</Y>
+          <Width>97</Width>
+          <Height>79</Height>
+        </BoundRect>
+        <WrapMode>WordWrap</WrapMode>
+        <BTrueType>true</BTrueType>
+        <IsInverse>false</IsInverse>
+      </GraphicShape>
+      <GraphicShape xsi:type="GdiWindowTextBox" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="483.333344" Y="293.4737" Alignment="Center" AlignPointX="483.333344" AlignPointY="293.4737" FontScript="Hebrew" AutoFontResize="true" FontCmd="Arial Rounded MT Bold,12&#xD;&#xA;" LineSpacing="Single" bSpaceCropping="false" LineHeight="59" Multiple="10" DotBeforePara="0" DotAfterPara="0" FontWidth="9" TextSpace="0" BoundingAlignment="Top">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>5</Id>
+        <ItemLabel>GdiWindo24691</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>W</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>296</BoundRectWidth>
+        <DispData>בלינצ'ס במילוי בשר</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>בלינצ'ס במילוי בשר</Data>
+        <ItemInfoList>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData />
+          </Item>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData>בלינצ'ס במילוי בשר</ItemData>
+          </Item>
+        </ItemInfoList>
+        <BoundRectHeight>78</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>483.333344</X>
+            <Y>293.4737</Y>
+          </Location>
+          <Size>
+            <Width>296</Width>
+            <Height>78</Height>
+          </Size>
+          <X>483.333344</X>
+          <Y>293.4737</Y>
+          <Width>296</Width>
+          <Height>78</Height>
+        </BoundRect>
+        <WrapMode>WordWrap</WrapMode>
+        <BTrueType>true</BTrueType>
+        <IsInverse>false</IsInverse>
+      </GraphicShape>
+      <GraphicShape xsi:type="BarCode" Style="Cross" IsPrint="true" PageAlignment="None" Locked="false" bStroke="true" bFill="true" Direction="Angle0" X="142.8099" Y="302.18692" Alignment="Left" AlignPointX="142.8099" AlignPointY="302.18692" FontScript="Default" FontCmd="Arial,12&#xD;&#xA;" Symbology="EAN13" CaptionAlignment="BottomAndJustify" Height="80.63626" Width="8" Narrow="3" BearerBarStyle="2" BearerBarWidth="5" QuietZoneWidth="9" Offset="1" bDisplayChecksum="false" bDisplayStartStopChar="false" bBuiltinFont="true" bSetBuiltinFontSize="false" Code128Subset="Auto">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>4</Id>
+        <ItemLabel>BarCode_13651</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>B</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>325</BoundRectWidth>
+        <DispData>7290011505853</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>7290011505853</Data>
+        <ItemInfoList />
+        <BoundRectHeight>97</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>142.8099</X>
+            <Y>302.18692</Y>
+          </Location>
+          <Size>
+            <Width>325</Width>
+            <Height>97</Height>
+          </Size>
+          <X>142.8099</X>
+          <Y>302.18692</Y>
+          <Width>325</Width>
+          <Height>97</Height>
+        </BoundRect>
+        <CheckDigitType>MOD_43</CheckDigitType>
+        <Use_ITF_T2>true</Use_ITF_T2>
+        <CustomizeGuardBar>false</CustomizeGuardBar>
+        <GuardBarHeight>0</GuardBarHeight>
+      </GraphicShape>
+      <GraphicShape xsi:type="GdiWindowTextBox" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="43.6666641" Y="473.7779" Alignment="Center" AlignPointX="43.6666641" AlignPointY="473.7779" FontScript="Default" AutoFontResize="true" FontCmd="Arial,28&#xD;&#xA;" LineSpacing="Single" bSpaceCropping="false" LineHeight="78" Multiple="10" DotBeforePara="0" DotAfterPara="0" FontWidth="12" TextSpace="0" BoundingAlignment="Center">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>43</Id>
+        <ItemLabel>GdiWindo27063</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>W</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>97</BoundRectWidth>
+        <DispData>5</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>5</Data>
+        <ItemInfoList />
+        <BoundRectHeight>79</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>43.6666641</X>
+            <Y>473.7779</Y>
+          </Location>
+          <Size>
+            <Width>97</Width>
+            <Height>79</Height>
+          </Size>
+          <X>43.6666641</X>
+          <Y>473.7779</Y>
+          <Width>97</Width>
+          <Height>79</Height>
+        </BoundRect>
+        <WrapMode>WordWrap</WrapMode>
+        <BTrueType>true</BTrueType>
+        <IsInverse>false</IsInverse>
+      </GraphicShape>
+      <GraphicShape xsi:type="GdiWindowTextBox" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="483.333344" Y="456.4737" Alignment="Center" AlignPointX="493.333344" AlignPointY="629.4737" FontScript="Hebrew" AutoFontResize="true" FontCmd="Arial Rounded MT Bold,12&#xD;&#xA;" LineSpacing="Single" bSpaceCropping="false" LineHeight="59" Multiple="10" DotBeforePara="0" DotAfterPara="0" FontWidth="9" TextSpace="0" BoundingAlignment="Top">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>5</Id>
+        <ItemLabel>GdiWindo18791</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>W</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>296.055573</BoundRectWidth>
+        <DispData>בלינצ'ס במילוי חזרتן</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>בלינצ'ס במילוי חזרتן</Data>
+        <ItemInfoList />
+        <BoundRectHeight>78</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>483.333344</X>
+            <Y>456.4737</Y>
+          </Location>
+          <Size>
+            <Width>296.055573</Width>
+            <Height>78</Height>
+          </Size>
+          <X>483.333344</X>
+          <Y>456.4737</Y>
+          <Width>296.055573</Width>
+          <Height>78</Height>
+        </BoundRect>
+        <WrapMode>WordWrap</WrapMode>
+        <BTrueType>true</BTrueType>
+        <IsInverse>false</IsInverse>
+      </GraphicShape>
+      <GraphicShape xsi:type="GdiWindowTextBox" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="46.50005" Y="100.777779" Alignment="Center" AlignPointX="46.50005" AlignPointY="100.777779" FontScript="Default" AutoFontResize="true" FontCmd="Arial,24,B&#xD;&#xA;" LineSpacing="Single" bSpaceCropping="false" LineHeight="45" Multiple="10" DotBeforePara="0" DotAfterPara="0" FontWidth="36" TextSpace="0" BoundingAlignment="Center">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>45</Id>
+        <ItemLabel>GdiWindowTextBox_45</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>W</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>191</BoundRectWidth>
+        <DispData>Север 2</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>Север 2</Data>
+        <ItemInfoList>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData>Север 2</ItemData>
+          </Item>
+        </ItemInfoList>
+        <BoundRectHeight>46</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>46.50005</X>
+            <Y>100.777779</Y>
+          </Location>
+          <Size>
+            <Width>191</Width>
+            <Height>46</Height>
+          </Size>
+          <X>46.50005</X>
+          <Y>100.777779</Y>
+          <Width>191</Width>
+          <Height>46</Height>
+        </BoundRect>
+        <WrapMode>WordWrap</WrapMode>
+        <BTrueType>true</BTrueType>
+        <IsInverse>false</IsInverse>
+      </GraphicShape>
+      <GraphicShape xsi:type="GdiWindowTextBox" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="46.50005" Y="49.77778" Alignment="Center" AlignPointX="46.50005" AlignPointY="49.77778" FontScript="Hebrew" AutoFontResize="true" FontCmd="Arial,24,B&#xD;&#xA;" LineSpacing="Single" bSpaceCropping="false" LineHeight="45" Multiple="10" DotBeforePara="0" DotAfterPara="0" FontWidth="36" TextSpace="0" BoundingAlignment="Center">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>45</Id>
+        <ItemLabel>GdiWindo91574</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>W</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>191</BoundRectWidth>
+        <DispData>צפון 2</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>צפון 2</Data>
+        <ItemInfoList>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData>צפון 2</ItemData>
+          </Item>
+        </ItemInfoList>
+        <BoundRectHeight>46</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>46.50005</X>
+            <Y>49.77778</Y>
+          </Location>
+          <Size>
+            <Width>191</Width>
+            <Height>46</Height>
+          </Size>
+          <X>46.50005</X>
+          <Y>49.77778</Y>
+          <Width>191</Width>
+          <Height>46</Height>
+        </BoundRect>
+        <WrapMode>WordWrap</WrapMode>
+        <BTrueType>true</BTrueType>
+        <IsInverse>false</IsInverse>
+      </GraphicShape>
+      <GraphicShape xsi:type="GdiWindowTextBox" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="579.777832" Y="80.55556" Alignment="Center" AlignPointX="579.777832" AlignPointY="80.55556" FontScript="Default" AutoFontResize="true" FontCmd="Arial,24,B&#xD;&#xA;" LineSpacing="Single" bSpaceCropping="false" LineHeight="64" Multiple="10" DotBeforePara="0" DotAfterPara="0" FontWidth="36" TextSpace="0" BoundingAlignment="Center">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>45</Id>
+        <ItemLabel>GdiWindo72749</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>W</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>188</BoundRectWidth>
+        <DispData>2 / 2</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>2 / 2</Data>
+        <ItemInfoList>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData>2 / 2</ItemData>
+          </Item>
+        </ItemInfoList>
+        <BoundRectHeight>65</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>579.777832</X>
+            <Y>80.55556</Y>
+          </Location>
+          <Size>
+            <Width>188</Width>
+            <Height>65</Height>
+          </Size>
+          <X>579.777832</X>
+          <Y>80.55556</Y>
+          <Width>188</Width>
+          <Height>65</Height>
+        </BoundRect>
+        <WrapMode>WordWrap</WrapMode>
+        <BTrueType>true</BTrueType>
+        <IsInverse>false</IsInverse>
+      </GraphicShape>
+      <GraphicShape xsi:type="GdiWindowTextBox" Style="Cross" IsPrint="true" PageAlignment="None" Locked="false" bStroke="true" bFill="true" Direction="Angle0" X="258.388916" Y="24.8333511" Alignment="Center" AlignPointX="258.388916" AlignPointY="24.8333511" FontScript="Default" AutoFontResize="false" FontCmd="Arial,36,B&#xD;&#xA;" LineSpacing="Single" bSpaceCropping="false" LineHeight="118" Multiple="10" DotBeforePara="0" DotAfterPara="0" FontWidth="28" TextSpace="0" BoundingAlignment="Center">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>44</Id>
+        <ItemLabel>GdiWindowTextBox_44</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>W</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>300</BoundRectWidth>
+        <DispData>39798</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>39798</Data>
+        <ItemInfoList>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData>39798</ItemData>
+          </Item>
+        </ItemInfoList>
+        <BoundRectHeight>110</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>258.388916</X>
+            <Y>24.8333511</Y>
+          </Location>
+          <Size>
+            <Width>300</Width>
+            <Height>110</Height>
+          </Size>
+          <X>258.388916</X>
+          <Y>24.8333511</Y>
+          <Width>300</Width>
+          <Height>110</Height>
+        </BoundRect>
+        <WrapMode>WordWrap</WrapMode>
+        <BTrueType>true</BTrueType>
+        <IsInverse>false</IsInverse>
+      </GraphicShape>
+      <GraphicShape xsi:type="GdiWindowTextBox" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="43.6666641" Y="636.7779" Alignment="Center" AlignPointX="43.6666641" AlignPointY="636.7779" FontScript="Default" AutoFontResize="true" FontCmd="Arial,28&#xD;&#xA;" LineSpacing="Single" bSpaceCropping="false" LineHeight="78" Multiple="10" DotBeforePara="0" DotAfterPara="0" FontWidth="12" TextSpace="0" BoundingAlignment="Center">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>43</Id>
+        <ItemLabel>GdiWindo37368</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>W</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>97</BoundRectWidth>
+        <DispData>5</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>5</Data>
+        <ItemInfoList>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData>5</ItemData>
+          </Item>
+        </ItemInfoList>
+        <BoundRectHeight>79</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>43.6666641</X>
+            <Y>636.7779</Y>
+          </Location>
+          <Size>
+            <Width>97</Width>
+            <Height>79</Height>
+          </Size>
+          <X>43.6666641</X>
+          <Y>636.7779</Y>
+          <Width>97</Width>
+          <Height>79</Height>
+        </BoundRect>
+        <WrapMode>WordWrap</WrapMode>
+        <BTrueType>true</BTrueType>
+        <IsInverse>false</IsInverse>
+      </GraphicShape>
+      <GraphicShape xsi:type="Text" Style="Cross" IsPrint="true" PageAlignment="None" Locked="false" bStroke="true" bFill="true" Direction="Angle0" X="338.8889" Y="124.333344" Alignment="Left" AlignPointX="338.8889" AlignPointY="124.333344" FontScript="Default" TextAlign="Left" FontCmd="Microsoft Sans Serif,12&#xD;&#xA;" FontType="BuiltIn_Bitmap_Font" TextSpace="0" Encoding="Default" FontId="F" FontHeight="1" FontWidth="1" IsInverse="false" IsUTF8="true" IsCheckDigit="false" UsePrinterClock="true">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>42</Id>
+        <ItemLabel>Text_42</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>A</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>127.807617</BoundRectWidth>
+        <DispData>Order</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>Order</Data>
+        <ItemInfoList>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData>Order</ItemData>
+          </Item>
+        </ItemInfoList>
+        <BoundRectHeight>55.859375</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>338.8889</X>
+            <Y>124.333344</Y>
+          </Location>
+          <Size>
+            <Width>127.807617</Width>
+            <Height>55.859375</Height>
+          </Size>
+          <X>338.8889</X>
+          <Y>124.333344</Y>
+          <Width>127.807617</Width>
+          <Height>55.859375</Height>
+        </BoundRect>
+        <NormalRatio>true</NormalRatio>
+        <BTrueType>true</BTrueType>
+      </GraphicShape>
+      <GraphicShape xsi:type="GdiWindowTextBox" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="483.333344" Y="619.4737" Alignment="Center" AlignPointX="451.388916" AlignPointY="615.4737" FontScript="Hebrew" AutoFontResize="true" FontCmd="Arial Rounded MT Bold,12&#xD;&#xA;" LineSpacing="Single" bSpaceCropping="false" LineHeight="59" Multiple="10" DotBeforePara="0" DotAfterPara="0" FontWidth="9" TextSpace="0" BoundingAlignment="Top">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>5</Id>
+        <ItemLabel>GdiWindo55372</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>W</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>296.055573</BoundRectWidth>
+        <DispData>בלינצ'ס במילוי תפו"א עם פטריות</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>בלינצ'ס במילוי תפו"א עם פטריות</Data>
+        <ItemInfoList>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData />
+          </Item>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData>בלינצ'ס במילוי תפו"א עם פטריות</ItemData>
+          </Item>
+        </ItemInfoList>
+        <BoundRectHeight>78</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>483.333344</X>
+            <Y>619.4737</Y>
+          </Location>
+          <Size>
+            <Width>296.055573</Width>
+            <Height>78</Height>
+          </Size>
+          <X>483.333344</X>
+          <Y>619.4737</Y>
+          <Width>296.055573</Width>
+          <Height>78</Height>
+        </BoundRect>
+        <WrapMode>WordWrap</WrapMode>
+        <BTrueType>true</BTrueType>
+        <IsInverse>false</IsInverse>
+      </GraphicShape>
+      <GraphicShape xsi:type="Text" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="638.2631" Y="44.5263176" Alignment="Left" AlignPointX="638.2631" AlignPointY="44.5263176" FontScript="Default" TextAlign="Left" FontCmd="Microsoft Sans Serif,12&#xD;&#xA;" FontType="BuiltIn_Bitmap_Font" TextSpace="0" Encoding="Default" FontId="Default" FontHeight="1" FontWidth="1" IsInverse="false" IsUTF8="true" IsCheckDigit="false" UsePrinterClock="true">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>7</Id>
+        <ItemLabel>Text_7</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>A</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <CharTruncateRule>
+          <TrimLeft>false</TrimLeft>
+          <TrimRight>false</TrimRight>
+          <RemoveCharLeft>false</RemoveCharLeft>
+          <RemoveCharLeftNo>0</RemoveCharLeftNo>
+          <RemoveCharRight>false</RemoveCharRight>
+          <RemoveCharRightNo>0</RemoveCharRightNo>
+          <KeepCharLeft>false</KeepCharLeft>
+          <KeepCharLeftNo>6</KeepCharLeftNo>
+          <KeepCharRight>false</KeepCharRight>
+          <KeepCharRightNo>6</KeepCharRightNo>
+          <RemoveDotZero>false</RemoveDotZero>
+        </CharTruncateRule>
+        <bReplaceSpecialCharFromDB>false</bReplaceSpecialCharFromDB>
+        <CharFilterRule>None</CharFilterRule>
+        <LinkMode>OriginalData</LinkMode>
+        <GraphicMode>false</GraphicMode>
+        <ReplaceInfoItems />
+        <FormatType>None</FormatType>
+        <P1 />
+        <P2 />
+        <P3 />
+        <P4 />
+        <Culture>ru-RU</Culture>
+        <calendar>GregorianCalendar</calendar>
+        <GetAiFromDigitalLink>false</GetAiFromDigitalLink>
+        <DataField>None</DataField>
+        <Prompt>None</Prompt>
+        <BoundRectWidth>66.03223</BoundRectWidth>
+        <DispData>Box:</DispData>
+        <bRemovePreZeroAndEmpty>false</bRemovePreZeroAndEmpty>
+        <Data>Box:</Data>
+        <ItemInfoList>
+          <Item>
+            <ItemSymbol>1</ItemSymbol>
+            <ItemData>Box:</ItemData>
+          </Item>
+        </ItemInfoList>
+        <BoundRectHeight>36.8671875</BoundRectHeight>
+        <BoundRect>
+          <Location>
+            <X>638.2631</X>
+            <Y>44.5263176</Y>
+          </Location>
+          <Size>
+            <Width>66.03223</Width>
+            <Height>36.8671875</Height>
+          </Size>
+          <X>638.2631</X>
+          <Y>44.5263176</Y>
+          <Width>66.03223</Width>
+          <Height>36.8671875</Height>
+        </BoundRect>
+        <NormalRatio>true</NormalRatio>
+        <BTrueType>true</BTrueType>
+      </GraphicShape>
+      <GraphicShape xsi:type="QRectangle" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="566" Y="40" Alignment="Left" AlignPointX="566" AlignPointY="40">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>1</Id>
+        <ItemLabel>None1</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>R</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <Height>121.052628</Height>
+        <HStroke>4</HStroke>
+        <VStroke>4</VStroke>
+        <Width>216</Width>
+      </GraphicShape>
+      <GraphicShape xsi:type="QRectangle" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="35" Y="40" Alignment="Left" AlignPointX="35" AlignPointY="40">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>1</Id>
+        <ItemLabel>None1</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>R</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <Height>121.052628</Height>
+        <HStroke>4</HStroke>
+        <VStroke>4</VStroke>
+        <Width>216</Width>
+      </GraphicShape>
+      <GraphicShape xsi:type="QRectangle" Style="Cross" IsPrint="true" PageAlignment="None" Locked="false" bStroke="true" bFill="true" Direction="Angle0" X="26.6111145" Y="273.6111" Alignment="Left" AlignPointX="26.6111145" AlignPointY="273.6111">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>46</Id>
+        <ItemLabel>None46</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>R</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <Height>154</Height>
+        <HStroke>3</HStroke>
+        <VStroke>3</VStroke>
+        <Width>762</Width>
+      </GraphicShape>
+      <GraphicShape xsi:type="QRectangle" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="26.6111145" Y="600.6111" Alignment="Left" AlignPointX="26.6111145" AlignPointY="600.6111">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>46</Id>
+        <ItemLabel>None46</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>R</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <Height>154</Height>
+        <HStroke>3</HStroke>
+        <VStroke>3</VStroke>
+        <Width>762</Width>
+      </GraphicShape>
+      <GraphicShape xsi:type="QRectangle" Style="Cross" IsPrint="true" PageAlignment="None" Locked="false" bStroke="true" bFill="true" Direction="Angle0" X="26.6111145" Y="436.6111" Alignment="Left" AlignPointX="26.6111145" AlignPointY="436.6111">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>46</Id>
+        <ItemLabel>None46</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>R</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <Height>154</Height>
+        <HStroke>3</HStroke>
+        <VStroke>3</VStroke>
+        <Width>762</Width>
+      </GraphicShape>
+      <GraphicShape xsi:type="QRectangle" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="11.320755" Y="10.3773594" Alignment="Left" AlignPointX="11.320755" AlignPointY="10.3773594">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>40</Id>
+        <ItemLabel>None40</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>R</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <Height>783.100952</Height>
+        <HStroke>3</HStroke>
+        <VStroke>3</VStroke>
+        <Width>796.287964</Width>
+      </GraphicShape>
+      <GraphicShape xsi:type="QRectangle" Style="Cross" IsPrint="true" PageAlignment="None" Locked="true" bStroke="true" bFill="true" Direction="Angle0" X="1" Y="1" Alignment="Left" AlignPointX="1" AlignPointY="1">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>6</Id>
+        <ItemLabel>None6</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>R</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <Height>802.438965</Height>
+        <HStroke>4</HStroke>
+        <VStroke>4</VStroke>
+        <Width>816</Width>
+      </GraphicShape>
+      <GraphicShape xsi:type="Line" Style="Cross" IsPrint="true" PageAlignment="None" Locked="false" bStroke="true" bFill="true" Direction="Angle0" X="45" Y="239" Alignment="Left" AlignPointX="45" AlignPointY="239">
+        <qHitOnCircumferance>false</qHitOnCircumferance>
+        <Selected>false</Selected>
+        <iBackground_color>4294967295</iBackground_color>
+        <Id>8</Id>
+        <ItemLabel>None8</ItemLabel>
+        <ObjectDrawMode>FW</ObjectDrawMode>
+        <Name>L</Name>
+        <GroupID>0</GroupID>
+        <GroupSelected>false</GroupSelected>
+        <lineShape>HLine</lineShape>
+        <Height>2</Height>
+        <Operation>111</Operation>
+        <Width>720</Width>
+      </GraphicShape>
+    </qlabel>
+    <VariableOpFormat />
+    <VariableOption />
+    <DateFormat>y2-me-dd</DateFormat>
+    <TimeFormat>h:m:s</TimeFormat>
+    <DataBaseFormat>None</DataBaseFormat>
+    <DataBaseFilePath />
+    <DataBaseSelection />
+    <UserID />
+    <Password>zhsTbm6nT9o+RQurpwH5Hw==</Password>
+    <EncryptPwd>true</EncryptPwd>
+    <DatabaseNoHeader>false</DatabaseNoHeader>
+    <IntegratedSecurity>false</IntegratedSecurity>
+    <RowIndex>0</RowIndex>
+  </Label>
+  <Setup bInfinityPrint="false" LabelLength="100" LabelWidth="102" LeftMargin="0" TopMargin="0" LabelType="0" GapLength="3" FeedLength="0" ZSign="45" BlackMark="3" Position="0" Speed="4" Copy="1" bCopyDataBase="false" CopyField="None" Stripper="0" LabelsPerCut="0" DoubleCut_Enable="false" DoubleCut_OffsetLen="0" DoubleCut_FirstCutMode="1" Rotate180="255" Stop="12" Darkness="10" Number="1" bCutDataBase="false" bBatchCut="false" bNumberDataBase="false" NumberField="None" PageDirection="Portrait" PrintMode="1" bUsePrinterRFIDCfg="true" PowerRFID="10" LengthRFID="0" RetryRFID="3" DrawMode="0">
+    <Layout Shape="0" AcrossType="Copied" PageDirection="Portrait" HorAcross="1" VerAcross="1" HorGap="0" VerGap="0" HorAcrossMode1="1" VerAcrossMode1="1" LabelMode="0" HorGapMode1="0" VerGapMode1="0" BottomMargin="0" RightMargin="0" />
+    <Description>&#x0;
+Lang:(ru-RU) OS:Microsoft Windows NT 10.0.26100.0(Win32NT)</Description>
+    <UnitType>Mm</UnitType>
+    <Dpi>203</Dpi>
+  </Setup>
+  <DriverName />
+  <BLE_MAC />
+  <BLE_Address>0</BLE_Address>
+  <BLE_AutoMTU>true</BLE_AutoMTU>
+  <BLE_MTU>20</BLE_MTU>
+  <PrinterModel>ZX420i</PrinterModel>
+  <PrinterLanguage>EZPL</PrinterLanguage>
+  <USBName />
+  <COMName />
+  <CommunicationType>USB</CommunicationType>
+  <NetworkIPAddress>0</NetworkIPAddress>
+  <NetworkPort>9100</NetworkPort>
+  <BaudRate>9600</BaudRate>
+  <ComSettings>N81</ComSettings>
+  <StandaloneDbSearchKey />
+  <StandaloneDbEnable>false</StandaloneDbEnable>
+</PrintJob>

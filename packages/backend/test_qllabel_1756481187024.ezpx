@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QLLabel Version="1.0">
+  <Settings>
+    <LabelWidth>80</LabelWidth>
+    <LabelHeight>50</LabelHeight>
+    <Units>mm</Units>
+    <PrinterModel>GoDEX</PrinterModel>
+  </Settings>
+  <Objects>
+    <Text>
+      <ID>1</ID>
+      <X>10</X>
+      <Y>10</Y>
+      <Data>RIVHIT Test Label</Data>
+      <Font>Arial</Font>
+      <Size>14</Size>
+      <Bold>True</Bold>
+    </Text>
+    <Barcode>
+      <ID>2</ID>
+      <X>10</X>
+      <Y>30</Y>
+      <Type>Code128</Type>
+      <Data>TEST1756481187017</Data>
+      <Height>15</Height>
+      <ShowText>True</ShowText>
+    </Barcode>
+  </Objects>
+</QLLabel>

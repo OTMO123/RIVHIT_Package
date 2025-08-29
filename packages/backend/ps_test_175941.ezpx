@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<labels _FORMAT="godex">
+  <label _WIDTH="50" _HEIGHT="30" _QUANTITY="1" _SPEED="2" _DENSITY="8">
+    <text>
+      <x>10</x>
+      <y>10</y>
+      <data>PowerShell Test Label</data>
+      <fontName>Arial</fontName>
+      <fontSize>20</fontSize>
+    </text>
+    <barcode>
+      <x>10</x>
+      <y>50</y>
+      <type>Code128</type>
+      <data>PS-TEST-123</data>
+      <height>80</height>
+    </barcode>
+  </label>
+</labels>

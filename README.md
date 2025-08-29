@@ -1,10 +1,26 @@
 # RIVHIT Packing System
 
+## 🎯 Platform-Specific Branches
+
+| Platform | Branch | Features |
+|----------|--------|----------|
+| **macOS/Linux** | `main` | ZPL printing, basic printer support |
+| **Windows** | `windows-golabel-integration` | GoLabel integration, EZPX format, enhanced printer management |
+
+```bash
+# For macOS/Linux users:
+git checkout main
+
+# For Windows users:
+git checkout windows-golabel-integration
+```
+
 ## ⚡ Quick Start for Developers
 
 ### Prerequisites
 - **Node.js 18+** (required)
 - **npm** (comes with Node.js)
+- **Windows Users**: [GoLabel II](https://www.godexprinters.co.uk/downloads/golabel-ii) (recommended)
 
 ### Setup (First Time)
 ```bash
@@ -29,7 +45,8 @@ npx lerna run dev --scope=@packing/frontend  # Electron app
 ### ⚠️ Important Notes
 - **Always use `npx lerna`** instead of `npm run` for lerna commands
 - **Build shared package first** before starting backend/frontend
-- **macOS/Linux users**: Printer warnings are normal (Windows-only feature)
+- **Windows users**: This branch includes GoLabel integration for enhanced printing
+- **macOS/Linux users**: Use `main` branch for ZPL-based printing
 
 ### Troubleshooting
 | Issue | Solution |
@@ -68,6 +85,7 @@ npx lerna run dev --scope=@packing/frontend  # Electron app
 - **SQLite + TypeORM** для локального кэширования
 - **Winston** для структурированного логирования
 - **Axios** для RIVHIT API интеграции
+- **GoLabel Integration** 🆕 для надежной печати на Godex принтерах
 
 #### Frontend
 - **Electron 37** для desktop приложения
@@ -121,22 +139,45 @@ npm run test:integration  # Integration тесты
 - **Node.js 18+**
 - **npm 8+** или **yarn 1.22+**
 - **Git** с настроенными pre-commit hooks
-- **Windows 10+** (для принтера GoDEX)
+- **Platform Requirements**:
+  - **Windows**: Windows 10+ with GoLabel II installed
+  - **macOS/Linux**: Any recent version (use `main` branch)
 
 ### Установка и настройка
 
-1. **Клонирование и установка зависимостей**
+1. **Клонирование и выбор ветки**
 ```bash
 git clone <repository-url>
 cd packing-system
+
+# Windows users:
+git checkout windows-golabel-integration
+
+# macOS/Linux users:
+git checkout main
+
 npm install
 ```
 
-2. **Конфигурация окружения**
+2. **Windows: GoLabel Setup**
+```bash
+# Install GoLabel II from https://www.godexprinters.co.uk/downloads/golabel-ii
+# Set environment variable:
+$env:GOLABEL_PATH = "C:\Program Files (x86)\Godex\GoLabel II\GoLabel.exe"
+
+# Test GoLabel integration:
+node packages/backend/test-golabel-integration.ts
+```
+
+3. **Конфигурация окружения**
 ```bash
 # Backend configuration
 cp packages/backend/.env.example packages/backend/.env
 # Настройте RIVHIT_API_TOKEN в .env файле
+
+# Windows users - add to .env:
+# GOLABEL_PATH=C:\Program Files (x86)\Godex\GoLabel II\GoLabel.exe
+# PRINTER_TYPE=godex
 ```
 
 3. **TDD setup**
@@ -163,6 +204,10 @@ packing-system/
 │   │   ├── src/
 │   │   │   ├── controllers/     # API контроллеры (Single Responsibility)
 │   │   │   ├── services/        # Бизнес-логика с DI
+│   │   │   │   ├── golabel/    # GoLabel интеграция 🆕
+│   │   │   │   │   ├── cli/     # GoLabel.exe CLI
+│   │   │   │   │   ├── sdk/     # EZio32.dll SDK
+│   │   │   │   │   └── generators/ # EZPX генераторы
 │   │   │   ├── interfaces/      # Контракты (Interface Segregation)
 │   │   │   ├── factories/       # Factory Pattern для создания объектов
 │   │   │   ├── middleware/      # Express middleware
@@ -250,6 +295,11 @@ npm run clean               # Очистка build артефактов
 - ✅ **Database миграции** для автоматического обновления схемы
 - ✅ **Printer Discovery Services** с network detection и кэшированием
 - ✅ **Printer Connection Services** с диагностикой и troubleshooting
+- ✅ **GoLabel Integration** (Windows only) - Полная интеграция с GoLabel SDK и CLI для надежной печати на Godex принтерах
+  - EZPX format support с template-based label generation
+  - Variable substitution for dynamic label content
+  - Support for Hebrew/Russian text and EAN13 barcodes
+  - Box label templates с автоматической подстановкой данных
 
 ### Frontend (92% готово)  
 - ✅ **Electron + React** архитектура
@@ -436,6 +486,25 @@ class OrderService {
 - Требуется стабильное соединение с RIVHIT API
 - Поддержка только принтеров GoDEX/Zebra
 
+## 🔄 Migration Guide: ZPL to EZPX (Windows)
+
+### For Windows Users Upgrading from v1.0
+1. **Switch to Windows branch**: `git checkout windows-golabel-integration`
+2. **Install GoLabel II**: Download from Godex website
+3. **Update printer settings**: Change from ZPL to EZPX format
+4. **Test new templates**: Run `test-golabel-integration.ts`
+
+### Key Differences
+| Feature | macOS/Linux (main) | Windows (golabel) |
+|---------|-------------------|-------------------|
+| **Format** | ZPL | EZPX (XML-based) |
+| **Software** | Direct ZPL | GoLabel II |
+| **Templates** | Code-based | File-based (.ezpx) |
+| **Variables** | In-code | Template substitution |
+| **Preview** | HTML visualization | GoLabel preview |
+
 ---
 
 **RIVHIT Packing System v2.0** - Современное решение для автоматизации упаковки заказов, построенное на принципах TDD и SOLID с интеграцией в экосистему RIVHIT.
+
+**Branch Info**: This is the Windows-specific branch with GoLabel integration. macOS/Linux users should use the `main` branch.

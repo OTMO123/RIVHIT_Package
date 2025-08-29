@@ -5,7 +5,6 @@ import { MemoryCacheService } from '../services/cache/memory.cache.service';
 import { RedisCacheService } from '../services/cache/redis.cache.service';
 import { PrinterService } from '../services/printer.service';
 import { ZPLPrinterService } from '../services/zpl-printer.service';
-import { WinLabelPrinterService, WinLabelPrinterFactory } from '../services/winlabel-printer.service';
 import { RivhitService } from '../services/rivhit.service';
 import { MockRivhitService } from '../services/mock-rivhit.service';
 import { SafeRivhitService } from '../services/safe-rivhit.service';
@@ -93,25 +92,6 @@ export class PrinterServiceFactory {
     return new PrinterService(config.templatesPath);
   }
 
-  /**
-   * Создание WinLabel принтер-сервиса
-   * Для интеграции с WINCODE Technology WinLabel
-   */
-  static createWinLabel(config?: {
-    winLabelPath?: string;
-    templatesPath?: string;
-    dataPath?: string;
-  }): IPrinterService {
-    return WinLabelPrinterFactory.create(config);
-  }
-
-  /**
-   * Создание WinLabel принтер-сервиса для RIVHIT
-   * Использует настройки по умолчанию для RIVHIT системы
-   */
-  static createWinLabelForRivhit(): IPrinterService {
-    return WinLabelPrinterFactory.createForRivhit();
-  }
 
   /**
    * Создание ZPL принтер-сервиса (для GoDEX с ZPL)
@@ -129,12 +109,35 @@ export class PrinterServiceFactory {
   }
 
   /**
+   * Создание Godex принтер-сервиса с GoLabel интеграцией
+   */
+  static async createGodex(): Promise<IPrinterService> {
+    const { GodexPrinterService } = await import('../services/golabel/godex-printer.service');
+    const service = new GodexPrinterService();
+    
+    // Initialize the service with all available methods
+    const initialized = await service.initialize();
+    if (!initialized) {
+      throw new Error('Failed to initialize Godex printer service');
+    }
+    
+    return service;
+  }
+
+  /**
    * Создание принтер-сервиса по умолчанию
    */
   static async createDefault(): Promise<IPrinterService> {
-    // Если WinLabel доступен, используем его
-    if (process.env.USE_WINLABEL === 'true') {
-      return this.createWinLabelForRivhit();
+    // Используем новую GoLabel интеграцию для GoDEX принтера
+    if (process.env.USE_GOLABEL === 'true' || process.env.PRINTER_TYPE === 'godex') {
+      console.log('🖨️ Using GoLabel integration for GoDEX printer');
+      try {
+        return await this.createGodex();
+      } catch (error) {
+        console.error('⚠️ Failed to initialize GoLabel, falling back to ZPL:', error);
+        // Fallback to ZPL if GoLabel fails
+        return await this.createZPL();
+      }
     }
     
     // Используем ZPL для GoDEX принтера

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Document>
+  <Label Width="80" Height="50">
+    <Text X="10" Y="10" Font="Arial" Size="14">Test Label</Text>
+    <Barcode X="10" Y="30" Type="Code128">123456</Barcode>
+  </Label>
+</Document>

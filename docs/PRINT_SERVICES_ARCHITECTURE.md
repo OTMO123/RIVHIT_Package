@@ -1,8 +1,8 @@
 # 🖨️ Print Services Architecture - RIVHIT Packing System
 
-**Дата**: 28 августа 2025  
-**Версия**: 2.0  
-**Статус**: Production Ready  
+**Дата**: 29 августа 2025  
+**Версия**: 3.0  
+**Статус**: Production Ready with GoLabel Integration  
 
 ---
 
@@ -10,11 +10,12 @@
 
 1. [Обзор архитектуры](#обзор-архитектуры)
 2. [Основные сервисы](#основные-сервисы)
-3. [Взаимодействие компонентов](#взаимодействие-компонентов)
-4. [Протоколы и стандарты](#протоколы-и-стандарты)
-5. [API Reference](#api-reference)
-6. [Troubleshooting](#troubleshooting)
-7. [Развертывание и конфигурация](#развертывание-и-конфигурация)
+3. [GoLabel Integration](#golabel-integration) 🆕
+4. [Взаимодействие компонентов](#взаимодействие-компонентов)
+5. [Протоколы и стандарты](#протоколы-и-стандарты)
+6. [API Reference](#api-reference)
+7. [Troubleshooting](#troubleshooting)
+8. [Развертывание и конфигурация](#развертывание-и-конфигурация)
 
 ---
 
@@ -136,6 +137,81 @@ class BoxLabelEZPLService {
 - 🌐 Поддержка RTL (Hebrew) и LTR (English/Russian) текста
 - 📊 Штрих-коды с автоматической генерацией
 - 🎨 Адаптивная компоновка под количество товаров
+
+---
+
+---
+
+## 🆕 GoLabel Integration
+
+### **Обзор интеграции GoLabel**
+
+GoLabel интеграция предоставляет надежное решение для печати на принтерах Godex ZX420i, используя официальные инструменты Godex.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    GoLabel Integration Layer                         │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────────┐│
+│  │ GoLabelCliService   │  │ GoLabelSdkService   │  │ Direct USB   ││
+│  │ (GoLabel.exe)       │  │ (EZio32.dll)        │  │ (Fallback)   ││
+│  └─────────────────────┘  └─────────────────────┘  └──────────────┘│
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### **GodexPrinterService** 🖨️
+**Файл:** `src/services/golabel/godex-printer.service.ts`  
+**Роль:** Унифицированный интерфейс для всех методов печати Godex
+
+```typescript
+export class GodexPrinterService implements IGodexPrinter, IPrinterService {
+  // Автоматический выбор метода печати
+  async print(data: LabelData | string): Promise<PrintResult>
+  
+  // Совместимость с IPrinterService
+  async printLabels(items: PackingItem[]): Promise<any>
+  
+  // Поддержка тестовой печати
+  async testPrint(): Promise<any>
+}
+```
+
+**Методы печати (по приоритету):**
+1. **GoLabel CLI** - Использует GoLabel.exe для максимальной совместимости
+2. **SDK Direct** - Прямое управление через EZio32.dll
+3. **Direct USB** - Резервный метод через прямую отправку команд
+
+### **GoLabelCliService** 
+**Файл:** `src/services/golabel/cli/golabel-cli.service.ts`  
+**Роль:** Обертка для командной строки GoLabel.exe
+
+**Возможности:**
+- ✅ Полная поддержка параметров CLI (-f, -c, -i, -dark, -speed)
+- ✅ Управление временными файлами
+- ✅ Подстановка переменных (-V00, -V01)
+- ✅ Режим предпросмотра
+
+### **GoLabelSdkService**
+**Файл:** `src/services/golabel/sdk/golabel-sdk.service.ts`  
+**Роль:** Прямая интеграция с SDK через FFI
+
+**Возможности:**
+- ✅ Полная интеграция с EZio32.dll
+- ✅ Функции SDK: setup(), ecTextOut(), Bar(), LabelEnd()
+- ✅ Мониторинг статуса в реальном времени
+- ✅ Поддержка USB/Serial/Network
+
+### **EzpxGeneratorService**
+**Файл:** `src/services/golabel/generators/ezpx-generator.service.ts`  
+**Роль:** Генерация современного формата EZPX
+
+**Возможности:**
+- ✅ Генерация XML в формате EZPX
+- ✅ Поддержка всех элементов: текст, штрих-коды, фигуры, изображения
+- ✅ Переменные для динамического контента
+- ✅ Валидация с подробными ошибками
 
 ---
 

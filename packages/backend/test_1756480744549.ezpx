@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<labels _FORMAT="godex" _QUANTITY="1" _PRINTNAME="GoDEX">
+  <label _WIDTH="50" _HEIGHT="30" _SPEED="2" _DENSITY="8">
+    <text>
+      <x>10</x>
+      <y>10</y>
+      <data>RIVHIT DIRECT TEST</data>
+      <fontName>Arial</fontName>
+      <fontSize>24</fontSize>
+      <bold>true</bold>
+    </text>
+    <barcode>
+      <x>10</x>
+      <y>60</y>
+      <type>Code128</type>
+      <data>TEST1756480744492</data>
+      <height>100</height>
+      <textEnabled>true</textEnabled>
+    </barcode>
+    <text>
+      <x>10</x>
+      <y>180</y>
+      <data>29.08.2025, 18:19:04</data>
+      <fontName>Arial</fontName>
+      <fontSize>14</fontSize>
+    </text>
+  </label>
+</labels>

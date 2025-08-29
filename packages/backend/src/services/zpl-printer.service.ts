@@ -19,26 +19,44 @@ export interface PrintJobResult {
 }
 
 export class ZPLPrinterService implements IPrinterService {
-  private printerIP: string = '192.168.14.200';
-  private printerPort: number = 9101;
+  private printerIP: string;
+  private printerPort: number;
+  private printerName: string;
+  private connectionType: string;
   private _isConnected: boolean = false;
 
   async initialize(options?: any): Promise<boolean> {
     try {
-      console.log('🖨️ Initializing ZPL printer service...');
-      console.log(`📡 Printer: ${this.printerIP}:${this.printerPort}`);
+      // Read configuration from environment
+      this.connectionType = process.env.PRINTER_CONNECTION_TYPE || 'usb';
+      this.printerPort = parseInt(process.env.PRINTER_PORT || '9101');
+      this.printerIP = process.env.PRINTER_IP || '192.168.14.200';
+      this.printerName = process.env.PRINTER_NAME || 'Godex ZX420i';
       
-      // Тест подключения
-      const connected = await this.testConnection();
-      this._isConnected = connected;
+      console.log('🖨️ Initializing ZPL/EZPL printer service...');
+      console.log(`📡 Connection type: ${this.connectionType}`);
+      console.log(`📡 Printer: ${this.printerName}`);
       
-      if (connected) {
-        console.log('✅ ZPL printer initialized successfully');
+      if (this.connectionType === 'network') {
+        console.log(`📡 Network: ${this.printerIP}:${this.printerPort}`);
+        const connected = await this.testConnection();
+        this._isConnected = connected;
+        
+        if (connected) {
+          console.log('✅ Network printer initialized successfully');
+        }
+        return connected;
+      } else if (this.connectionType === 'usb') {
+        console.log(`📡 USB Port: ${process.env.PRINTER_PORT || 'USB002'}`);
+        // For USB, we assume it's connected if Windows sees it
+        this._isConnected = true;
+        console.log('✅ USB printer initialized successfully');
+        return true;
       }
       
-      return connected;
+      return false;
     } catch (error) {
-      console.error('❌ Failed to initialize ZPL printer:', error);
+      console.error('❌ Failed to initialize ZPL/EZPL printer:', error);
       return false;
     }
   }
@@ -164,6 +182,71 @@ export class ZPLPrinterService implements IPrinterService {
   }
 
   private generateZPLLabel(item: PackingItem, options: PrintJobOptions): string {
+    // Check if we should use EZPL (Godex) or ZPL (Zebra) format
+    const useEZPL = process.env.USE_EZPL !== 'false' && this.printerName.toLowerCase().includes('godex');
+    
+    if (useEZPL) {
+      return this.generateEZPLLabel(item, options);
+    } else {
+      return this.generateZebraZPLLabel(item, options);
+    }
+  }
+  
+  private generateEZPLLabel(item: PackingItem, options: PrintJobOptions): string {
+    // EZPL format for Godex printers
+    let ezpl = '^L\r\n'; // Start of label
+    
+    // Set label size
+    ezpl += 'Dy2-me-dd\r\n'; // Date format
+    ezpl += 'Th:m:s\r\n'; // Time format
+    
+    // Title - item name
+    ezpl += `A,50,30,0,2,1,1,N,"${this.encodeTextEZPL(item.item_name)}"\r\n`;
+    
+    // English name if available
+    if (item.item_name_en) {
+      ezpl += `A,50,80,0,1,1,1,N,"${this.encodeTextEZPL(item.item_name_en)}"\r\n`;
+    }
+    
+    // Quantity
+    if (options.includeQuantity !== false) {
+      ezpl += `A,50,130,0,1,1,1,N,"Qty: ${item.packedQuantity || item.quantity}"\r\n`;
+    }
+    
+    // Price
+    if (options.includePrices && item.sale_nis > 0) {
+      ezpl += `A,300,130,0,1,1,1,N,"Price: ${item.sale_nis.toFixed(2)} NIS"\r\n`;
+    }
+    
+    // Location
+    if (item.location) {
+      ezpl += `A,50,180,0,1,1,1,N,"Location: ${item.location}"\r\n`;
+    }
+    
+    // Barcode
+    if (options.includeBarcodes !== false && item.barcode) {
+      // B = Barcode command
+      // Parameters: X,Y,rotation,barcode_type,narrow_bar_width,height,readable,data
+      ezpl += `B,50,230,0,1,2,100,B,"${item.barcode}"\r\n`;
+    }
+    
+    // Date and time
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('he-IL');
+    const timeStr = now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+    
+    ezpl += `A,50,350,0,1,1,1,N,"${dateStr} ${timeStr}"\r\n`;
+    
+    // Item ID
+    ezpl += `A,400,350,0,1,1,1,N,"ID: ${item.item_id}"\r\n`;
+    
+    ezpl += 'E\r\n'; // End of label and print
+    
+    return ezpl;
+  }
+  
+  private generateZebraZPLLabel(item: PackingItem, options: PrintJobOptions): string {
+    // Original ZPL format for Zebra printers
     // Размеры этикетки в точках (203 dpi)
     const labelWidth = 609;  // 80mm at 203dpi
     const labelHeight = 406; // 50mm at 203dpi
@@ -238,17 +321,82 @@ export class ZPLPrinterService implements IPrinterService {
       .replace(/>/g, '\\3E')   // > -> \3E
       .replace(/</g, '\\3C');  // < -> \3C
   }
+  
+  private encodeTextEZPL(text: string): string {
+    // EZPL has different escaping rules
+    // Double quotes need to be escaped
+    return text.replace(/"/g, '\\"');
+  }
 
   private async sendToPrinter(zplCommand: string): Promise<boolean> {
     console.log('🔍 [PRINT DEBUG] Starting print job...');
-    console.log('🔍 [PRINT DEBUG] Printer config:', {
-      ip: this.printerIP,
-      port: this.printerPort,
-      timeout: 5000
-    });
-    console.log('🔍 [PRINT DEBUG] Command length:', zplCommand.length, 'characters');
-    console.log('🔍 [PRINT DEBUG] Command preview:', zplCommand.substring(0, 100) + '...');
+    console.log('🔍 [PRINT DEBUG] Connection type:', this.connectionType);
     
+    if (this.connectionType === 'usb') {
+      // For USB printing on Windows
+      return this.sendToUSBPrinter(zplCommand);
+    } else {
+      // For network printing
+      console.log('🔍 [PRINT DEBUG] Network printer config:', {
+        ip: this.printerIP,
+        port: this.printerPort,
+        timeout: 5000
+      });
+      console.log('🔍 [PRINT DEBUG] Command length:', zplCommand.length, 'characters');
+      console.log('🔍 [PRINT DEBUG] Command preview:', zplCommand.substring(0, 100) + '...');
+      
+      return this.sendToNetworkPrinter(zplCommand);
+    }
+  }
+  
+  private async sendToUSBPrinter(command: string): Promise<boolean> {
+    try {
+      const { exec } = require('child_process');
+      const fs = require('fs').promises;
+      const path = require('path');
+      const os = require('os');
+      
+      console.log('🔍 [USB PRINT] Sending to USB printer:', this.printerName);
+      console.log('🔍 [USB PRINT] Port:', process.env.PRINTER_PORT);
+      
+      // Create a temporary file with the EZPL/ZPL commands
+      const tempFile = path.join(os.tmpdir(), `print_${Date.now()}.prn`);
+      await fs.writeFile(tempFile, command, 'utf8');
+      
+      console.log('🔍 [USB PRINT] Temp file created:', tempFile);
+      
+      // Send to printer using raw Windows API
+      return new Promise((resolve) => {
+        // Try direct port copy first
+        const portCommand = `copy /B "${tempFile}" "${process.env.PRINTER_PORT || 'USB002'}"`;
+        console.log('🔍 [USB PRINT] Executing port command:', portCommand);
+        
+        exec(portCommand, async (error: any, stdout: string, stderr: string) => {
+          // Clean up temp file
+          try {
+            await fs.unlink(tempFile);
+          } catch (e) {
+            console.error('Failed to delete temp file:', e);
+          }
+          
+          if (error) {
+            console.error('❌ [USB PRINT] Print failed:', error);
+            console.error('❌ [USB PRINT] stderr:', stderr);
+            resolve(false);
+          } else {
+            console.log('✅ [USB PRINT] Print succeeded');
+            console.log('✅ [USB PRINT] stdout:', stdout);
+            resolve(true);
+          }
+        });
+      });
+    } catch (error) {
+      console.error('❌ [USB PRINT] Error:', error);
+      return false;
+    }
+  }
+  
+  private async sendToNetworkPrinter(zplCommand: string): Promise<boolean> {
     return new Promise((resolve) => {
       const startTime = Date.now();
       const client = new net.Socket();
@@ -351,9 +499,10 @@ export class ZPLPrinterService implements IPrinterService {
   }
 
   private detectCommandType(command: string): string {
+    if (command.startsWith('^L')) return 'EZPL Format (Godex)';
+    if (command.startsWith('^XA')) return 'ZPL Format (Zebra)';
     if (command.includes('B')) return 'Contains Barcodes';
     if (command.includes('A')) return 'Text Labels';
-    if (command.includes('^L') && command.includes('E')) return 'EZPL Label';
     return 'Unknown Format';
   }
 

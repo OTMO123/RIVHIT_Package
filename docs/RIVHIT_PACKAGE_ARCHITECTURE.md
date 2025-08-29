@@ -78,15 +78,18 @@ class MaxPerBoxRepository
 - **`MockRivhitService`** - Mock данные для разработки
 
 #### **Printer Services** 
+- **`GodexPrinterService`** 🆕 - Унифицированный сервис с GoLabel интеграцией
+- **`GoLabelCliService`** 🆕 - Интеграция с GoLabel.exe (официальный инструмент Godex)
+- **`GoLabelSdkService`** 🆕 - Прямая интеграция с EZio32.dll через FFI
+- **`EzpxGeneratorService`** 🆕 - Генератор современного формата EZPX для GoLabel
 - **`EnhancedPrinterDiscoveryService`** - Интеллектуальный поиск принтеров с кэшированием
-- **`ZPLPrinterService`** - ZPL принтеры (GoDEX)
+- **`ZPLPrinterService`** - ZPL принтеры (резервный метод для GoDEX)
 - **`ImageToZPLService`** - Конвертация изображений в ZPL
 - **`NetworkDetectionService`** - Автообнаружение сетевых принтеров
 - **`ParallelDiscoveryService`** - Параллельное сканирование устройств
 - **`PrinterConnectionService`** - Управление подключениями к принтерам
 - **`PrinterCacheService`** - Кэширование информации о принтерах
 - **`EZPLDebugService`** - Отладка и визуализация EZPL шаблонов
-- **`WinLabelPrinterService`** - WinLabel интеграция (Windows)
 - **`BoxLabelService`** - Генерация этикеток коробок
 - **`ImagePrintService`** - Печать через изображения
 
@@ -279,14 +282,28 @@ constants/printer.constants.ts - Константы принтеров
 ### 🖨️ Printer System
 
 #### **Supported Printers**
-- **GoDEX ZX420i** - Основной принтер (USB001)
+- **GoDEX ZX420i** - Основной принтер с GoLabel интеграцией 🆕
+  - GoLabel.exe CLI (приоритетный метод)
+  - EZio32.dll SDK (резервный метод)
+  - Direct USB (аварийный метод)
 - **Zebra ZPL** - ZPL совместимые принтеры
 - **Windows Printers** - Через WinLabel интеграцию
 
 #### **Print Formats**
+- **EZPX** 🆕 - Современный XML формат GoLabel
 - **EZPL Templates** - GoDEX формат (`printer-templates/*.ezpl`)
 - **ZPL** - Zebra Printing Language  
 - **Image-based** - PNG/JPEG через Canvas
+
+#### **GoLabel Integration Architecture** 🆕
+```
+┌─────────────────────────────────────────────────────────┐
+│              GodexPrinterService                        │
+│         (Automatic Method Selection)                    │
+├─────────────────────────────────────────────────────────┤
+│ Priority 1: GoLabel CLI │ Priority 2: SDK │ Priority 3: USB │
+└─────────────────────────────────────────────────────────┘
+```
 
 #### **Template System**
 ```bash

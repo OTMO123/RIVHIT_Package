@@ -997,7 +997,9 @@ export class PrintController {
         // Используем новый сервис печати изображений (работающий метод ZPL)
         console.log('🏷️ Using image printing service (ZPL method 1)...');
         
-        printResult = await this.imagePrintService.printBoxLabelsWithImages(labels);
+        // printResult = await this.imagePrintService.printBoxLabelsWithImages(labels);
+        // TODO: Implement image printing service
+        printResult = { success: false, printedCount: 0, error: 'Image printing not implemented' };
       } else {
         // Иначе генерируем ZPL текстовые этикетки
         console.log('📝 Using text ZPL method...');
@@ -1039,7 +1041,7 @@ export class PrintController {
    */
   async assignItemsToBoxes(req: Request, res: Response): Promise<void> {
     try {
-      const { items, maxPerBox = 10 }: { items: PackingItem[], maxPerBox: number } = req.body;
+      const { items }: { items: PackingItem[] } = req.body;
 
       if (!items || !Array.isArray(items)) {
         res.status(400).json({
@@ -1049,23 +1051,44 @@ export class PrintController {
         return;
       }
 
+      // Get MaxPerBoxRepository to fetch limits from database
+      const { MaxPerBoxRepository } = require('../repositories/MaxPerBoxRepository');
+      const maxPerBoxRepo = new MaxPerBoxRepository();
+      
       const boxes: PackingBox[] = [];
       let currentBox: PackingBox | null = null;
       let boxNumber = 1;
 
-      // Сортируем товары по размеру/весу если есть данные
-      const sortedItems = [...items].sort((a, b) => {
-        // Приоритет крупным товарам
-        const aSize = a.boxCapacity || 1;
-        const bSize = b.boxCapacity || 1;
-        return bSize - aSize;
-      });
+      // Group items by their maxPerBox settings
+      const itemsWithLimits = await Promise.all(items.map(async (item) => {
+        const catalogNumber = (item as any).catalog_number || item.item_part_num;
+        const maxPerBox = catalogNumber 
+          ? await maxPerBoxRepo.getMaxQuantityForCatalog(catalogNumber)
+          : null;
+        return {
+          ...item,
+          maxPerBox: maxPerBox || 10 // Default to 10 if not found
+        };
+      }));
+
+      // Sort items by maxPerBox (smaller limits first for better packing)
+      const sortedItems = itemsWithLimits.sort((a, b) => a.maxPerBox - b.maxPerBox);
 
       for (const item of sortedItems) {
         const itemQuantity = item.packedQuantity || item.quantity;
+        const maxForThisItem = item.maxPerBox;
         
-        // Если нет текущей коробки или она заполнена, создаем новую
-        if (!currentBox || currentBox.items.length >= maxPerBox) {
+        // Check if current box can fit this item
+        const canFitInCurrentBox = currentBox && 
+          currentBox.items.length < maxForThisItem &&
+          // Also check if all items in the box have compatible limits
+          currentBox!.items.every(boxItem => {
+            const boxItemData = sortedItems.find(si => si.item_id === boxItem.itemId);
+            return boxItemData && currentBox!.items.length < boxItemData.maxPerBox;
+          });
+        
+        // If no current box or can't fit, create new box
+        if (!currentBox || !canFitInCurrentBox) {
           currentBox = {
             boxId: `BOX_${Date.now()}_${boxNumber}`,
             boxNumber,
@@ -1078,19 +1101,20 @@ export class PrintController {
           boxNumber++;
         }
 
-        // Добавляем товар в текущую коробку
+        // Add item to current box
         currentBox.items.push({
           itemId: item.item_id,
           name: item.item_name,
           nameHebrew: item.item_name, // Using item_name as fallback
           quantity: itemQuantity,
-          catalogNumber: item.item_part_num || undefined,
+          catalogNumber: item.item_part_num || (item as any).catalog_number || undefined,
           barcode: item.barcode || undefined
         });
 
-        // Проверяем, заполнена ли коробка
-        if (currentBox.items.length >= maxPerBox) {
+        // Check if box is full for this item's limit
+        if (currentBox.items.length >= maxForThisItem) {
           currentBox.isFull = true;
+          currentBox = null; // Force new box for next item
         }
       }
 
@@ -1669,9 +1693,17 @@ export class PrintController {
         customerName, 
         customerCity,
         items,
-        region
+        region,
+        boxes // Support multiple boxes
       } = req.body;
 
+      // Handle multiple boxes if provided
+      const boxesToPrint = boxes && boxes.length > 0 ? boxes : [{
+        boxNumber,
+        totalBoxes: totalBoxes || 1,
+        items: items || []
+      }];
+      
       // Generate label first - try template service, then fall back to generator
       const { BoxLabelTemplateService } = require('../services/golabel/generators/box-label-template-service');
       const templateService = new BoxLabelTemplateService(this.logger);
@@ -1686,75 +1718,88 @@ export class PrintController {
         generator = new BoxLabelGoLabelGeneratorService(this.logger);
       }
       
-      const boxData = {
-        orderId,
-        boxNumber,
-        totalBoxes: totalBoxes || 1,
-        customerName,
-        customerCity,
-        items: items || [],
-        region,
-        deliveryDate: new Date().toLocaleDateString('he-IL')
-      };
+      const printResults = [];
+      const { GoLabelCliService } = require('../services/golabel/cli/golabel-cli.service');
+      const golabelService = new GoLabelCliService(this.logger);
+      const isGoLabelAvailable = await golabelService.initialize();
       
-      const ezpxContent = useTemplate 
-        ? templateService.generateBoxLabel(boxData)
-        : generator.generateBoxLabel(boxData);
+      // Process each box
+      for (const box of boxesToPrint) {
+        const boxData = {
+          orderId,
+          boxNumber: box.boxNumber,
+          totalBoxes: box.totalBoxes || boxesToPrint.length,
+          customerName,
+          // Removed customerCity as per requirement
+          items: box.items || [],
+          region,
+          deliveryDate: new Date().toLocaleDateString('he-IL')
+        };
       
-      // Save to temp file
-      const fs = require('fs');
-      const path = require('path');
-      const os = require('os');
-      const tempDir = path.join(os.tmpdir(), 'golabel-labels');
-      
-      if (!fs.existsSync(tempDir)) {
-        fs.mkdirSync(tempDir, { recursive: true });
-      }
-      
-      const timestamp = Date.now();
-      const filename = `box_${orderId}_${boxNumber}_${timestamp}.ezpx`;
-      const filepath = path.join(tempDir, filename);
-      
-      fs.writeFileSync(filepath, ezpxContent, 'utf8');
-      
-      // Try to print using GoLabel CLI service
-      try {
-        const { GoLabelCliService } = require('../services/golabel/cli/golabel-cli.service');
-        const golabelService = new GoLabelCliService(this.logger);
+        const ezpxContent = useTemplate 
+          ? templateService.generateBoxLabel(boxData)
+          : generator.generateBoxLabel(boxData);
         
-        if (await golabelService.initialize()) {
-          const printResult = await golabelService.print(filepath);
-          
-          res.status(200).json({
-            success: printResult.success,
-            message: printResult.message || 'Label sent to GoLabel',
-            method: printResult.method,
+        // Save to temp file
+        const fs = require('fs');
+        const path = require('path');
+        const os = require('os');
+        const tempDir = path.join(os.tmpdir(), 'golabel-labels');
+        
+        if (!fs.existsSync(tempDir)) {
+          fs.mkdirSync(tempDir, { recursive: true });
+        }
+        
+        const timestamp = Date.now();
+        const filename = `box_${orderId}_${box.boxNumber}_${timestamp}.ezpx`;
+        const filepath = path.join(tempDir, filename);
+        
+        fs.writeFileSync(filepath, ezpxContent, 'utf8');
+        
+        // Try to print if GoLabel is available
+        if (isGoLabelAvailable) {
+          try {
+            const printResult = await golabelService.print(filepath);
+            printResults.push({
+              boxNumber: box.boxNumber,
+              success: printResult.success,
+              message: printResult.message,
+              filename,
+              filepath
+            });
+          } catch (printError) {
+            console.error(`Failed to print box ${box.boxNumber}:`, printError);
+            printResults.push({
+              boxNumber: box.boxNumber,
+              success: false,
+              error: printError instanceof Error ? printError.message : String(printError),
+              filename,
+              filepath
+            });
+          }
+        } else {
+          // GoLabel not available, save file for manual printing
+          printResults.push({
+            boxNumber: box.boxNumber,
+            success: false,
+            message: 'GoLabel not available. File saved for manual printing.',
             filename,
             filepath
           });
-        } else {
-          // GoLabel not available, return file for manual printing
-          res.status(200).json({
-            success: false,
-            message: 'GoLabel not available. Please open the file manually.',
-            filename,
-            filepath,
-            content: ezpxContent
-          });
         }
-      } catch (printError) {
-        console.error('Failed to print via GoLabel:', printError);
-        
-        // Return file info for manual handling
-        res.status(200).json({
-          success: false,
-          message: 'Could not print automatically. File saved for manual printing.',
-          filename,
-          filepath,
-          content: ezpxContent,
-          error: printError instanceof Error ? printError.message : String(printError)
-        });
       }
+      
+      // Return overall results
+      const successCount = printResults.filter(r => r.success).length;
+      const overallSuccess = successCount === boxesToPrint.length;
+      
+      res.status(200).json({
+        success: overallSuccess,
+        message: overallSuccess 
+          ? `All ${boxesToPrint.length} labels printed successfully`
+          : `Printed ${successCount} of ${boxesToPrint.length} labels`,
+        results: printResults
+      });
       
     } catch (error) {
       console.error('❌ Error printing GoLabel box label:', error);
@@ -1770,5 +1815,109 @@ export class PrintController {
    */
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Open generated EZPX files in GoLabel application
+   * POST /api/print/open-in-golabel
+   */
+  async openFilesInGoLabel(req: Request, res: Response): Promise<void> {
+    try {
+      const { orderId, files } = req.body;
+      
+      if (!files || !Array.isArray(files) || files.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'Files array is required'
+        });
+        return;
+      }
+      
+      console.log(`🖨️ Opening ${files.length} files in GoLabel for order ${orderId}`);
+      
+      // Initialize GoLabel service
+      const { GoLabelCliService } = require('../services/golabel/cli/golabel-cli.service');
+      const golabelService = new GoLabelCliService(this.logger);
+      const isGoLabelAvailable = await golabelService.initialize();
+      
+      if (!isGoLabelAvailable) {
+        console.log('⚠️ GoLabel not available on server');
+        
+        // For Windows clients, return file paths for client-side opening
+        if (process.platform === 'linux') {
+          // Convert WSL paths to Windows paths
+          const windowsFiles = files.map(file => ({
+            ...file,
+            windowsPath: file.filepath.startsWith('/tmp/') 
+              ? file.filepath.replace('/tmp/', 'C:\\Temp\\').replace(/\//g, '\\')
+              : file.filepath.replace(/^\/mnt\/c/, 'C:').replace(/\//g, '\\')
+          }));
+          
+          res.status(200).json({
+            success: false,
+            message: 'GoLabel not available on server. Open files manually.',
+            files: windowsFiles,
+            requiresManualOpen: true
+          });
+          return;
+        }
+        
+        res.status(200).json({
+          success: false,
+          message: 'GoLabel not available',
+          files: files
+        });
+        return;
+      }
+      
+      // If GoLabel is available, open files
+      const results = [];
+      for (const file of files) {
+        try {
+          if (file.filepath && require('fs').existsSync(file.filepath)) {
+            const openResult = await golabelService.openInGoLabel(file.filepath);
+            results.push({
+              ...file,
+              opened: openResult.success,
+              message: openResult.message || openResult.error
+            });
+            
+            // Delay between files
+            if (files.indexOf(file) < files.length - 1) {
+              await this.delay(1500);
+            }
+          } else {
+            results.push({
+              ...file,
+              opened: false,
+              message: 'File not found'
+            });
+          }
+        } catch (error) {
+          results.push({
+            ...file,
+            opened: false,
+            message: error instanceof Error ? error.message : 'Failed to open'
+          });
+        }
+      }
+      
+      const successCount = results.filter(r => r.opened).length;
+      
+      res.status(200).json({
+        success: successCount > 0,
+        message: successCount === files.length 
+          ? `All ${files.length} files opened in GoLabel`
+          : `Opened ${successCount} of ${files.length} files`,
+        results
+      });
+      
+    } catch (error) {
+      console.error('❌ Error opening files in GoLabel:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to open files in GoLabel'
+      });
+    }
   }
 }

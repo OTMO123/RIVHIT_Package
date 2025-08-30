@@ -9,7 +9,7 @@ import {
   PrintResult, 
   PrinterStatus 
 } from '../types/golabel.types';
-import { ILogger } from '../../interfaces/ILogger';
+import { ILogger } from '../../../interfaces/ILogger';
 import { ConsoleLoggerService } from '../../logging/console.logger.service';
 
 /**
@@ -47,7 +47,7 @@ export class GoLabelCliService implements IGodexPrinter {
       this.isInitialized = true;
       return true;
     } catch (error) {
-      this.logger.error('Failed to initialize GoLabel CLI:', error);
+      this.logger.error('Failed to initialize GoLabel CLI:', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -111,7 +111,7 @@ export class GoLabelCliService implements IGodexPrinter {
       };
       
     } catch (error) {
-      this.logger.error('GoLabel CLI print error:', error);
+      this.logger.error('GoLabel CLI print error:', error instanceof Error ? error : new Error(String(error)));
       return {
         success: false,
         error: error instanceof Error ? error.message : String(error),
@@ -147,43 +147,43 @@ export class GoLabelCliService implements IGodexPrinter {
       
       this.logger.debug('Executing GoLabel with args:', args);
       
-      const process: ChildProcess = spawn(this.golabelPath, args, {
+      const childProcess: ChildProcess = spawn(this.golabelPath, args, {
         windowsHide: true
       });
       
       let stdout = '';
       let stderr = '';
       
-      process.stdout?.on('data', (data) => {
+      childProcess.stdout?.on('data', (data) => {
         stdout += data.toString();
       });
       
-      process.stderr?.on('data', (data) => {
+      childProcess.stderr?.on('data', (data) => {
         stderr += data.toString();
       });
       
-      process.on('close', (code) => {
+      childProcess.on('close', (code) => {
         if (code === 0) {
           this.logger.info('GoLabel executed successfully');
           resolve(true);
         } else {
           this.logger.error(`GoLabel exited with code ${code}`);
-          this.logger.error('STDOUT:', stdout);
-          this.logger.error('STDERR:', stderr);
+          this.logger.debug('STDOUT:', { stdout });
+          this.logger.debug('STDERR:', { stderr });
           resolve(false);
         }
       });
       
-      process.on('error', (error) => {
+      childProcess.on('error', (error) => {
         this.logger.error('GoLabel execution error:', error);
         reject(error);
       });
       
       // Timeout after 30 seconds
       setTimeout(() => {
-        process.kill();
+        childProcess.kill();
         reject(new Error('GoLabel execution timeout'));
-      }, parseInt(process.env.GOLABEL_CLI_TIMEOUT || '30000'));
+      }, parseInt(process.env['GOLABEL_CLI_TIMEOUT'] || '30000'));
     });
   }
   
@@ -270,7 +270,7 @@ export class GoLabelCliService implements IGodexPrinter {
     try {
       return generator.generate(labelData);
     } catch (error) {
-      this.logger.error('Failed to generate EZPX PrintJob format:', error);
+      this.logger.error('Failed to generate EZPX PrintJob format:', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -367,7 +367,7 @@ export class GoLabelCliService implements IGodexPrinter {
       return true; // Assume success
       
     } catch (error) {
-      this.logger.error('Hot folder print failed:', error);
+      this.logger.error('Hot folder print failed:', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -395,7 +395,7 @@ export class GoLabelCliService implements IGodexPrinter {
         const scriptPath = path.join(__dirname, '..', '..', '..', '..', 'print-with-golabel.vbs');
         const command = `cscript //NoLogo "${scriptPath}" "${labelPath}"`;
         
-        this.logger.info('Executing Windows automation:', command);
+        this.logger.info('Executing Windows automation:', { command });
         
         const child = spawn('cmd', ['/c', command], {
           shell: false,
@@ -417,7 +417,7 @@ export class GoLabelCliService implements IGodexPrinter {
             this.logger.info('Automation completed successfully');
             resolve(true);
           } else {
-            this.logger.warn('Automation exited with code:', code);
+            this.logger.warn('Automation exited with code:', { code });
             // Still consider it success if GoLabel was opened
             resolve(output.includes('Print command sent'));
           }
@@ -435,8 +435,115 @@ export class GoLabelCliService implements IGodexPrinter {
         }, 15000);
         
       } catch (error) {
-        this.logger.error('Failed to execute automation:', error);
+        this.logger.error('Failed to execute automation:', error instanceof Error ? error : new Error(String(error)));
         resolve(false);
+      }
+    });
+  }
+  
+  /**
+   * Opens an EZPX file in GoLabel application
+   * This method is primarily used for testing and manual label editing
+   * 
+   * @param filePath - Path to the EZPX file to open
+   * @returns Object with success status and any error message
+   */
+  async openInGoLabel(filePath: string): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      // Verify file exists
+      await fs.access(filePath);
+      
+      this.logger.info(`Opening file in GoLabel: ${filePath}`);
+      
+      // Method 1: Try using Windows file association
+      if (process.platform === 'win32') {
+        try {
+          // Use Windows shell to open the file with its associated application
+          const { exec } = require('child_process');
+          
+          return new Promise((resolve) => {
+            // Use 'start' command on Windows to open with default application
+            exec(`start "" "${filePath}"`, (error: any) => {
+              if (error) {
+                this.logger.warn('Failed to open via file association:', error);
+                // Try method 2
+                this.openViaGoLabelExe(filePath).then(resolve);
+              } else {
+                this.logger.info('File opened via Windows file association');
+                resolve({ success: true, message: 'File opened in GoLabel' });
+              }
+            });
+          });
+        } catch (error) {
+          this.logger.warn('File association method failed:', { error: error instanceof Error ? error.message : String(error) });
+        }
+      }
+      
+      // Method 2: Open directly with GoLabel.exe
+      return await this.openViaGoLabelExe(filePath);
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error('Failed to open file in GoLabel:', error instanceof Error ? error : new Error(String(error)));
+      return {
+        success: false,
+        error: errorMessage
+      };
+    }
+  }
+  
+  /**
+   * Opens a file using GoLabel.exe directly
+   * @private
+   */
+  private async openViaGoLabelExe(filePath: string): Promise<{ success: boolean; message?: string; error?: string }> {
+    return new Promise((resolve) => {
+      try {
+        // Check if GoLabel exists
+        if (!this.isInitialized) {
+          resolve({ 
+            success: false, 
+            error: 'GoLabel not initialized' 
+          });
+          return;
+        }
+        
+        this.logger.info(`Opening ${filePath} with GoLabel.exe`);
+        
+        // Spawn GoLabel with the file path as argument
+        const child = spawn(this.golabelPath, [filePath], {
+          detached: true,
+          stdio: 'ignore',
+          windowsHide: false // Show GoLabel window
+        });
+        
+        // Detach from parent process so GoLabel continues running
+        child.unref();
+        
+        // Give it a moment to start
+        setTimeout(() => {
+          this.logger.info('GoLabel started with file');
+          resolve({ 
+            success: true, 
+            message: 'File opened in GoLabel application' 
+          });
+        }, 1000);
+        
+        child.on('error', (error) => {
+          this.logger.error('Failed to start GoLabel:', error);
+          resolve({ 
+            success: false, 
+            error: error.message 
+          });
+        });
+        
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        this.logger.error('Failed to open GoLabel:', error instanceof Error ? error : new Error(String(error)));
+        resolve({ 
+          success: false, 
+          error: errorMessage 
+        });
       }
     });
   }

@@ -9,7 +9,7 @@ import {
   ImageElement,
   CircleElement 
 } from '../types/golabel.types';
-import { ILogger } from '../../interfaces/ILogger';
+import { IApplicationLogger } from '../../../interfaces/ILogger';
 import { ConsoleLoggerService } from '../../logging/console.logger.service';
 
 /**
@@ -17,10 +17,14 @@ import { ConsoleLoggerService } from '../../logging/console.logger.service';
  * Основан на реальной структуре файлов GoLabel
  */
 export class EzpxGeneratorV2Service implements ILabelGenerator {
-  private logger: ILogger;
+  private logger: IApplicationLogger;
   
-  constructor(logger?: ILogger) {
+  constructor(logger?: IApplicationLogger) {
     this.logger = logger || new ConsoleLoggerService('EzpxGeneratorV2Service');
+  }
+  
+  getFormat(): string {
+    return 'EZPX_V2';
   }
   
   generate(labelData: LabelData): string {
@@ -75,7 +79,7 @@ export class EzpxGeneratorV2Service implements ILabelGenerator {
       
       // Добавляем настройки принтера
       const printSettings = diagram.ele('PrintSettings');
-      printSettings.ele('Printer').txt(labelData.printerSettings?.printerName || 'GoDEX ZX420i');
+      printSettings.ele('Printer').txt('GoDEX ZX420i');
       printSettings.ele('Speed').txt((labelData.printerSettings?.speed || 3).toString());
       printSettings.ele('Darkness').txt((labelData.printerSettings?.darkness || 10).toString());
       printSettings.ele('MediaType').txt('1'); // Labels
@@ -88,7 +92,7 @@ export class EzpxGeneratorV2Service implements ILabelGenerator {
       return xml;
       
     } catch (error) {
-      this.logger.error('Failed to generate EZPX V2:', error);
+      this.logger.error('Failed to generate EZPX V2:', error as Error);
       throw error;
     }
   }
@@ -99,8 +103,8 @@ export class EzpxGeneratorV2Service implements ILabelGenerator {
       .att('Name', `Text${index}`)
       .att('Left', element.position.x.toString())
       .att('Top', element.position.y.toString())
-      .att('Width', (element.properties.width || 100).toString())
-      .att('Height', (element.properties.height || 20).toString());
+      .att('Width', '100')
+      .att('Height', '20');
     
     // Настройки кисти и пера
     shape.ele('Brush')
@@ -145,8 +149,8 @@ export class EzpxGeneratorV2Service implements ILabelGenerator {
     shape.ele('BarcodeData').txt(element.properties.data || '');
     
     // Показывать текст
-    shape.ele('ShowText').txt(element.properties.textEnabled !== false ? '1' : '0');
-    shape.ele('TextPosition').txt(element.properties.textAbove ? '1' : '0');
+    shape.ele('ShowText').txt(element.properties.showText !== false ? '1' : '0');
+    shape.ele('TextPosition').txt(element.properties.textPosition === 'top' ? '1' : '0');
     shape.ele('Checksum').txt('1');
   }
   
@@ -174,12 +178,12 @@ export class EzpxGeneratorV2Service implements ILabelGenerator {
       .att('Name', `Line${index}`)
       .att('Left', element.position.x.toString())
       .att('Top', element.position.y.toString())
-      .att('Width', ((element.properties.x2 || element.position.x) - element.position.x).toString())
-      .att('Height', ((element.properties.y2 || element.position.y) - element.position.y).toString());
+      .att('Width', (element.properties.endX - element.position.x).toString())
+      .att('Height', (element.properties.endY - element.position.y).toString());
     
     shape.ele('Pen')
       .att('Color', '0')
-      .att('Width', (element.properties.lineWidth || 1).toString());
+      .att('Width', (element.properties.width || 1).toString());
   }
   
   private mapBarcodeType(type: string): string {

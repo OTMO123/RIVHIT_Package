@@ -437,6 +437,97 @@ class MainProcess {
       // TODO: Implement actual API call
       return { success: true, data: null };
     });
+
+    // GoLabel integration handler
+    ipcMain.handle('golabel:openFiles', async (event, files: string[]) => {
+      try {
+        const { exec } = require('child_process');
+        const path = require('path');
+        const fs = require('fs');
+        
+        console.log(`Opening ${files.length} files in GoLabel...`);
+        
+        // Check if we're on Windows
+        if (process.platform !== 'win32') {
+          return { 
+            success: false, 
+            error: 'GoLabel is only supported on Windows' 
+          };
+        }
+        
+        // Find GoLabel executable
+        const golabelPaths = [
+          'C:\\Program Files (x86)\\Godex\\GoLabel\\GoLabel.exe',
+          'C:\\Program Files (x86)\\Godex\\GoLabel II\\GoLabel.exe',
+          'C:\\Program Files\\Godex\\GoLabel\\GoLabel.exe',
+          'C:\\GoLabel\\GoLabel.exe'
+        ];
+        
+        let golabelPath = '';
+        for (const path of golabelPaths) {
+          if (fs.existsSync(path)) {
+            golabelPath = path;
+            break;
+          }
+        }
+        
+        if (!golabelPath) {
+          return { 
+            success: false, 
+            error: 'GoLabel not found. Please install GoLabel.' 
+          };
+        }
+        
+        // Open files in GoLabel
+        const results: any[] = [];
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          console.log(`Opening file ${i + 1}/${files.length}: ${file}`);
+          
+          try {
+            // Use Windows 'start' command to open file with GoLabel
+            await new Promise((resolve, reject) => {
+              exec(`"${golabelPath}" "${file}"`, (error: any, stdout: string, stderr: string) => {
+                if (error) {
+                  console.error(`Error opening file: ${error}`);
+                  reject(error);
+                } else {
+                  resolve(stdout);
+                }
+              });
+            });
+            
+            results.push({ file, success: true } as any);
+            
+            // Add delay between files to prevent overwhelming GoLabel
+            if (i < files.length - 1) {
+              await new Promise(resolve => setTimeout(resolve, 1500));
+            }
+          } catch (error) {
+            results.push({ 
+              file, 
+              success: false, 
+              error: error instanceof Error ? error.message : 'Failed to open' 
+            } as any);
+          }
+        }
+        
+        const successCount = results.filter((r: any) => r.success).length;
+        
+        return {
+          success: successCount > 0,
+          message: `Opened ${successCount} of ${files.length} files in GoLabel`,
+          results
+        };
+        
+      } catch (error) {
+        console.error('Error opening files in GoLabel:', error);
+        return { 
+          success: false, 
+          error: error instanceof Error ? error.message : 'Failed to open files' 
+        };
+      }
+    });
   }
 }
 

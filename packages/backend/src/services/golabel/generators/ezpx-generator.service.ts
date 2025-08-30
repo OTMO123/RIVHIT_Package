@@ -9,16 +9,16 @@ import {
   ImageElement,
   CircleElement 
 } from '../types/golabel.types';
-import { ILogger } from '../../interfaces/ILogger';
+import { IApplicationLogger } from '../../../interfaces/ILogger';
 import { ConsoleLoggerService } from '../../logging/console.logger.service';
 
 /**
  * EZPX format generator for GoLabel
  */
 export class EzpxGeneratorService implements ILabelGenerator {
-  private logger: ILogger;
+  private logger: IApplicationLogger;
   
-  constructor(logger?: ILogger) {
+  constructor(logger?: IApplicationLogger) {
     this.logger = logger || new ConsoleLoggerService('EzpxGeneratorService');
   }
   
@@ -62,7 +62,7 @@ export class EzpxGeneratorService implements ILabelGenerator {
       
       return xml;
     } catch (error) {
-      this.logger.error('Failed to generate EZPX:', error);
+      this.logger.error('Failed to generate EZPX:', error as Error);
       throw error;
     }
   }

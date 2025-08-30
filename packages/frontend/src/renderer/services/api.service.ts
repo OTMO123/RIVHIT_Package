@@ -581,6 +581,30 @@ class ApiService {
     }
   }
 
+  // Add get method for API calls
+  async get(url: string): Promise<any> {
+    try {
+      console.log(`📡 GET request to: ${url}`);
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log(`✅ GET response:`, result);
+      return result;
+    } catch (error) {
+      console.error(`❌ GET request failed:`, error);
+      throw error;
+    }
+  }
+
   // Enhanced POST method with comprehensive debug logging forwarding
   async post(url: string, data: any): Promise<any> {
     try {

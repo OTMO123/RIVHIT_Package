@@ -1,8 +1,16 @@
 import { ILogger } from '../interfaces/ILogger';
 import { ConsoleLoggerService } from './logging/console.logger.service';
 import * as path from 'path';
-import * as ffi from 'ffi-napi';
-import * as ref from 'ref-napi';
+// import * as ffi from 'ffi-napi';
+// import * as ref from 'ref-napi';
+let ffi: any;
+let ref: any;
+try {
+  ffi = require('ffi-napi');
+  ref = require('ref-napi');
+} catch (e) {
+  console.warn('ffi-napi not available');
+}
 
 /**
  * Service for direct communication with Godex printers using their SDK
@@ -31,7 +39,7 @@ export class GodexSDKService {
       // Check if DLLs exist
       const fs = require('fs');
       if (!fs.existsSync(this.EZIO_DLL_PATH)) {
-        this.logger.error('EZio32.dll not found at:', this.EZIO_DLL_PATH);
+        this.logger.error('EZio32.dll not found at: ' + this.EZIO_DLL_PATH);
         return false;
       }
       
@@ -57,7 +65,7 @@ export class GodexSDKService {
         this.logger.info('EZio32 DLL Version:', version);
         
       } catch (error) {
-        this.logger.error('Failed to load EZio32.dll:', error);
+        this.logger.error('Failed to load EZio32.dll', error as Error);
         // Continue without SDK - fallback to direct USB
       }
       
@@ -65,7 +73,7 @@ export class GodexSDKService {
       return true;
       
     } catch (error) {
-      this.logger.error('Failed to initialize Godex SDK:', error);
+      this.logger.error('Failed to initialize Godex SDK', error as Error);
       return false;
     }
   }
@@ -100,7 +108,7 @@ export class GodexSDKService {
       this.logger.info('Found USB printers:', printers);
       
     } catch (error) {
-      this.logger.error('Error finding USB printers:', error);
+      this.logger.error('Error finding USB printers', error as Error);
     }
     
     return printers;
@@ -116,7 +124,7 @@ export class GodexSDKService {
         return true; // Fallback mode
       }
       
-      this.logger.info('Opening connection to:', portName);
+      this.logger.info('Opening connection to: ' + portName);
       
       let result: number;
       if (portName.startsWith('USB')) {
@@ -136,12 +144,12 @@ export class GodexSDKService {
         this.logger.info('Connection opened successfully');
         return true;
       } else {
-        this.logger.error('Failed to open connection, error code:', result);
+        this.logger.error('Failed to open connection, error code: ' + result);
         return false;
       }
       
     } catch (error) {
-      this.logger.error('Error opening connection:', error);
+      this.logger.error('Error opening connection', error as Error);
       return false;
     }
   }
@@ -156,19 +164,19 @@ export class GodexSDKService {
         return this.sendDirectUSB(command);
       }
       
-      this.logger.debug('Sending command:', command.substring(0, 50) + '...');
+      this.logger.debug('Sending command: ' + command.substring(0, 50) + '...');
       
       const result = this.ezioLib.SendCommand(command);
       if (result === command.length) {
         this.logger.debug('Command sent successfully');
         return true;
       } else {
-        this.logger.error('Failed to send command, sent bytes:', result);
+        this.logger.error('Failed to send command, sent bytes: ' + result);
         return false;
       }
       
     } catch (error) {
-      this.logger.error('Error sending command:', error);
+      this.logger.error('Error sending command', error as Error);
       return false;
     }
   }
@@ -198,7 +206,7 @@ export class GodexSDKService {
           }
           
           if (error) {
-            this.logger.error('Direct USB send failed:', error);
+            this.logger.error('Direct USB send failed', error as Error);
             resolve(false);
           } else {
             this.logger.debug('Direct USB send successful');
@@ -208,7 +216,7 @@ export class GodexSDKService {
       });
       
     } catch (error) {
-      this.logger.error('Direct USB error:', error);
+      this.logger.error('Direct USB error', error as Error);
       return false;
     }
   }
@@ -223,7 +231,7 @@ export class GodexSDKService {
         this.logger.info('Connection closed');
       }
     } catch (error) {
-      this.logger.error('Error closing connection:', error);
+      this.logger.error('Error closing connection', error as Error);
     }
   }
   
@@ -242,7 +250,7 @@ export class GodexSDKService {
         
         if (bytesRead > 0) {
           const status = buffer.toString('utf8', 0, bytesRead);
-          this.logger.info('Printer status:', status);
+          this.logger.info('Printer status: ' + status);
           return status;
         }
       }
@@ -250,7 +258,7 @@ export class GodexSDKService {
       return 'Unknown';
       
     } catch (error) {
-      this.logger.error('Error getting status:', error);
+      this.logger.error('Error getting status', error as Error);
       return 'Error';
     }
   }
@@ -273,7 +281,7 @@ export class GodexSDKService {
       return success;
       
     } catch (error) {
-      this.logger.error('Error printing label:', error);
+      this.logger.error('Error printing label', error as Error);
       return false;
     }
   }

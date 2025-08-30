@@ -22,6 +22,10 @@ export class EzpxPrintJobGeneratorService implements ILabelGenerator {
     this.logger = logger || new ConsoleLoggerService('EzpxPrintJobGenerator');
   }
   
+  getFormat(): string {
+    return 'EZPX_PRINTJOB';
+  }
+  
   generate(labelData: LabelData): string {
     this.logger.debug('Generating EZPX PrintJob format', {
       size: labelData.size,
@@ -98,7 +102,7 @@ export class EzpxPrintJobGeneratorService implements ILabelGenerator {
       doc.ele('BLE_Address').txt('0');
       doc.ele('BLE_AutoMTU').txt('true');
       doc.ele('BLE_MTU').txt('20');
-      doc.ele('PrinterModel').txt(labelData.printerSettings?.printerName || 'ZX420i');
+      doc.ele('PrinterModel').txt('ZX420i');
       doc.ele('PrinterLanguage').txt('EZPL');
       doc.ele('USBName');
       doc.ele('COMName');
@@ -117,7 +121,7 @@ export class EzpxPrintJobGeneratorService implements ILabelGenerator {
       return xml;
       
     } catch (error) {
-      this.logger.error('Failed to generate EZPX PrintJob:', error);
+      this.logger.error('Failed to generate EZPX PrintJob:', error as Error);
       throw error;
     }
   }
@@ -435,12 +439,12 @@ export class EzpxPrintJobGeneratorService implements ILabelGenerator {
     shape.ele('GroupID').txt('0');
     shape.ele('GroupSelected').txt('false');
     shape.ele('lineShape').txt('HLine');
-    shape.ele('Height').txt((element.properties.lineWidth || 4).toString());
+    shape.ele('Height').txt((element.properties.width || 4).toString());
     shape.ele('Operation').txt('111');
     
     // Вычисляем ширину линии
-    const width = Math.abs((element.properties.x2 || element.position.x) - element.position.x) ||
-                  Math.abs((element.properties.y2 || element.position.y) - element.position.y) || 100;
+    const width = Math.abs(element.properties.endX - element.position.x) ||
+                  Math.abs(element.properties.endY - element.position.y) || 100;
     shape.ele('Width').txt(width.toString());
   }
   

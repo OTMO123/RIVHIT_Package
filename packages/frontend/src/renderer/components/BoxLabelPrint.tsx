@@ -35,7 +35,50 @@ export const BoxLabelPrint: React.FC<BoxLabelPrintProps> = ({
   const assignBoxes = async () => {
     setIsLoading(true);
     try {
-      // Если есть группы из системы линков, используем их
+      // Сначала пытаемся получить сохраненные коробки из базы данных
+      try {
+        const draftBoxesResponse = await apiService.get(`/api/order-status/${orderId}/draft-boxes`);
+        
+        if (draftBoxesResponse.data.success && draftBoxesResponse.data.data.length > 0) {
+          // Используем сохраненные коробки из процесса упаковки
+          const savedBoxes = draftBoxesResponse.data.data;
+          const boxesFromDB: PackingBox[] = savedBoxes.map((box: any) => {
+            // Получаем полную информацию о товарах из items prop
+            const boxItems = box.items.map((savedItem: any) => {
+              const fullItem = items.find(item => 
+                item.item_id === savedItem.itemId || 
+                item.unique_id === savedItem.unique_id
+              );
+              
+              return {
+                itemId: savedItem.itemId,
+                name: savedItem.name || fullItem?.item_name || savedItem.itemName,
+                nameHebrew: savedItem.nameHebrew || fullItem?.item_name || savedItem.name,
+                quantity: savedItem.quantity,
+                catalogNumber: savedItem.catalogNumber || fullItem?.item_part_num || (fullItem as any)?.catalog_number,
+                barcode: savedItem.barcode || fullItem?.barcode
+              };
+            });
+            
+            return {
+              boxId: box.id || `BOX_${Date.now()}_${box.boxNumber}`,
+              boxNumber: box.boxNumber,
+              orderId,
+              items: boxItems,
+              isFull: false, // Will be determined by actual item count vs maxPerBox
+              isPrinted: false
+            };
+          });
+          
+          setBoxes(boxesFromDB);
+          message.success(`Загружено ${boxesFromDB.length} коробок из сохраненной упаковки`);
+          return;
+        }
+      } catch (dbError) {
+        console.log('No saved boxes found, will use standard assignment');
+      }
+      
+      // Если нет сохраненных коробок, используем группы из системы линков
       if (boxGroups && boxGroups.size > 0) {
         const boxesFromGroups: PackingBox[] = [];
         let boxNumber = 1;
@@ -47,8 +90,7 @@ export const BoxLabelPrint: React.FC<BoxLabelPrintProps> = ({
             .map(item => ({
               itemId: item!.item_id,
               name: item!.item_name,
-              nameHebrew: item!.item_name,  // Using item_name as fallback
-              nameRussian: item!.item_name,  // Using item_name as fallback
+              nameHebrew: item!.item_name,
               quantity: item!.packedQuantity || item!.quantity,
               catalogNumber: item!.item_part_num || undefined,
               barcode: item!.barcode || undefined
@@ -60,7 +102,7 @@ export const BoxLabelPrint: React.FC<BoxLabelPrintProps> = ({
               boxNumber,
               orderId,
               items: boxItems,
-              isFull: boxItems.length >= 10,
+              isFull: false,
               isPrinted: false
             });
             boxNumber++;
@@ -70,10 +112,10 @@ export const BoxLabelPrint: React.FC<BoxLabelPrintProps> = ({
         setBoxes(boxesFromGroups);
         message.success(`Товары распределены по ${boxesFromGroups.length} коробкам согласно группировке`);
       } else {
-        // Стандартное автоматическое распределение
+        // Стандартное автоматическое распределение (без hardcoded maxPerBox)
         const response = await apiService.post('/api/print/assign-boxes', {
-          items: items.filter(item => item.isPacked && item.isAvailable),
-          maxPerBox: 10
+          items: items.filter(item => item.isPacked && item.isAvailable)
+          // Removed maxPerBox: 10 - backend will use database values
         });
 
         if (response.data.success) {
@@ -114,22 +156,22 @@ export const BoxLabelPrint: React.FC<BoxLabelPrintProps> = ({
     setPrintResults([]);
 
     try {
-      // Используем EZPL endpoint для прямой печати
-      const response = await apiService.post('/api/print/box-labels-ezpl', {
+      // Используем GoLabel endpoint для печати
+      const response = await apiService.post('/api/print/box-label/golabel/print', {
         orderId,
         boxes: boxes.map(box => ({
           ...box,
           items: box.items.map(item => ({
             name: item.name,
             nameHebrew: item.nameHebrew || item.name,
-            nameRussian: item.nameRussian,
+            // Removed nameRussian as per requirement
             quantity: item.quantity,
             barcode: item.barcode,
             catalogNumber: item.catalogNumber || item.barcode
           }))
         })),
         customerName,
-        customerCity,
+        // Removed customerCity as per requirement
         format: labelFormat,
         region: selectedRegion
       });
@@ -137,6 +179,59 @@ export const BoxLabelPrint: React.FC<BoxLabelPrintProps> = ({
       if (response.data.success) {
         setPrintResults(response.data.results);
         message.success(response.data.message);
+        
+        // Автоматически открываем файлы в GoLabel
+        if (response.data.results && response.data.results.length > 0) {
+          const successfulFiles = response.data.results.filter((r: any) => r.filepath);
+          
+          if (successfulFiles.length > 0) {
+            message.info('Открываю файлы в GoLabel...');
+            
+            try {
+              // Вызываем backend endpoint для открытия файлов в GoLabel
+              const openResponse = await apiService.post('/api/print/open-in-golabel', {
+                orderId,
+                files: successfulFiles.map((r: any) => ({
+                  filepath: r.filepath,
+                  filename: r.filename,
+                  boxNumber: r.boxNumber
+                }))
+              });
+              
+              if (openResponse.data.success) {
+                message.success(`✅ Все ${successfulFiles.length} этикетки открыты в GoLabel!`);
+              } else if (openResponse.data.requiresManualOpen && openResponse.data.files) {
+                // Backend работает в WSL, используем Electron для открытия файлов
+                console.log('Backend in WSL, trying Electron IPC...');
+                
+                try {
+                  // Проверяем, есть ли Electron API
+                  if (window.electronAPI && window.electronAPI.golabel) {
+                    const windowsPaths = openResponse.data.files.map((f: any) => f.windowsPath);
+                    const electronResult = await window.electronAPI.golabel.openFiles(windowsPaths);
+                    
+                    if (electronResult.success) {
+                      message.success(`✅ ${electronResult.message}`);
+                    } else {
+                      message.warning('Файлы сохранены. Откройте их вручную в GoLabel.');
+                      console.log('Windows paths:', windowsPaths);
+                    }
+                  } else {
+                    message.warning('Файлы сохранены, но не удалось открыть в GoLabel автоматически');
+                  }
+                } catch (electronError) {
+                  console.error('Electron GoLabel error:', electronError);
+                  message.warning('Файлы сохранены. Откройте их вручную в GoLabel.');
+                }
+              } else {
+                message.warning('Файлы сохранены, но не удалось открыть в GoLabel автоматически');
+              }
+            } catch (error) {
+              console.log('Could not auto-open in GoLabel:', error);
+              // Не показываем ошибку, так как файлы все равно созданы
+            }
+          }
+        }
         
         if (onPrintComplete) {
           onPrintComplete(true);
@@ -219,7 +314,7 @@ export const BoxLabelPrint: React.FC<BoxLabelPrintProps> = ({
           items: box.items.map(item => ({
             name: item.name,
             nameHebrew: item.nameHebrew || item.name,
-            nameRussian: item.nameRussian,
+            // Removed nameRussian as per requirement
             quantity: item.quantity,
             barcode: item.barcode,
             catalogNumber: item.catalogNumber || item.barcode

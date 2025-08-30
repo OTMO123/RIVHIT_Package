@@ -9,9 +9,9 @@ import {
 } from './types/golabel.types';
 import { GoLabelCliService } from './cli/golabel-cli.service';
 import { EzpxGeneratorService } from './generators/ezpx-generator.service';
-import { ILogger } from '../interfaces/ILogger';
+import { IApplicationLogger } from '../../interfaces/ILogger';
 import { ConsoleLoggerService } from '../logging/console.logger.service';
-import { IPrinterService } from '../interfaces/IPrinterService';
+import { IPrinterService } from '../../interfaces/IPrinterService';
 import { PackingItem } from '@packing/shared';
 import { BoxLabelEZPLData } from '../box-label-ezpl.service';
 
@@ -19,8 +19,8 @@ import { BoxLabelEZPLData } from '../box-label-ezpl.service';
  * Unified Godex Printer Service
  * Automatically selects the best available printing method
  */
-export class GodexPrinterService implements IGodexPrinter, IPrinterService {
-  private logger: ILogger;
+export class GodexPrinterService implements IPrinterService {
+  private logger: IApplicationLogger;
   private methods: PrintMethodConfig[] = [];
   private currentMethod?: PrintMethodConfig;
   private goLabelCli: GoLabelCliService;
@@ -30,7 +30,7 @@ export class GodexPrinterService implements IGodexPrinter, IPrinterService {
   // Keep compatibility with IPrinterService
   private _isConnected: boolean = false;
   
-  constructor(logger?: ILogger) {
+  constructor(logger?: IApplicationLogger) {
     this.logger = logger || new ConsoleLoggerService('GodexPrinterService');
     
     // Initialize services
@@ -111,7 +111,7 @@ export class GodexPrinterService implements IGodexPrinter, IPrinterService {
       
       return true;
     } catch (error) {
-      this.logger.error('Failed to initialize Godex Printer Service:', error);
+      this.logger.error('Failed to initialize Godex Printer Service:', error as Error);
       return false;
     }
   }
@@ -147,7 +147,7 @@ export class GodexPrinterService implements IGodexPrinter, IPrinterService {
           this.logger.warn(`Print failed with ${method.name}: ${result.error}`);
         }
       } catch (error) {
-        this.logger.error(`${method.name} error:`, error);
+        this.logger.error(`${method.name} error:`, error as Error);
       }
     }
     
@@ -209,7 +209,7 @@ export class GodexPrinterService implements IGodexPrinter, IPrinterService {
         });
       });
     } catch (error) {
-      this.logger.error('Direct USB error:', error);
+      this.logger.error('Direct USB error:', error as Error);
       return {
         success: false,
         error: error instanceof Error ? error.message : String(error),
@@ -268,25 +268,48 @@ export class GodexPrinterService implements IGodexPrinter, IPrinterService {
     return commands.join('\r\n');
   }
   
-  async getStatus(): Promise<PrinterStatus> {
+  async getStatus(): Promise<{
+    connected: boolean;
+    model: string;
+    paperLevel: number;
+    ribbonLevel: number;
+    temperature: number;
+    isReady: boolean;
+    lastError?: string;
+  }> {
     if (!this.isInitialized) {
       return {
         connected: false,
-        ready: false,
-        status: 'Not initialized',
-        method: 'None'
+        model: 'GoDEX',
+        paperLevel: 0,
+        ribbonLevel: 0,
+        temperature: 0,
+        isReady: false,
+        lastError: 'Not initialized'
       };
     }
     
     if (this.currentMethod?.name === PrintMethod.GOLABEL_CLI) {
-      return await this.goLabelCli.getStatus();
+      const status = await this.goLabelCli.getStatus();
+      return {
+        connected: status.connected,
+        model: 'GoDEX',
+        paperLevel: 100,
+        ribbonLevel: 100,
+        temperature: 25,
+        isReady: status.ready,
+        lastError: status.error
+      };
     }
     
     return {
       connected: this._isConnected,
-      ready: this._isConnected,
-      status: this._isConnected ? 'Ready' : 'Disconnected',
-      method: this.currentMethod?.name || 'None'
+      model: 'GoDEX',
+      paperLevel: 100,
+      ribbonLevel: 100,
+      temperature: 25,
+      isReady: this._isConnected,
+      lastError: this._isConnected ? undefined : 'Disconnected'
     };
   }
   
@@ -383,8 +406,8 @@ export class GodexPrinterService implements IGodexPrinter, IPrinterService {
     const status = await this.getStatus();
     return {
       connected: status.connected,
-      method: status.method,
-      ready: status.ready
+      method: this.getCurrentMethod(),
+      ready: status.isReady
     };
   }
   

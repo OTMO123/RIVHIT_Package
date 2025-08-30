@@ -49,6 +49,18 @@ export class BoxLabelGoLabelGeneratorService implements ILabelGenerator {
     throw new Error('Use generateBoxLabel method instead');
   }
   
+  validate(labelData: LabelData): boolean {
+    return true; // Box label validation is done in generateBoxLabel
+  }
+  
+  getSupportedFeatures(): string[] {
+    return ['box-labels', 'hebrew-text', 'multi-items', 'barcodes'];
+  }
+  
+  getFormat(): string {
+    return 'EZPX';
+  }
+  
   generateBoxLabel(boxData: BoxLabelData): string {
     this.logger.debug('Generating box label in PrintJob format', {
       orderId: boxData.orderId,
@@ -124,7 +136,7 @@ export class BoxLabelGoLabelGeneratorService implements ILabelGenerator {
       return xml;
       
     } catch (error) {
-      this.logger.error('Failed to generate box label EZPX:', error);
+      this.logger.error('Failed to generate box label EZPX:', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -774,22 +786,5 @@ export class BoxLabelGoLabelGeneratorService implements ILabelGenerator {
       'north2': 'צפון 2\nСевер 2'
     };
     return regionMap[region] || 'אזור\nРегион';
-  }
-  
-  validate(labelData: LabelData): boolean {
-    return true; // Box label has its own validation
-  }
-  
-  getSupportedFeatures(): string[] {
-    return [
-      'text',
-      'barcode', 
-      'rectangle',
-      'line',
-      'box-labels',
-      'hebrew',
-      'russian',
-      'multi-item'
-    ];
   }
 }

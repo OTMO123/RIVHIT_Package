@@ -372,7 +372,7 @@ router.post('/test-usb', async (req, res) => {
           error: 'CUPS printing failed',
           data: {
             platform: 'macOS',
-            cupsError: cupsError.message,
+            cupsError: (cupsError as Error).message,
             printerName,
             suggestions: [
               'Ensure printer is added in System Preferences > Printers & Scanners',
@@ -401,7 +401,7 @@ router.post('/test-usb', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'USB test print failed',
-      details: error.message,
+      details: (error as Error).message,
       platform: process.platform,
       timestamp: new Date().toISOString()
     });
@@ -424,6 +424,15 @@ router.post('/box-label/golabel', async (req, res) => {
  */
 router.post('/box-label/golabel/print', async (req, res) => {
   await getPrintController(req).printBoxLabelGoLabel(req, res);
+});
+
+/**
+ * @route POST /api/print/open-in-golabel
+ * @desc Open generated EZPX files in GoLabel application
+ * @body { orderId: string, files: Array<{ filepath: string, filename: string, boxNumber: number }> }
+ */
+router.post('/open-in-golabel', async (req, res) => {
+  await getPrintController(req).openFilesInGoLabel(req, res);
 });
 
 export default router;

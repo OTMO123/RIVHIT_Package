@@ -386,7 +386,7 @@ router.get('/usb-check', async (req: Request, res: Response) => {
       } catch (parseError) {
         parsedResult = {
           rawOutput: stdout,
-          parseError: parseError.message
+          parseError: (parseError as Error).message
         };
       }
       
@@ -439,7 +439,7 @@ router.get('/usb-check', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: 'USB printer detection failed',
-      details: error.message,
+      details: (error as Error).message,
       platform: process.platform
     });
   }

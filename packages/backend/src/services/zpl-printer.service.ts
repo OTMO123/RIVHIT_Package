@@ -19,10 +19,10 @@ export interface PrintJobResult {
 }
 
 export class ZPLPrinterService implements IPrinterService {
-  private printerIP: string;
-  private printerPort: number;
-  private printerName: string;
-  private connectionType: string;
+  private printerIP: string = '';
+  private printerPort: number = 9100;
+  private printerName: string = '';
+  private connectionType: string = 'ethernet';
   private _isConnected: boolean = false;
 
   async initialize(options?: any): Promise<boolean> {

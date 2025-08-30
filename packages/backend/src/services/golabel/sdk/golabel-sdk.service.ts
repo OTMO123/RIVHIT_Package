@@ -1,5 +1,13 @@
-import * as ffi from 'ffi-napi';
-import * as ref from 'ref-napi';
+// import * as ffi from 'ffi-napi';
+// import * as ref from 'ref-napi';
+let ffi: any;
+let ref: any;
+try {
+  ffi = require('ffi-napi');
+  ref = require('ref-napi');
+} catch (e) {
+  // Optional dependencies
+}
 import * as path from 'path';
 import { IGodexPrinter } from '../interfaces/IGodexPrinter';
 import { 
@@ -8,7 +16,7 @@ import {
   PrinterStatus,
   PrintMethod 
 } from '../types/golabel.types';
-import { ILogger } from '../../interfaces/ILogger';
+import { IApplicationLogger } from '../../../interfaces/ILogger';
 import { ConsoleLoggerService } from '../../logging/console.logger.service';
 
 /**
@@ -16,7 +24,7 @@ import { ConsoleLoggerService } from '../../logging/console.logger.service';
  * Uses EZio32.dll and QLabelSDK.DLL for native printer control
  */
 export class GoLabelSdkService implements IGodexPrinter {
-  private logger: ILogger;
+  private logger: IApplicationLogger;
   private ezio: any;
   private qlabel: any;
   private isInitialized: boolean = false;
@@ -41,7 +49,7 @@ export class GoLabelSdkService implements IGodexPrinter {
     GetDllVersion: ['string', []]
   };
   
-  constructor(logger?: ILogger) {
+  constructor(logger?: IApplicationLogger) {
     this.logger = logger || new ConsoleLoggerService('GoLabelSdkService');
   }
   
@@ -89,13 +97,13 @@ export class GoLabelSdkService implements IGodexPrinter {
         return true;
         
       } catch (error) {
-        this.logger.error('Failed to load SDK DLLs:', error);
-        this.logger.error('Make sure Godex SDK is installed at:', dllPath);
+        this.logger.error('Failed to load SDK DLLs:', error as Error);
+        this.logger.info(`Make sure Godex SDK is installed at: ${dllPath}`);
         return false;
       }
       
     } catch (error) {
-      this.logger.error('Failed to initialize GoLabel SDK:', error);
+      this.logger.error('Failed to initialize GoLabel SDK:', error as Error);
       return false;
     }
   }
@@ -120,7 +128,7 @@ export class GoLabelSdkService implements IGodexPrinter {
         return false;
       }
     } catch (error) {
-      this.logger.error('Error opening port:', error);
+      this.logger.error('Error opening port:', error as Error);
       return false;
     }
   }
@@ -159,7 +167,7 @@ export class GoLabelSdkService implements IGodexPrinter {
       };
       
     } catch (error) {
-      this.logger.error('SDK print error:', error);
+      this.logger.error('SDK print error:', error as Error);
       return {
         success: false,
         error: error instanceof Error ? error.message : String(error),
@@ -186,7 +194,7 @@ export class GoLabelSdkService implements IGodexPrinter {
       
       return true;
     } catch (error) {
-      this.logger.error('Error sending raw commands:', error);
+      this.logger.error('Error sending raw commands:', error as Error);
       return false;
     }
   }
@@ -231,7 +239,7 @@ export class GoLabelSdkService implements IGodexPrinter {
       
       return true;
     } catch (error) {
-      this.logger.error('Error printing label data:', error);
+      this.logger.error('Error printing label data:', error as Error);
       return false;
     }
   }
@@ -378,7 +386,7 @@ export class GoLabelSdkService implements IGodexPrinter {
         };
       }
     } catch (error) {
-      this.logger.error('Error getting status:', error);
+      this.logger.error('Error getting status:', error as Error);
       return {
         connected: false,
         ready: false,
@@ -413,7 +421,7 @@ export class GoLabelSdkService implements IGodexPrinter {
         this.printerHandle = -1;
       }
     } catch (error) {
-      this.logger.error('Error during dispose:', error);
+      this.logger.error('Error during dispose:', error as Error);
     }
   }
   

@@ -31,6 +31,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     print: (orderId: string, stickers: any[]) => ipcRenderer.invoke('printer:print', orderId, stickers),
     test: () => ipcRenderer.invoke('printer:test'),
   },
+
+  // GoLabel methods
+  golabel: {
+    openFiles: (files: string[]) => ipcRenderer.invoke('golabel:openFiles', files),
+  },
 });
 
 // Type definitions for the exposed API
@@ -55,6 +60,14 @@ declare global {
         getStatus: () => Promise<{ success: boolean; data: { connected: boolean; ready: boolean } }>;
         print: (orderId: string, stickers: any[]) => Promise<{ success: boolean; data: any }>;
         test: () => Promise<{ success: boolean; data: any }>;
+      };
+      golabel: {
+        openFiles: (files: string[]) => Promise<{ 
+          success: boolean; 
+          message?: string; 
+          error?: string; 
+          results?: Array<{ file: string; success: boolean; error?: string }> 
+        }>;
       };
     };
   }
